@@ -422,6 +422,6 @@ export const emailTemplateList = async (req, res) => {
         }
         return res.status(200).json(encodedata({ 'success': true, 'message': 'Fetched successfully.', result }))
     } catch (err) {
-        return res.status(500).json({ 'success': true, 'message': 'Something went wrong.' })
+        return res.status(500).json(encodedata({ 'success': true, 'message': 'Something went wrong.' }))
     }
 }

@@ -1015,16 +1015,16 @@ export const canceloffer = async (req, res) => {
 export const getpaymentmethod = async (req, res) => {
     try {
         var result = await PaymentTypes.find({ status: "Active" });
-        return res.json(encodedata({
+        return res.json({
             type: "success",
             data: result
-        }));
+        });
     }
     catch (e) {
-        return res.json(encodedata({
+        return res.json({
             type: "failed",
             message: "Error found"
-        }))
+        })
     }
 }
 

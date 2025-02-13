@@ -10,6 +10,7 @@ import { mailTemplateLang } from './emailTemplate.controller';
 
 // import lib
 import isEmpty from '../lib/isEmpty';
+import { encodedata } from '../lib/cryptoJS';
 
 /**
  * Add Newsletter
@@ -48,7 +49,7 @@ export const allSubscriber = async (req, res) => {
     try{
         const data = await NewsLetter.find({}, { 'email': 1 })
         if(data){
-            return res.status(200).json({ 'status': true, 'message': 'FETCH', 'result': data })
+            return res.status(200).json(encodedata({ 'status': true, 'message': 'FETCH', 'result': data }))
         }else{
             return res.status(500).json({ 'status': false, 'message': 'Error on server' })   
         }
@@ -90,7 +91,7 @@ export const sendNews = async (req, res) => {
                 })
             }
         }
-        return res.status(200).json({ 'status': true, 'message': "Sent newsletter mails successfully. Refreshing data..." });
+        return res.status(200).json(encodedata({ 'status': true, 'message': "Sent newsletter mails successfully. Refreshing data..." }))
     } catch (err) {
         return res.status(500).json({ 'status': false, 'message': 'Error on server' })
     }

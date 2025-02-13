@@ -341,16 +341,16 @@ export const editProfile = async (req, res) => {
     try {
         let reqBody = req.body;
         if (isEmpty(reqBody.name)) {
-            return res.status(400).json({ status: false, message: 'Name is Required' })
+            return res.status(400).json(encodedata({ status: false, message: 'Name is Required' }))
         }
         let update = await Admin.findOneAndUpdate({ _id: req.user.id }, { $set: { name: reqBody.name } }, { new: true })
         if (!isEmpty(update)) {
             return res.status(200).json(encodedata({ status: true, message: 'updated successfully' }))
         } else {
-            return res.status(400).json({ status: false, message: 'failed' })
+            return res.status(400).json(encodedata({ status: false, message: 'failed' }))
         }
     } catch (err) {
-        return res.status(500).json({ status: false, message: 'something wrong' })
+        return res.status(500).json(encodedata({ status: false, message: 'something wrong' }))
     }
 
 }

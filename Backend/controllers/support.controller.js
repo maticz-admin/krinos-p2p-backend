@@ -785,7 +785,7 @@ export const getTicketList = async (req, res) => {
 
 
     } catch (err) {
-        return res.status(500).json({ "success": false, 'errors': { 'messages': 'Error on server' } })
+        return res.status(500).json(encodedata({ "success": false, 'errors': { 'messages': 'Error on server' } }))
     }
 }
 

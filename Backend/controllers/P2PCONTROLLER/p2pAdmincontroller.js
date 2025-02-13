@@ -14,7 +14,7 @@ import { encodedata, encryptString } from "../../lib/cryptoJS";
 
 
 const filterSearchQuery = async (query = {}, fields = []) => {
-    let filterQuery = {}
+    let filterQuery = {};
     if (!isEmpty(query) && !isEmpty(query.search)) {
         let filterArray = []
         for (const key of fields) {
@@ -111,9 +111,15 @@ export const Editoffertag = async (req, res) => {
 export const Getalloffertag = async (req, res) => {
     try {
         let pagination = paginationQuery(req.query);
+        // console.log('req.queryreq.query----', pagination)
         let filter = await filterSearchQuery(req.query, ['Name', 'Description']);
+        // console.log('filter----', filter)
+
         const count =  await OfferTag.find(filter).count();
+        // console.log('count----', count)
+
         const result =  await OfferTag.find(filter).sort({createdAt : -1}).skip(pagination.skip).limit(pagination.limit);
+    //   console.log('result-----', result)
         if (result == "" || result == null) {
             return res.send({ 
                 "status" : "success",
@@ -123,6 +129,7 @@ export const Getalloffertag = async (req, res) => {
             })
         }
         else{
+
             return res.send({ 
                 "status" : "success",
                 "message": "Retrive successfully",

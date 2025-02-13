@@ -210,7 +210,7 @@ router.route('/ticketMessage')
 
 // News Letter
 router.route('/subscriber-all').get(passportAuth, newsLetterCtrl.allSubscriber)
-router.route('/subscriber/sendNews').post(passportAuth, NewsValid.newsValid, newsLetterCtrl.sendNews)
+router.route('/subscriber/sendNews').post(decodedata , passportAuth, NewsValid.newsValid, newsLetterCtrl.sendNews)
 
 
 // Common

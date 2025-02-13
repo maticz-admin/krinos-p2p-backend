@@ -43,7 +43,7 @@ const passportAuth = passport.authenticate("usersAuth", { session: false });
 // User
 router.route('/register').post(decodedata,userValid.registerValidate, userCtrl.createNewUser);//
 router.route('/login').post(decodedata,userValid.loginValidate, userCtrl.userLogin);//
-router.route('/resend-otp').post(userCtrl.resendOTP);
+router.route('/resend-otp').post(decodedata, userCtrl.resendOTP);
 router.route('/confirm-mail').post(userValid.confirmMailValidate, userCtrl.confirmMail);
 router.route('/check-deposit').get(apiKeyCtrl.authorization, userCtrl.checkDeposit)//
 router.route('/hide-btn').get(apiKeyCtrl.authorizationEncrypt, userCtrl.hideBtn)
@@ -75,7 +75,7 @@ router.route('/emailChange') //
     .post(apiKeyCtrl.authorization, userValid.editEmailValidate, userCtrl.editEmail)//
     .put(userValid.tokenValidate, userCtrl.sentVerifLink)//
     .patch(userValid.tokenValidate, userCtrl.verifyNewEmail);//
-router.route('/sentOTP').post(userValid.sentOtp, userCtrl.checkMobile, userCtrl.sentOtp)//
+router.route('/sentOTP').post(decodedata, userValid.sentOtp, userCtrl.checkMobile, userCtrl.sentOtp)//
 
 // kyc
 router.route('/kycdetail').get(apiKeyCtrl.authorizationEncrypt, userKycCtrl.getUserKycDetail);//

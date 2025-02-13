@@ -124,34 +124,46 @@ export const checkMobile = async (req, res, next) => {
 export const sentOtp = async (req, res) => {
     try {
         let reqBody = req.body;
+        console.log('ysdgfyugdsyfugsdyufgyusdgfyugdsyuf----------')
+
         if (reqBody.type == 'login') {
             let checkDoc = await User.findOne({ "phoneCode": reqBody.phoneCode, "phoneNo": reqBody.phoneNo });
             if (isEmpty(checkDoc) && reqBody.type == 'forgot') {
-                return res.status(400).json({ "success": false, errors: { phone: 'Phone number not exists' } });
+                console.log('ysdgfyugdsyfugsdyufgyusdgfyugdsyuf----------')
+                return res.status(400).json(encodedata({ "success": false, errors: { phone: 'Phone number not exists' } }));
             }
             if (!checkDoc.authenticate(reqBody.password)) {
-                return res.status(400).json({ 'success': false, 'errors': { 'password': "Password incorrect" } });
+                console.log('ysdgfyugdsyfugsdyufgyusdgfyugdsyuf----------')
+
+                return res.status(400).json(encodedata({ 'success': false, 'errors': { 'password': "Password incorrect" } }));
             }
         }
         let checkDoc = await User.findOne({ "phoneCode": reqBody.phoneCode, "phoneNo": reqBody.phoneNo });
         if (isEmpty(checkDoc) && reqBody.type == 'forgot') {
-            return res.status(400).json({ "success": false, errors: { phone: 'Phone number not exists' } });
+            console.log('ysdgfyugdsyfugsdyufgyusdgfyugdsyuf----------')
+            return res.status(400).json(encodedata({ "success": false, errors: { phone: 'Phone number not exists' } }));
         }
         let to = `+${reqBody.phoneCode}${reqBody.phoneNo}`;
         let { smsStatus,message } = await smsHelper.sentOtp(to);
        
         if(message === "Max send attempts reached"){
-            return res.status(400).json({ "success": false, errors: { phoneNo: "Max send attempts reached" } })
+            console.log('ysdgfyugdsyfugsdyufgyusdgfyugdsyuf----------')
+
+            return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Max send attempts reached" } }))
         }
         if(message === " Too many requests") {
-            return res.status(400).json({ "success": false, errors: { phoneNo: "Too many requests" } })
+            console.log('ysdgfyugdsyfugsdyufgyusdgfyugdsyuf----------')
+
+            return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Too many requests" } }))
         }
         if(!smsStatus) {
-            return res.status(400).json({ "success": false, errors: { phoneNo: "Invalid mobile number" } })
+            console.log('ysdgfyugdsyfugsdyufgyusdgfyugdsyuf----------')
+
+            return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Invalid mobile number" } }))
         }
-        return res.status(200).json({ "success": true, "message": "OTP sent successfully, It is only valid for 10 minutes" });
+        return res.status(200).json(encodedata({ "success": true, "message": "OTP sent successfully, It is only valid for 10 minutes" }));
     } catch (err) {
-        return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
+        return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
     }
 }
 
@@ -166,10 +178,10 @@ export const createNewUser = async (req, res) => {
     try {
         let reqBody = req.body;
         // return false;
-        let recaptcha = await recaptchaFun.checkToken(reqBody.reCaptcha);
-        if (recaptcha && recaptcha.status == false) {
-            return res.status(500).json({ "success": false, 'message': "Invalid reCaptcha" })
-        }
+        // let recaptcha = await recaptchaFun.checkToken(reqBody.reCaptcha);
+        // if (recaptcha && recaptcha.status == false) {
+        //     return res.status(500).json({ "success": false, 'message': "Invalid reCaptcha" })
+        // }
         let newData = {
             'password': reqBody.password,
         }
@@ -179,11 +191,11 @@ export const createNewUser = async (req, res) => {
             // console.log('reqBody-----', reqBody);
 
             let checkUser = await User.findOne(({ 'email': reqBody.email }))
-            console.log("check user" , checkUser);
-            
+
             if (checkUser) {
                 return res.status(400).json(encodedata({ 'success': false, 'errors': { 'email': "Email already exists" } }));
             }
+
             newData['email'] = reqBody.email;
 
         } else if (reqBody.formType == 'mobile') {
@@ -194,7 +206,7 @@ export const createNewUser = async (req, res) => {
             let to = `+${reqBody.phoneCode}${reqBody.phoneNo}`;
             let { smsStatus,message } = await smsHelper.verifyOtp(to, reqBody.otp);
             if(message === "Max send attempts reached"){
-                return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Max send attempts reached" } }))
+                return res.status(200).json(encodedata({ "success": false, errors: { phoneNo: "Max send attempts reached" } }))
             }
             else if(message === "Too many requests") {
                 return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Too many requests" } }))
@@ -627,7 +639,7 @@ export const resendOTP= async (req, res) => {
         }
         mailTemplate('SEND_OTP' , updateData.email, content);
            
-        return res.status(200).json({ 'success': true, result : "otpsent" , 'message' : "OTP send to your mail id"})
+        return res.status(200).json(encodedata({ 'success': true, result : "otpsent" , 'message' : "OTP send to your mail id"}))
     //     let { smsStatus } = await smsHelper.sentOtp(to);
     
     // if (!smsStatus) {
@@ -639,7 +651,7 @@ export const resendOTP= async (req, res) => {
     
   
     catch (err) {
-        return res.status(500).json({ "success": false, 'message': "Error on server" })
+        return res.status(500).json(encodedata({ "success": false, 'message': "Error on server" }))
     }
 }
 

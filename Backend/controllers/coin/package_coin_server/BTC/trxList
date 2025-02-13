@@ -1,0 +1,55 @@
+ ------result {
+   list: [
+     {
+       account: '',
+       address: '32KabSvXWsinPXUoiH2mEHhvSS8aEK1vwC',
+       category: 'receive',
+       amount: 0.00499,
+       label: '',
+       vout: 0,
+       confirmations: 26,
+       blockhash: '00000000000000000001b5337e6df416002dec8f3e6fc8f9ea696c46c1654265',
+       blockindex: 222,
+       blocktime: 1646622637,
+       txid: '2e333b3ecb6b33f87c32a191e946e68346e88a0e1ff0e779cf375c143065f31d',
+       walletconflicts: [],
+       time: 1646622521,
+       timereceived: 1646622521,
+       'bip125-replaceable': 'no'
+     },
+     {
+       account: 'test12@gmail.com',
+       address: '3MuVneEsp1wcXrWXPMznKb4xqM38vXzNbB',
+       category: 'receive',
+       amount: 0.0001,
+       label: 'test12@gmail.com',
+       vout: 0,
+       confirmations: 0,
+       trusted: true,
+       txid: '6c04663c994b727a091ba8dbe2fbe604a8f9df46c8d545abd1e1f6eaeaaa68a1',
+       walletconflicts: [],
+       time: 1646639635,
+       timereceived: 1646639635,
+       'bip125-replaceable': 'no'
+     },
+     {
+       account: '',
+       address: '3MuVneEsp1wcXrWXPMznKb4xqM38vXzNbB',
+       category: 'send',
+       amount: -0.0001,
+       label: 'test12@gmail.com',
+       vout: 0,
+       fee: -0.00000333,
+       confirmations: 0,
+       trusted: true,
+       txid: '6c04663c994b727a091ba8dbe2fbe604a8f9df46c8d545abd1e1f6eaeaaa68a1',
+       walletconflicts: [],
+       time: 1646639635,
+       timereceived: 1646639635,
+       'bip125-replaceable': 'no',
+       abandoned: false
+     }
+   ]
+ }
+
+ 0.00489

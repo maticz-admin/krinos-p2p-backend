@@ -1752,7 +1752,7 @@ export const getUserList = async (req, res) => {
         // console.log('result-----', result)
         return res.status(200).json(encodedata({ 'success': true, "messages": "success", result }))
     } catch (err) {
-        return res.status(500).json({ "success": false, 'message': "error on server" })
+        return res.status(500).json(encodedata({ "success": false, 'message': "error on server" }))
     }
 }
 

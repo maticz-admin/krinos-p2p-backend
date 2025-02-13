@@ -100,10 +100,10 @@ export const addSupportCategory = async (req, res) => {
         let reqBody = req.body;
         let checkCategory = await SupportCategory.findOne({ "categoryName": reqBody.categoryName })
         if (!isEmpty(checkCategory)) {
-            return res.status(400).json({ status: false, message: 'Name already exist' })
+            return res.status(400).json(encodedata({ status: false, message: 'Name already exist' }))
         }
         if (isEmpty(reqBody.categoryName)) {
-            return res.status(400).json({ "success": false, 'errors': { 'categoryName': "Required" } })
+            return res.status(400).json(encodedata({ "success": false, 'errors': { 'categoryName': "Required" } }))
         }
         let newDoc = new SupportCategory({
             'categoryName': reqBody.categoryName
@@ -111,7 +111,7 @@ export const addSupportCategory = async (req, res) => {
         await newDoc.save()
         return res.status(200).json(encodedata({ "success": false, 'result': { 'messages': "Added successfully" } }))
     } catch (err) {
-        return res.status(500).json({ "success": false, 'errors': { 'messages': "Error on server" } })
+        return res.status(500).json(encodedata({ "success": false, 'errors': { 'messages': "Error on server" } }))
     }
 }
 
@@ -129,7 +129,7 @@ export const editSupportCategory = async (req, res) => {
             "_id": { "$ne": reqBody.categoryId }
         })
         if (checkCategory) {
-            return res.status(400).json({ "success": false, 'errors': { 'categoryName': "category name already exists" } })
+            return res.status(400).json(encodedata({ "success": false, 'errors': { 'categoryName': "category name already exists" } }))
         }
         await SupportCategory.updateOne(
             { "_id": reqBody.categoryId },
@@ -142,7 +142,7 @@ export const editSupportCategory = async (req, res) => {
         )
         return res.status(200).json(encodedata({ "success": false, 'result': { 'messages': "updated successfully" } }))
     } catch (err) {
-        return res.status(500).json({ "success": false, 'errors': { 'messages': "Error on server" } })
+        return res.status(500).json(encodedata({ "success": false, 'errors': { 'messages': "Error on server" } }))
     }
 }
 
@@ -158,10 +158,10 @@ export const getSupportCategory = async (req, res) => {
     if(categoryData){
         return res.status(200).json(encodedata({ "success": true, 'result': { 'data': categoryData } }))
     }else{
-        return res.status(500).json({ "success": false, 'errors': { 'messages': "Error on server" } })
+        return res.status(500).json(encodedata({ "success": false, 'errors': { 'messages': "Error on server" } }))
     }
 }catch(e){
-    return res.status(500).json({ "success": false, 'errors': { 'messages': "Error on server" } })
+    return res.status(500).json(encodedata({ "success": false, 'errors': { 'messages': "Error on server" } }))
 }
     // SupportCategory.find(filter, { 'categoryName': 1, 'status': 1 }, (err, categoryData) => {
     //     if (err) {
@@ -545,7 +545,7 @@ export const replyMessage = async (req, res) => {
 
     } catch (err) {
         console.error("Error replying to ticket:", err);
-        return res.status(500).json({ success: false, message: "Something went wrong" });
+        return res.status(500).json(encodedata({ success: false, message: "Something went wrong" }))
     }
 };
 

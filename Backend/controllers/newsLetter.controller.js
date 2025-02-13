@@ -51,10 +51,10 @@ export const allSubscriber = async (req, res) => {
         if(data){
             return res.status(200).json(encodedata({ 'status': true, 'message': 'FETCH', 'result': data }))
         }else{
-            return res.status(500).json({ 'status': false, 'message': 'Error on server' })   
+            return res.status(500).json(encodedata({ 'status': false, 'message': 'Error on server' })   )
         }
     }catch(e){
-        return res.status(500).json({ 'status': false, 'message': 'Error on server' }) 
+        return res.status(500).json(encodedata({ 'status': false, 'message': 'Error on server' }) )
     }
     // NewsLetter.find({}, { 'email': 1 }).exec((err, data) => {
     //     if (err) {
@@ -93,6 +93,6 @@ export const sendNews = async (req, res) => {
         }
         return res.status(200).json(encodedata({ 'status': true, 'message': "Sent newsletter mails successfully. Refreshing data..." }))
     } catch (err) {
-        return res.status(500).json({ 'status': false, 'message': 'Error on server' })
+        return res.status(500).json(encodedata({ 'status': false, 'message': 'Error on server' }))
     }
 }

@@ -1375,7 +1375,7 @@ export const getWithdrawList = async (req, res) => {
             return res.status(200).json(encodedata({ "success": true, result }))
         }
     } catch (err) {
-        return res.status(500).json({ "success": false, 'message': 'Error on server' })
+        return res.status(500).json(encodedata({ "success": false, 'message': 'Error on server' }))
     }
 }
 

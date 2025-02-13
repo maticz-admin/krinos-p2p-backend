@@ -121,27 +121,27 @@ export const Getalloffertag = async (req, res) => {
         const result =  await OfferTag.find(filter).sort({createdAt : -1}).skip(pagination.skip).limit(pagination.limit);
     //   console.log('result-----', result)
         if (result == "" || result == null) {
-            return res.send({ 
+            return res.send(encodedata({ 
                 "status" : "success",
                 "message": "Retrive successfully",
                 "data" : [],
                 "count" : 0
-            })
+            }))
         }
         else{
 
-            return res.send({ 
+            return res.send(encodedata({ 
                 "status" : "success",
                 "message": "Retrive successfully",
                 "data" : result,
                 "count": count
-            })
+            }))
         }
     } catch (e) {
-        return res.send({ 
+        return res.send(encodedata({ 
             "status" : "failed",
             "message": "Something Went Worng"
-        })
+        }))
     }
 }
 
@@ -238,10 +238,10 @@ export const getofferhistory = async(req , res) => {
        
     
     catch(e){
-        return res.json({
+        return res.json(encodedata({
             type : "failed",
             message : "Error found"
-        })
+        }))
     }
 }
 
@@ -345,10 +345,10 @@ export const gettradehistory = async(req , res) => {
         }
     }
     catch(e){
-        return res.json({
+        return res.json(encodedata({
             type : "failed",
             message : "Error found"
-        })
+        }))
     }
 }
 
@@ -585,12 +585,11 @@ export const updatewallet = async(req , res) => {
         }))
     }
     catch(e){
-        console.log('e------', e)
-        return res.json({
+        return res.json(encodedata({
             type : "failed" , 
             data : result,
             message: "Server error"
-        })
+        }))
     }
 }
 

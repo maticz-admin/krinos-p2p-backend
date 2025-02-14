@@ -71,7 +71,6 @@ let attachmentUpload = multer({
 
 export const uploadAttachment = (req, res, next) => {
     try {
-        console.log('reqreqreq-------', req.files);
         attachmentUpload(req, res, function (err) {
             if (!isEmpty(req.validationError)) {
                 return res.status(400).json({ "success": false, 'errors': { [req.validationError.fieldname]: req.validationError.messages } })

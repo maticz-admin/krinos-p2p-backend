@@ -24,7 +24,7 @@ import { createPassBook } from './passbook.controller';
 
 // import lib
 import isEmpty from '../lib/isEmpty';
-import { decryptObject } from '../lib/cryptoJS';
+import { decryptObject, encodedata } from '../lib/cryptoJS';
 import { paginationQuery } from '../lib/adminHelpers';
 import { toFixed } from '../lib/roundOf'
 import { withoutServiceFee } from '../lib/calculation'
@@ -22623,7 +22623,6 @@ export const allPairs = async (req, res) => {
 */
 export const getPairList = async (req, res) => {
     try {
-        console.log("pair",req.body)
         let spotPairData = await SpotPair.aggregate([
             { "$match": { "status": "active" } },
             {
@@ -22684,10 +22683,9 @@ export const getPairList = async (req, res) => {
                 }
             },
         ])
-        console.log("tradepair",spotPairData)
-        return res.status(200).json({ 'success': true, 'messages': "success", 'result': spotPairData })
+        return res.status(200).json(encodedata({ 'success': true, 'messages': "success", 'result': spotPairData }))
     } catch (err) {
-        return res.status(500).json({ 'status': false, 'message': "Error occured" });
+        return res.status(500).json(encodedata({ 'status': false, 'message': "Error occured" }))
     }
 }
 

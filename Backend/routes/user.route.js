@@ -35,7 +35,7 @@ import * as supportValid from "../validation/support.validation"
 import * as p2pValid from '../validation/p2p.validation';
 import * as contactUsValid from '../validation/contactus.validation'
 
-import { decodedata } from '../lib/cryptoJS'
+import { decodedata, reqQueryDecodedata } from '../lib/cryptoJS'
 
 const router = express();
 const passportAuth = passport.authenticate("usersAuth", { session: false });
@@ -50,7 +50,7 @@ router.route('/hide-btn').get(apiKeyCtrl.authorizationEncrypt, userCtrl.hideBtn)
 router.route('/userProfile')
     .get(apiKeyCtrl.authorizationEncrypt, userCtrl.getUserProfile)//
     .put(apiKeyCtrl.authorization, userCtrl.uploadProfile, userValid.editProfileValidate, userCtrl.editUserProfile);//
-router.route('/changePassword').post(apiKeyCtrl.authorization, userValid.changePwdValidate, userCtrl.changePassword);//
+router.route('/changePassword').post(decodedata, apiKeyCtrl.authorization, userValid.changePwdValidate, userCtrl.changePassword);//
 router.route('/upgradeUser').post(apiKeyCtrl.authorization, userCtrl.upgradeUser)
 router.route('/security/2fa')
     .get(apiKeyCtrl.authorization, userCtrl.get2faCode)
@@ -65,9 +65,9 @@ router.route('/userSetting')
     .get(decodedata, apiKeyCtrl.authorization, userCtrl.getUserSetting)//
     .put(decodedata, apiKeyCtrl.authorization, userValid.editSettingValid, userCtrl.editUserSetting);
 router.route('/editNotif').put(apiKeyCtrl.authorization, userValid.editNotifValid, userCtrl.editNotif)
-router.route('/forgotPassword').post(userValid.checkForgotPwdValidate, userCtrl.checkForgotPassword);
+router.route('/forgotPassword').post(decodedata, userValid.checkForgotPwdValidate, userCtrl.checkForgotPassword);
 
-router.route('/resetPassword').post(userValid.resetPwdValidate, userCtrl.resetPassword);
+router.route('/resetPassword').post(decodedata, userValid.resetPwdValidate, userCtrl.resetPassword);
 router.route('/phoneChange') //
     .post(apiKeyCtrl.authorization, userValid.newPhoneValidate, userCtrl.changeNewPhone)
     .put(apiKeyCtrl.authorization, userValid.editPhoneValidate, userCtrl.verifyNewPhone);
@@ -76,6 +76,7 @@ router.route('/emailChange') //
     .put(userValid.tokenValidate, userCtrl.sentVerifLink)//
     .patch(userValid.tokenValidate, userCtrl.verifyNewEmail);//
 router.route('/sentOTP').post(decodedata, userValid.sentOtp, userCtrl.checkMobile, userCtrl.sentOtp)//
+router.route('/spot/tradepair').get(spotTradeCtrl.getPairList)//
 
 // kyc
 router.route('/kycdetail').get(apiKeyCtrl.authorizationEncrypt, userKycCtrl.getUserKycDetail);//
@@ -107,14 +108,14 @@ router.route('/fiatWithdraw')
     .post(apiKeyCtrl.authorization, walletValid.tokenValid, walletCtrl.decryptWallet, walletValid.fiatWithdrawValidate, walletCtrl.checkUserKyc, walletCtrl.withdrawFiatRequest)
     .patch(walletValid.tokenValid, walletCtrl.fiatRequestVerify);
 router.route('/coinWithdraw')
-    .post(apiKeyCtrl.authorization, walletValid.tokenValid, walletCtrl.decryptWallet, walletValid.coinWithdrawValid, walletCtrl.withdrawCoinRequest)
-    .patch(walletValid.tokenValid, walletCtrl.coinRequestVerify);
+    .post(decodedata, apiKeyCtrl.authorization, walletValid.tokenValid, walletCtrl.decryptWallet, walletValid.coinWithdrawValid, walletCtrl.withdrawCoinRequest)
+    .patch( walletValid.tokenValid, walletCtrl.coinRequestVerify);
 router.route('/fiatDeposit').post(apiKeyCtrl.authorization, walletCtrl.uploadWalletDoc, walletValid.depositReqtValid, walletCtrl.checkUserKyc, walletCtrl.depositRequest);
 router.route('/walletTransfer').post(apiKeyCtrl.authorization, walletValid.walletTransferValid, walletCtrl.walletTransfer);
 router.route('/fundTransfer').post(apiKeyCtrl.authorization, walletValid.fundTransferValid, walletCtrl.fundTransfer);
 router.route('/withdrawfee').post(apiKeyCtrl.authorization, walletCtrl.withdrawfee)
 
-router.route('/history/transaction/:paymentType').get(apiKeyCtrl.authorization, walletCtrl.getTrnxHistory);
+router.route('/history/transaction/:paymentType').get(reqQueryDecodedata, apiKeyCtrl.authorization, walletCtrl.getTrnxHistory);
 
 // Dashboard
 router.route('/recentTransaction').get(apiKeyCtrl.authorization, dashboardCtrl.getRecentTransaction);//
@@ -157,7 +158,7 @@ router.route('/getFaqTrend').get(commonCtrl.getFaqTrend)
 router.route('/getPairData').get(apiKeyCtrl.authorization, commonCtrl.getPairData)
 router.route('/priceConversion').get(apiKeyCtrl.authorization, commonCtrl.getPriceCNV)//
 router.route('/historyFilter').get(apiKeyCtrl.authorization, commonCtrl.historyFilter)
-router.route('/contact').post(contactUsValid.newContactValid, contactCtrl.newContact)
+router.route('/contact').post(decodedata, contactUsValid.newContactValid, contactCtrl.newContact)
 
 // Announcement
 router.route('/announcement').get(anouncementCtrl.getAnnouncement)

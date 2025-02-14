@@ -659,7 +659,8 @@ export const withdrawCoinRequest = async (req, res) => {
     try {
         let api_key = req.header("x-api-key");
         if(api_key!==null && api_key!== undefined && req.user.withdraw !==true){
-             return res.status(400).json({ 'status': false, 'message': "You don't have permission to WithdrawCoinRequest" });      
+            console.log('------------------1');
+             return res.status(400).json(encodedata({ 'status': false, 'message': "You don't have permission to WithdrawCoinRequest" }));      
         }
         else{
         let reqBody = req.body;
@@ -667,12 +668,16 @@ export const withdrawCoinRequest = async (req, res) => {
         let userData = await User.findOne({ "_id": req.user.id });
 
         if (userData.google2Fa.secret == '') {
-            return res.status(500).json({ "success": false, 'errors': { 'twoFACode': 'TWO_FA_MSG' } })
+            console.log('------------------2');
+
+            return res.status(500).json(encodedata({ "success": false, 'errors': { 'twoFACode': 'TWO_FA_MSG' } }))
         }
 
         let verifyTwoFaCode = node2fa.verifyToken(userData.google2Fa.secret, reqBody.twoFACode);
         if (!(verifyTwoFaCode && verifyTwoFaCode.delta == 0)) {
-            return res.status(400).json({ "success": false, 'errors': { 'twoFACode': "INVALID_CODE" } })
+            console.log('------------------3');
+
+            return res.status(400).json(encodedata({ "success": false, 'errors': { 'twoFACode': "INVALID_CODE" } }))
         }
 
         let usrWallet = await Wallet.findOne({
@@ -689,31 +694,43 @@ export const withdrawCoinRequest = async (req, res) => {
             "assets.p2pBal": 1,
         })
         if (!usrWallet) {
-            return res.status(400).json({ 'success': false, 'message': 'NO_DATA' })
+            console.log('------------------4');
+
+            return res.status(400).json(encodedata({ 'success': false, 'message': 'NO_DATA' }))
         }
 
         let usrAsset = usrWallet.assets.id(reqBody.currencyId);
         if (!usrAsset) {
-            return res.status(400).json({ 'success': false, 'message': 'NO_DATA' })
+            console.log('------------------5');
+
+            return res.status(400).json(encodedata({ 'success': false, 'message': 'NO_DATA' }))
         }
 
         if (reqBody.coin != 'XRP' && usrAsset.address == reqBody.receiverAddress) {
-            return res.status(400).json({ 'success': false, 'errors': { 'receiverAddress': 'RECEIVER_ADDRESS_SHOULD_DIFFER' } })
+            console.log('------------------6');
+
+            return res.status(400).json(encodedata({ 'success': false, 'errors': { 'receiverAddress': 'RECEIVER_ADDRESS_SHOULD_DIFFER' } }))
         }
 
         if (reqBody.coin == 'XRP' && usrAsset.destTag == reqBody.destTag) {
-            return res.status(400).json({ 'success': false, 'errors': { 'destTag': 'RECEIVER_TAG_SHOULD_DIFFER' } })
+            console.log('------------------7');
+
+            return res.status(400).json(encodedata({ 'success': false, 'errors': { 'destTag': 'RECEIVER_TAG_SHOULD_DIFFER' } }))
         }
 
         let curData = await Currency.findOne({ '_id': reqBody.currencyId })
         if (!curData) {
-            return res.status(400).json({ 'success': false, 'message': 'NO_DATA' })
+            console.log('------------------8');
+
+            return res.status(400).json(encodedata({ 'success': false, 'message': 'NO_DATA' }))
         }
 
         // let finalAmount = reqBody.amount + precentConvetPrice(reqBody.amount, curData.withdrawFee)
         let finalAmount = reqBody.finalAmount //+ parseFloat(curData.withdrawFee)
         if (usrAsset.p2pBal < finalAmount) {
-            return res.status(400).json({ 'success': false, 'errors': { 'finalAmount': 'INSUFFICIENT_BALANCE' } })
+            console.log('------------------9');
+
+            return res.status(400).json(encodedata({ 'success': false, 'errors': { 'finalAmount': 'INSUFFICIENT_BALANCE' } }))
         }
 
         var transactions = new Transaction();
@@ -780,11 +797,13 @@ export const withdrawCoinRequest = async (req, res) => {
         //     'paymentType': trxData.paymentType,
         //     'status': trxData.status,
         // })
-        return res.status(200).json({ "success": true, 'message': 'VERIFICATION_LINK', 'result': updateWallet.assets })
+        return res.status(200).json(encodedata({ "success": true, 'message': 'VERIFICATION_LINK', 'result': updateWallet.assets }))
     }
 }
     catch (err) {
-        return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
+        console.log('------------------', err);
+
+        return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
     }
 }
 
@@ -1118,7 +1137,7 @@ export const getTrnxHistory = async (req, res) => {
         let filter = filterSearchQuery(req.query, ['currencySymbol', 'status']);
 
         if (!['fiat', 'crypto','token'.includes(paymentType)]) {
-            return res.status(400).json({ 'success': false, 'message': 'Invalid type' })
+            return res.status(400).json(encodedata({ 'success': false, 'message': 'Invalid type' }))
         }
         if (paymentType == 'crypto') {
             if (req.query.type == 'all') {
@@ -1171,9 +1190,9 @@ export const getTrnxHistory = async (req, res) => {
             data,
             count: count
         }
-        return res.status(200).json({ "success": true, result })
+        return res.status(200).json(encodedata({ "success": true, result }))
     } catch (err) {
-        return res.status(500).json({ "success": false, 'message': 'Error on server' })
+        return res.status(500).json(encodedata({ "success": false, 'message': 'Error on server' }))
     }
 }
 

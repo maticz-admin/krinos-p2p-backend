@@ -32,12 +32,12 @@ export const newContact = async(req, res) => {
 
     const SaveContact = await newDoc.save();
     if (SaveContact) {
-        return res.status(200).json({ 'success': true, 'message': 'Your Message submitted successfully' })
+        return res.status(200).json(encodedata({ 'success': true, 'message': 'Your Message submitted successfully' }))
     }else{
-        return res.status(500).json({ 'success': false, 'message': "Error on server" })
+        return res.status(500).json(encodedata({ 'success': false, 'message': "Error on server" }))
     }
 }catch(err){
-    return res.status(500).json({ 'success': false, 'message': "Error on server" })
+    return res.status(500).json(encodedata({ 'success': false, 'message': "Error on server" }))
 }
 }
 

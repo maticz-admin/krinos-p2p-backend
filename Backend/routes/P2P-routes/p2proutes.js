@@ -34,7 +34,7 @@ router.route("/assetupdate").post(apiKeyCtrl.authorization, p2pcontroller.Admina
 
 router.route("/update-user-status").post(decodedata, p2pcontroller.updateuseronlinestatus);
 
-router.route("/get-cms").get(p2pcontroller.Getcms); //
+router.route("/get-cms").get(reqQueryDecodedata, p2pcontroller.Getcms); //
 router.route("/get-faq").get(p2pcontroller.Getfaq); //
 router.route("/get-sitesettings").get(p2pcontroller.getsitesettings); //
 router.route("/get-tradehistory").get(reqQueryDecodedata, p2pcontroller.gettradehistory); //

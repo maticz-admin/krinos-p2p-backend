@@ -114,19 +114,20 @@ export const updateCms = async (req, res) => {
 */
 export const getCMSPage = async(req, res) => {
   try{
+    
   const data = await Cms.findOne({ "identifier": req.params.identifier }, {
         "_id": 0,
         "title": 1,
         "content": 1
     })
         if (data) {
-          return res.status(200).json({ 'status': true, 'message': 'FETCH_SUCCESS', 'result': data });
+          return res.status(200).json(encodedata({ 'status': true, 'message': 'FETCH_SUCCESS', 'result': data }));
         }
         else{
-          return res.status(500).json({ 'status': false, 'message': 'Something went wrong' });
+          return res.status(500).json(encodedata({ 'status': false, 'message': 'Something went wrong' }));
         }
   }catch(err){
-    return res.status(500).json({ 'status': false, 'message': 'Something went wrong' });
+    return res.status(500).json(encodedata({ 'status': false, 'message': 'Something went wrong' }));
   }
 }
 

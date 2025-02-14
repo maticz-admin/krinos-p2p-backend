@@ -23,6 +23,8 @@ import { mailTemplateLang } from "../emailTemplate.controller";
 import OwnerWallet from "../../models/ownerwallet";
 import { decodedata, encodedata } from "../../lib/cryptoJS"
 
+import kyc from "../../models/userKyc";
+
 export const CreateP2Porder = async (req, res) => {
     try {
         console.log('req?.bodyreq?.body-----', req?.body);
@@ -1121,6 +1123,52 @@ export const Checkdeposit = async (req, res) => {
     }
     catch (e) {
         return res.json({ success: false, data: {} });
+    }
+}
+
+
+export const AddSessionIdkyc = async (req, res) => {
+    try {
+        let { sessionid } = req?.body;
+        console.log("req?.body", req?.body, req?.user?.userId);
+
+        let checkkycdoc = await kyc.findOne({ userId: stringToObjectId(req?.user?.userId) });
+        console.log("checkkycdoc", checkkycdoc);
+
+        if (checkkycdoc) {
+            let update = await kyc.findOneAndUpdate({ userId: stringToObjectId(req?.profileid) }, { $set: { sessionId: sessionid } })
+            return res.status(200).json(encodedata({
+                type: "Success", message: "session Updated Successfully!"
+            }))
+        }
+        let newdoc = new kyc({ userId: stringToObjectId(req?.profileid), sessionId: sessionid });
+        await newdoc.save();
+        let updateuserdoc = await user.findOneAndUpdate({ _id: stringToObjectId(req?.profileid) }, {
+            $set: {
+                kycId: newdoc?._id
+            }
+        })
+        return res.status(200).json(encodedata({
+            type: "Success", message: "session Updated Successfully!"
+        }))
+    }
+    catch (e) {
+        console.log("error on add session id kyc", e);
+        return res.status(500).json(encodedata({
+            type: "failed",
+            message: "Error found"
+        }))
+    }
+}
+
+export const UpdateKycStatus = async (userid, status) => {
+    try {
+        console.log("webhookkkk called", userid, status);
+
+        let result = await kyc.findOneAndUpdate({ sessionId: userid }, { $set: { status: status } });
+    }
+    catch (e) {
+        console.log("error on update kyc status", e);
     }
 }
 

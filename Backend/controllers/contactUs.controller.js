@@ -32,12 +32,12 @@ export const newContact = async(req, res) => {
 
     const SaveContact = await newDoc.save();
     if (SaveContact) {
-        return res.status(200).json({ 'success': true, 'message': 'Your Message submitted successfully' })
+        return res.status(200).json(encodedata({ 'success': true, 'message': 'Your Message submitted successfully' }))
     }else{
-        return res.status(500).json({ 'success': false, 'message': "Error on server" })
+        return res.status(500).json(encodedata({ 'success': false, 'message': "Error on server" }))
     }
 }catch(err){
-    return res.status(500).json({ 'success': false, 'message': "Error on server" })
+    return res.status(500).json(encodedata({ 'success': false, 'message': "Error on server" }))
 }
 }
 
@@ -54,7 +54,7 @@ export const getContact = async (req, res) => {
         }
         return res.status(200).json(encodedata({ result: result }))
     } catch (err) {
-        return res.status(500).json({ result: {data: []} })
+        return res.status(500).json(encodedata({ result: {data: []} }))
     }
 
 }
@@ -85,9 +85,9 @@ export const adminMsg = async (req, res) => {
             })
             return res.status(200).json(encodedata({ status: true, message: 'Reply Email send Successfully' }))
         } else {
-            return res.status(400).json({ status: false, message: 'Reply failed' })
+            return res.status(400).json(encodedata({ status: false, message: 'Reply failed' }))
         }
     } catch (err) {
-        return res.status(500).json({ status: false, message: 'Something wrong' })
+        return res.status(500).json(encodedata({ status: false, message: 'Something wrong' }))
     }
 }

@@ -80,7 +80,6 @@ let profileUpload = multer({
 ])
 
 export const uploadProfile = (req, res, next) => {
-    // console.log('req--------', req)
     profileUpload(req, res, function (err) {
         if (!isEmpty(req.validationError)) {
             return res.status(400).json({ "success": false, 'errors': { [req.validationError.fieldname]: req.validationError.messages } })
@@ -124,34 +123,46 @@ export const checkMobile = async (req, res, next) => {
 export const sentOtp = async (req, res) => {
     try {
         let reqBody = req.body;
+        console.log('ysdgfyugdsyfugsdyufgyusdgfyugdsyuf----------')
+
         if (reqBody.type == 'login') {
             let checkDoc = await User.findOne({ "phoneCode": reqBody.phoneCode, "phoneNo": reqBody.phoneNo });
             if (isEmpty(checkDoc) && reqBody.type == 'forgot') {
-                return res.status(400).json({ "success": false, errors: { phone: 'Phone number not exists' } });
+                console.log('ysdgfyugdsyfugsdyufgyusdgfyugdsyuf----------')
+                return res.status(400).json(encodedata({ "success": false, errors: { phone: 'Phone number not exists' } }));
             }
             if (!checkDoc.authenticate(reqBody.password)) {
-                return res.status(400).json({ 'success': false, 'errors': { 'password': "Password incorrect" } });
+                console.log('ysdgfyugdsyfugsdyufgyusdgfyugdsyuf----------')
+
+                return res.status(400).json(encodedata({ 'success': false, 'errors': { 'password': "Password incorrect" } }));
             }
         }
         let checkDoc = await User.findOne({ "phoneCode": reqBody.phoneCode, "phoneNo": reqBody.phoneNo });
         if (isEmpty(checkDoc) && reqBody.type == 'forgot') {
-            return res.status(400).json({ "success": false, errors: { phone: 'Phone number not exists' } });
+            console.log('ysdgfyugdsyfugsdyufgyusdgfyugdsyuf----------')
+            return res.status(400).json(encodedata({ "success": false, errors: { phone: 'Phone number not exists' } }));
         }
         let to = `+${reqBody.phoneCode}${reqBody.phoneNo}`;
         let { smsStatus,message } = await smsHelper.sentOtp(to);
        
         if(message === "Max send attempts reached"){
-            return res.status(400).json({ "success": false, errors: { phoneNo: "Max send attempts reached" } })
+            console.log('ysdgfyugdsyfugsdyufgyusdgfyugdsyuf----------')
+
+            return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Max send attempts reached" } }))
         }
         if(message === " Too many requests") {
-            return res.status(400).json({ "success": false, errors: { phoneNo: "Too many requests" } })
+            console.log('ysdgfyugdsyfugsdyufgyusdgfyugdsyuf----------')
+
+            return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Too many requests" } }))
         }
         if(!smsStatus) {
-            return res.status(400).json({ "success": false, errors: { phoneNo: "Invalid mobile number" } })
+            console.log('ysdgfyugdsyfugsdyufgyusdgfyugdsyuf----------')
+
+            return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Invalid mobile number" } }))
         }
-        return res.status(200).json({ "success": true, "message": "OTP sent successfully, It is only valid for 10 minutes" });
+        return res.status(200).json(encodedata({ "success": true, "message": "OTP sent successfully, It is only valid for 10 minutes" }));
     } catch (err) {
-        return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
+        return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
     }
 }
 
@@ -179,11 +190,11 @@ export const createNewUser = async (req, res) => {
             // console.log('reqBody-----', reqBody);
 
             let checkUser = await User.findOne(({ 'email': reqBody.email }))
-            console.log("check user" , checkUser);
-            
+
             if (checkUser) {
                 return res.status(400).json(encodedata({ 'success': false, 'errors': { 'email': "Email already exists" } }));
             }
+
             newData['email'] = reqBody.email;
 
         } else if (reqBody.formType == 'mobile') {
@@ -194,7 +205,7 @@ export const createNewUser = async (req, res) => {
             let to = `+${reqBody.phoneCode}${reqBody.phoneNo}`;
             let { smsStatus,message } = await smsHelper.verifyOtp(to, reqBody.otp);
             if(message === "Max send attempts reached"){
-                return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Max send attempts reached" } }))
+                return res.status(200).json(encodedata({ "success": false, errors: { phoneNo: "Max send attempts reached" } }))
             }
             else if(message === "Too many requests") {
                 return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Too many requests" } }))
@@ -628,7 +639,7 @@ export const resendOTP= async (req, res) => {
         }
         mailTemplate('SEND_OTP' , updateData.email, content);
            
-        return res.status(200).json({ 'success': true, result : "otpsent" , 'message' : "OTP send to your mail id"})
+        return res.status(200).json(encodedata({ 'success': true, result : "otpsent" , 'message' : "OTP send to your mail id"}))
     //     let { smsStatus } = await smsHelper.sentOtp(to);
     
     // if (!smsStatus) {
@@ -640,7 +651,7 @@ export const resendOTP= async (req, res) => {
     
   
     catch (err) {
-        return res.status(500).json({ "success": false, 'message': "Error on server" })
+        return res.status(500).json(encodedata({ "success": false, 'message': "Error on server" }))
     }
 }
 
@@ -973,16 +984,16 @@ export const changePassword = async (req, res) => {
         let chackStatus = await UserSetting.findOne({ userId: req.user.id })
         let userData = await User.findOne({ "_id": req.user.id });
         if (!userData) {
-            return res.status(500).json({ "success": false, 'message': "User not found" })
+            return res.status(500).json(encodedata({ "success": false, 'message': "User not found" }))
         }
         if (reqBody.oldPassword) {
             if (reqBody.oldPassword === reqBody.password) {
-                return res.status(400).json({ 'success': false, 'message': "Old and New password must be different" });
+                return res.status(400).json(encodedata({ 'success': false, 'message': "Old and New password must be different" }))
 
             }
         }
         if (!userData.authenticate(reqBody.oldPassword)) {
-            return res.status(400).json({ 'success': false, 'errors': { 'oldPassword': "PASSWORD_INCORRECT" } });
+            return res.status(400).json(encodedata({ 'success': false, 'errors': { 'oldPassword': "PASSWORD_INCORRECT" } }))
         }
         userData.password = reqBody.password;
         await userData.save();
@@ -1017,10 +1028,10 @@ export const changePassword = async (req, res) => {
             'description': 'Your password has been updated',
         }
         newNotification(doc)
-        return res.status(200).json({ 'success': true, 'message': "PASSWORD_CHANGE_SUCCESS" });
+        return res.status(200).json(encodedata({ 'success': true, 'message': "PASSWORD_CHANGE_SUCCESS" }));
     }
     catch (err) {
-        return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
+        return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
     }
 }
 
@@ -1410,13 +1421,20 @@ export const editNotif = async (req, res) => {
 */
 export const checkForgotPassword = async (req, res) => {
     try {
-        let reqBody = req.body
+        console.log('usdghhhhhhhhhhhhhsssssssssssss--------1111111')
+
+        let reqBody = req.body;
+
+        // if(reqBody.email === ""){
+        //     return res.status(400).json(encodedata({ "success": false, 'errors': { 'email': "Email is required" }  }));
+        // }
+
         if (reqBody.type == 'mobile') {
             let checkDoc = await User.findOne({ "phoneCode": reqBody.phoneCode, "phoneNo": reqBody.phoneNo });
             let to = `+${reqBody.phoneCode}${reqBody.phoneNo}`;
             let { smsStatus } = await smsHelper.verifyOtp(to, reqBody.otp);
             if (!smsStatus) {
-                return res.status(400).json({ "success": false, errors: { otp: 'invalid OTP' } });
+                return res.status(400).json(encodedata({ "success": false, errors: { otp: 'invalid OTP' } }));
             }
             let encryptToken = encryptString(checkDoc._id, true)
             if (!isEmpty(encryptToken)) {
@@ -1424,19 +1442,22 @@ export const checkForgotPassword = async (req, res) => {
                 await checkDoc.save();
             }
             if (smsStatus === true) {
-                return res.status(200).json({ "success": true, message: 'success', result: encryptToken })
+                return res.status(200).json(encodedata({ "success": true, message: 'success', result: encryptToken }))
             }
 
         }
         if (reqBody.type == 'email') {
+            console.log('usdghhhhhhhhhhhhhsssssssssssss--------')
             let userData = await User.findOne({ "email": reqBody.email });
             if (!userData) {
-                return res.status(400).json({ "success": false, 'errors': { 'email': "EMAIL_NOT_EXISTS" } })
+                return res.status(400).json(encodedata({ "success": false, 'errors': { 'email': "EMAIL_NOT_EXISTS" } }))
             }
 
             let recaptcha = await recaptchaFun.checkToken(reqBody.reCaptcha);
             if (recaptcha && recaptcha.status && recaptcha.status == false) {
-                return res.status(500).json({ "success": false, 'message': "Invalid reCaptcha" })
+            console.log('usdghhhhhhhhhhhhhsssssssssssss--------')
+
+                return res.status(500).json(encodedata({ "success": false, 'message': "Invalid reCaptcha" }))
             }
             let encryptToken = encryptString(userData._id, true)
             let content = {
@@ -1453,12 +1474,14 @@ export const checkForgotPassword = async (req, res) => {
                 content
             })
 
-            return res.status(200).json({ 'success': true, "message": "Confirmation Link Sent to Your Mail" })
+            return res.status(200).json(encodedata({ 'success': true, "message": "Confirmation Link Sent to Your Mail" }))
         }
 
 
     } catch (err) {
-        return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
+        console.log('usdghhhhhhhhhhhhhsssssssssssss--------')
+
+        return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
     }
 }
 
@@ -1474,21 +1497,21 @@ export const resetPassword = async (req, res) => {
         let userId = decryptString(reqBody.authToken, true)
         let userData = await User.findOne({ "_id": userId });
         if (!userData) {
-            return res.status(500).json({ "success": false, 'message': "NOT_FOUND" })
+            return res.status(500).json(encodedata({ "success": false, 'message': "NOT_FOUND" }))
         }
 
         if (!(userData.mailToken == reqBody.authToken)) {
-            return res.status(400).json({ "success": false, 'message': "Your link was expiry" })
+            return res.status(400).json(encodedata({ "success": false, 'message': "Your link was expiry" }))
         }
 
         userData.password = reqBody.password;
         userData.mailToken = '';
         await userData.save();
 
-        return res.status(200).json({ 'success': true, "message": "Updated successfully" });
+        return res.status(200).json(encodedata({ 'success': true, "message": "Updated successfully" }))
     }
     catch (err) {
-        return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
+        return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
     }
 }
 
@@ -1741,7 +1764,7 @@ export const getUserList = async (req, res) => {
         // console.log('result-----', result)
         return res.status(200).json(encodedata({ 'success': true, "messages": "success", result }))
     } catch (err) {
-        return res.status(500).json({ "success": false, 'message': "error on server" })
+        return res.status(500).json(encodedata({ "success": false, 'message': "error on server" }))
     }
 }
 

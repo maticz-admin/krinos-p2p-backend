@@ -132,7 +132,7 @@ export const updateSiteSetting = async (req, res) => {
   try {
     let siteSettingData = await SiteSetting.findOne();
     if (!siteSettingData) {
-      return res.status(400).json({ 'success': false, 'message': "No record" })
+      return res.status(400).json(encodedata({ 'success': false, 'message': "No record" }))
     }
     let reqBody = req.body;
 
@@ -145,7 +145,7 @@ export const updateSiteSetting = async (req, res) => {
     }
     return res.status(200).json(encodedata({ 'success': true, 'message': "Fetch success", 'result': result }))
   } catch (err) {
-    return res.status(500).json({ 'success': false, 'message': "Something went wrong" })
+    return res.status(500).json(encodedata({ 'success': false, 'message': "Something went wrong" }))
   }
 }
 
@@ -254,7 +254,7 @@ export const updateSocialMedia = async (req, res) => {
     await siteSettingData.save();
     return res.status(200).json(encodedata({ 'success': true, 'message': "updated success" }))
   } catch (err) {
-    return res.status(500).json({ 'success': false, 'message': "Something went wrong" })
+    return res.status(500).json(encodedata({ 'success': false, 'message': "Something went wrong" }))
   }
 }
 
@@ -268,7 +268,7 @@ export const updateFaqTrend = async (req, res) => {
   try {
     let siteSettingData = await SiteSetting.findOne();
     if (!siteSettingData) {
-      return res.status(400).json({ 'success': false, 'message': "No record" })
+      return res.status(400).json(encodedata({ 'success': false, 'message': "No record" }))
     }
 
     let reqBody = req.body;
@@ -280,7 +280,7 @@ export const updateFaqTrend = async (req, res) => {
     }
     return res.status(200).json(encodedata({ 'success': true, 'message': "Updated successfully", 'result': result }))
   } catch (err) {
-    return res.status(500).json({ 'success': false, 'message': "Something went wrong" })
+    return res.status(500).json((encodedata({ 'success': false, 'message': "Something went wrong" })))
   }
 }
 
@@ -303,7 +303,7 @@ export const updateMailIntegrate = async (req, res) => {
       }
       await set('SMTP', JSON.stringify(payload))
       fs.writeFileSync(__dirname + '/../config/sendinBlue.json', JSON.stringify(payload), 'utf8');
-      return res.status(200).json({ 'success': true, 'message': "Update successfully" })
+      return res.status(200).json(encodedata({ 'success': true, 'message': "Update successfully" }))
     }
     if (reqBody.type == 'mailIntegrage') {
       let payload = {
@@ -322,7 +322,7 @@ export const updateMailIntegrate = async (req, res) => {
       return res.status(200).json(encodedata({ 'success': true, 'message': "Update successfully" }))
     }
   } catch (err) {
-    return res.status(500).json({ 'success': false, 'message': "Something went wrong" })
+    return res.status(500).json(encodedata({ 'success': false, 'message': "Something went wrong" }))
   }
 }
 

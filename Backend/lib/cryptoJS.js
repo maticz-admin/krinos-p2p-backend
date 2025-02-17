@@ -191,7 +191,7 @@ export const decodedata = (req, res, next) => {
     }
     else
       if (reqQuery) {
-        console.log('reqBodyreqBody------', reqQuery);
+        // console.log('reqBodyreqBody------', reqQuery);
 
         let decryptedData;
 

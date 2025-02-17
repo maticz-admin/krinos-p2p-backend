@@ -14,7 +14,7 @@ import { encodedata, encryptString } from "../../lib/cryptoJS";
 
 
 const filterSearchQuery = async (query = {}, fields = []) => {
-    let filterQuery = {}
+    let filterQuery = {};
     if (!isEmpty(query) && !isEmpty(query.search)) {
         let filterArray = []
         for (const key of fields) {
@@ -111,30 +111,37 @@ export const Editoffertag = async (req, res) => {
 export const Getalloffertag = async (req, res) => {
     try {
         let pagination = paginationQuery(req.query);
+        // console.log('req.queryreq.query----', pagination)
         let filter = await filterSearchQuery(req.query, ['Name', 'Description']);
+        // console.log('filter----', filter)
+
         const count =  await OfferTag.find(filter).count();
+        // console.log('count----', count)
+
         const result =  await OfferTag.find(filter).sort({createdAt : -1}).skip(pagination.skip).limit(pagination.limit);
+    //   console.log('result-----', result)
         if (result == "" || result == null) {
-            return res.send({ 
+            return res.send(encodedata({ 
                 "status" : "success",
                 "message": "Retrive successfully",
                 "data" : [],
                 "count" : 0
-            })
+            }))
         }
         else{
-            return res.send({ 
+
+            return res.send(encodedata({ 
                 "status" : "success",
                 "message": "Retrive successfully",
                 "data" : result,
                 "count": count
-            })
+            }))
         }
     } catch (e) {
-        return res.send({ 
+        return res.send(encodedata({ 
             "status" : "failed",
             "message": "Something Went Worng"
-        })
+        }))
     }
 }
 
@@ -231,10 +238,10 @@ export const getofferhistory = async(req , res) => {
        
     
     catch(e){
-        return res.json({
+        return res.json(encodedata({
             type : "failed",
             message : "Error found"
-        })
+        }))
     }
 }
 
@@ -338,10 +345,10 @@ export const gettradehistory = async(req , res) => {
         }
     }
     catch(e){
-        return res.json({
+        return res.json(encodedata({
             type : "failed",
             message : "Error found"
-        })
+        }))
     }
 }
 
@@ -578,12 +585,11 @@ export const updatewallet = async(req , res) => {
         }))
     }
     catch(e){
-        console.log('e------', e)
-        return res.json({
+        return res.json(encodedata({
             type : "failed" , 
             data : result,
             message: "Server error"
-        })
+        }))
     }
 }
 

@@ -272,7 +272,7 @@ export const currencyList = async (req, res) => {
 
       return res
         .status(200)
-        .json({ success: true, message: "FETCH_SUCCESS", result });
+        .json(encodedata({ success: true, message: "FETCH_SUCCESS", result }));
     } else {
       let data = await Currency.find(filter, {
         _id: 1,
@@ -317,7 +317,7 @@ export const currencyList = async (req, res) => {
         .json(encodedata({ success: true, message: "FETCH_SUCCESS", result }));
     }
   } catch (err) {
-    return res.status(500).json({ success: true, message: "SOMETHING_WRONG" });
+    return res.status(500).json(encodedata({ success: true, message: "SOMETHING_WRONG" }));
   }
 };
 
@@ -335,7 +335,7 @@ export const addCurrency = async (req, res) => {
     if (checkCurrency) {
       return res
         .status(400)
-        .json({ success: false, errors: { coin: "Coin already exists" } });
+        .json(encodedata({ success: false, errors: { coin: "Coin already exists" } }));
     }
 
     const newDoc = new Currency({
@@ -380,12 +380,12 @@ export const addCurrency = async (req, res) => {
     newAssetAllUsr(newData);
     return res
       .status(200)
-      .json({ success: true, message: "Coin added successfully" });
+      .json(encodedata({ success: true, message: "Coin added successfully" }))
   } catch (err) {
     console.log('errrrrrrrrrrrrr-------------', err)
     return res
       .status(500)
-      .json({ success: false, message: "Something went wrong" });
+      .json(encodedata({ success: false, message: "Something went wrong" }))
   }
 };
 

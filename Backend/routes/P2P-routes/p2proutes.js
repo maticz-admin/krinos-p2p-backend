@@ -34,7 +34,7 @@ router.route("/assetupdate").post(apiKeyCtrl.authorization, p2pcontroller.Admina
 
 router.route("/update-user-status").post(decodedata, p2pcontroller.updateuseronlinestatus);
 
-router.route("/get-cms").get(p2pcontroller.Getcms); //
+router.route("/get-cms").get(reqQueryDecodedata, p2pcontroller.Getcms); //
 router.route("/get-faq").get(p2pcontroller.Getfaq); //
 router.route("/get-sitesettings").get(p2pcontroller.getsitesettings); //
 router.route("/get-tradehistory").get(reqQueryDecodedata, p2pcontroller.gettradehistory); //
@@ -44,7 +44,7 @@ router.route("/get-user-balance").get(apiKeyCtrl.authorization, p2pcontroller.ge
 router.route("/get-trade-speed").get(p2pcontroller.gettradespeed);//
 router.route("/update-profile-pic").post(apiKeyCtrl.authorization, p2pcontroller.updateuserprofilepicUpload, p2pcontroller.updateuserprofilepic);
 router.route("/cancel-offer").post(apiKeyCtrl.authorization, p2pcontroller?.canceloffer);
-router.route("/get-paymenttypes").get(p2pcontroller.getpaymentmethod);//
+router.route("/get-paymenttypes").get( p2pcontroller.getpaymentmethod);//
 router.route("/create-addresss").post(p2pcontroller.createcryptoaddress);
 router.route("/get-message-notification").get(apiKeyCtrl.authorizationEncrypt, orderctrl.getmessagenotification); //
 router.route("/markus_readone").post(apiKeyCtrl.authorization, orderctrl.markasreadeone);

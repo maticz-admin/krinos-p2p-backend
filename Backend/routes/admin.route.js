@@ -105,7 +105,7 @@ router.route('/anouncement')
 router.route('/user').get(reqQueryDecodedata, passportAuth, userCntrl.getUserList)
 router.route('/user-update').post(passportAuth, userCntrl.UpdateStatue)
 router.route('/getUserBalnce').get(passportAuth, userCntrl.getUserBalanceList)
-router.route('/disable-2fa').post(passportAuth, userCntrl.Disable2FA)
+router.route('/disable-2fa').post(decodedata, passportAuth, userCntrl.Disable2FA)
 
 
 // User Reference 

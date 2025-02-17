@@ -77,7 +77,6 @@ export const getSocialMedia = async (req, res) => {
 export const getCmsData = async (req, res) => {
     try {
         let cmsData = await Cms.find();
-        console.log('cmsData----', cmsData);
         return res.status(200).json(encodedata({ 'success': true, 'message': "Fetch success", 'result': cmsData }))
     } catch (err) {
         return res.status(500).json(encodedata({ 'success': false, 'message': "Something went wrong" }))

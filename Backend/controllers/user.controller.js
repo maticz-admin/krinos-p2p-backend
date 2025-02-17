@@ -1043,10 +1043,8 @@ export const get2faCode = async (req, res) => {
     try{
     let result = {};
     const userData = await  User.findOne({ "_id": req.user.id })
-    console.log("asdsadsadasdas",userData,req.user.id,req.user);
     if(userData){
         let result = await generateTwoFa(userData)
-        console.log("result generateTwoFa",result);
         return res.status(200).json({ 'success': true, 'result': result })
     }else{
         return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
@@ -1276,7 +1274,6 @@ export const generateTwoFa = async (userData) => {
         //     twoFaStatus: "disabled"
         // }
     }
-    console.log("result Qr Node 2fa",result);
     return result;
 }
 
@@ -1760,7 +1757,7 @@ export const getUserList = async (req, res) => {
             count,
             data
         }
-        // console.log('result-----', result)
+
         return res.status(200).json(encodedata({ 'success': true, "messages": "success", result }))
     } catch (err) {
         return res.status(500).json(encodedata({ "success": false, 'message': "error on server" }))
@@ -2023,15 +2020,15 @@ export const Disable2FA = async (req, res) => {
                 }
                 let Data = await User.findOneAndUpdate({ _id: checkUser._id }, { $set: { google2Fa: Disable } });
                 if (!isEmpty(Data)) {
-                    return res.status(200).json({ status: true, message: '2FA Disabled' })
+                    return res.status(200).json(encodedata({ status: true, message: '2FA Disabled' }))
                 } else {
-                    return res.status(400).json({ status: false, message: 'Disabl Failed' })
+                    return res.status(400).json(encodedata({ status: false, message: 'Disabl Failed' }))
                 }
 
             }
         }
     } catch (err) {
-        return res.status(500).json({ status: false, message: 'something went wrong' })
+        return res.status(500).json(encodedata({ status: false, message: 'something went wrong' }))
     }
 
 }

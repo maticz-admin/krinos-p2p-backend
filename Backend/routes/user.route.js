@@ -201,7 +201,7 @@ router.route("/p2p/orderHistory").get(apiKeyCtrl.authorization, p2pCtrl.orderHis
 router.route("/p2p/orderHistoryDoc").get(apiKeyCtrl.authorization, p2pCtrl.orderHistoryDoc);
 
 // News Letter
-router.route("/newsLetter/subscribe").post(newsLetterCtrl.newSubscribe);//
+router.route("/newsLetter/subscribe").post(decodedata, newsLetterCtrl.newSubscribe);//
 
 // Webhook
 router.route('/depositwebhook').post(coinpaymentCtrl.verifySign, coinpaymentCtrl.depositwebhook)

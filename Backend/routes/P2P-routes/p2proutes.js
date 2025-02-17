@@ -40,8 +40,8 @@ router.route("/get-sitesettings").get(p2pcontroller.getsitesettings); //
 router.route("/get-tradehistory").get(reqQueryDecodedata, p2pcontroller.gettradehistory); //
 
 router.route("/get-your-request").get(reqQueryDecodedata, p2pcontroller.getspenderhistory);//
-router.route("/get-user-balance").get(apiKeyCtrl.authorization, p2pcontroller.gettotaluserbalance);
-router.route("/get-trade-speed").get(p2pcontroller.gettradespeed);//
+router.route("/get-user-balance").get(reqQueryDecodedata, apiKeyCtrl.authorization, p2pcontroller.gettotaluserbalance);
+router.route("/get-trade-speed").get(reqQueryDecodedata, p2pcontroller.gettradespeed);//
 router.route("/update-profile-pic").post(apiKeyCtrl.authorization, p2pcontroller.updateuserprofilepicUpload, p2pcontroller.updateuserprofilepic);
 router.route("/cancel-offer").post(apiKeyCtrl.authorization, p2pcontroller?.canceloffer);
 router.route("/get-paymenttypes").get( p2pcontroller.getpaymentmethod);//

@@ -14,9 +14,9 @@ router.route("/get-offertag").get(reqQueryDecodedata, passportAuth , p2padmincon
 router.route("/get-offer-history").get(reqQueryDecodedata, passportAuth , p2padmincontroller.getofferhistory);
 router.route("/get-trade-history").get(reqQueryDecodedata, passportAuth , p2padmincontroller.gettradehistory);
 
-router.route("/get-paymenttypes").get( passportAuth , p2padmincontroller.getpaymenttypes);
-router.route("/add-paymenttypes").post(passportAuth , p2padmincontroller.addpaymenttypes);
-router.route("/edit-paymenttypes").post(passportAuth , p2padmincontroller.editpaymenttypes);
+router.route("/get-paymenttypes").get(reqQueryDecodedata, passportAuth , p2padmincontroller.getpaymenttypes);
+router.route("/add-paymenttypes").post(decodedata, passportAuth , p2padmincontroller.addpaymenttypes);
+router.route("/edit-paymenttypes").post(decodedata, passportAuth , p2padmincontroller.editpaymenttypes);
 
 router.route("/getownerwallet").get(passportAuth , p2padmincontroller.GetWallet);
 router.route("/updatewallet").post(decodedata, passportAuth , p2padmincontroller.updatewallet);

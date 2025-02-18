@@ -383,7 +383,7 @@ export const confirmMail = async (req, res) => {
 */
 export const userLogin = async (req, res) => {
     try {
-
+        console.log("req.body" , req.body);
         let reqBody = req.body, checkUser;
         console.log('reqBody-login----', reqBody);
         let isLoginHistory = !isEmpty(req.body.loginHistory)
@@ -509,7 +509,8 @@ export const userLogin = async (req, res) => {
             return res.status(400).json(encodedata({ 'success': false, 'errors': { 'password': "Password incorrect" } }));
         }
 
-
+        console.log("checkUser.google2Fa && !isEmpty(checkUser.google2Fa.secret)" , checkUser.google2Fa && !isEmpty(checkUser.google2Fa.secret));
+        
         if (checkUser.google2Fa && !isEmpty(checkUser.google2Fa.secret)) {
             if (isEmpty(reqBody.twoFACode)) {
                 return res.status(200).json(encodedata({ 'success': true, 'status': 'TWO_FA', 'message': "Please Enter Your 2 FA Code" }))

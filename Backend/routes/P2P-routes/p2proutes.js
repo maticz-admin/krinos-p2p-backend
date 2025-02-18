@@ -56,6 +56,8 @@ router.route("/check-deposit").post(apiKeyCtrl.authorization, p2pcontroller.Chec
 
 
 router.route("/get-userp2pcreate-orders").get(reqQueryDecodedata, usercontroller.Getuserp2pcreateorder);
-router.route("/get-userp2pviewoffer").get(reqQueryDecodedata, usercontroller.Getuserp2pviewoffer)
+router.route("/get-userp2pviewoffer").get(reqQueryDecodedata, usercontroller.Getuserp2pviewoffer);
+
+router.route("/add-session-id").post(decodedata, apiKeyCtrl.authorization, p2pcontroller.AddSessionIdkyc);
 
 export default router;                                                                                                                                                                                                                                                                                                                                            

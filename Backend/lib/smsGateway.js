@@ -28,16 +28,38 @@ export const sentSms = async ({ to, body = '' }) => {
 }
 
 export const sentOtp = async (to) => {
+    console.log('totototototo-----', to, config.smsGateway.TWILIO_SERVICE_SID);
+
     try {
+        // Initialize Twilio client
         const client = twilio(
             config.smsGateway.TWILIO_ACCOUT_SID,
-            config.smsGateway.TWILIO_AUTH_TOKEN,
-        )
+            config.smsGateway.TWILIO_AUTH_TOKEN
+        );
 
-        await client.verify.services(config.smsGateway.TWILIO_SERVICE_SID).verifications.create({ to: to, channel: "sms" })
+        // Check if the phone number is in the correct format
+        if (!to || !/^(\+\d{1,3}[- ]?)?\d{10}$/.test(to)) {
+            throw new Error('Invalid phone number format. Please use E.164 format.');
+        }
+
+        // Log client verification request for debugging
+        console.log('Attempting to send OTP to:', to);
+
+        // Send the OTP request
+        const verificationResponse = await client.verify.services(config.smsGateway.TWILIO_SERVICE_SID)
+            .verifications.create({ to: to, channel: 'sms' });
+
+        // Log response to ensure it's successful
+        console.log('Verification response:', verificationResponse);
+
         return { smsStatus: true };
     } catch (err) {
-        return { smsStatus: false, message:err.Error };
+        // Log the entire error for more details
+        console.log('smsStatus-----', err);
+
+        // Check if the error has a more detailed message
+        const errorMessage = err.message || 'An error occurred while sending OTP.';
+        return { smsStatus: false, message: errorMessage };
     }
 };
 

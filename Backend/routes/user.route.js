@@ -69,8 +69,8 @@ router.route('/forgotPassword').post(decodedata, userValid.checkForgotPwdValidat
 
 router.route('/resetPassword').post(decodedata, userValid.resetPwdValidate, userCtrl.resetPassword);
 router.route('/phoneChange') //
-    .post(apiKeyCtrl.authorization, userValid.newPhoneValidate, userCtrl.changeNewPhone)
-    .put(apiKeyCtrl.authorization, userValid.editPhoneValidate, userCtrl.verifyNewPhone);
+    .post(decodedata,apiKeyCtrl.authorization, userValid.newPhoneValidate, userCtrl.changeNewPhone)
+    .put(decodedata, apiKeyCtrl.authorization, userValid.editPhoneValidate, userCtrl.verifyNewPhone);
 router.route('/emailChange') //
     .post(apiKeyCtrl.authorization, userValid.editEmailValidate, userCtrl.editEmail)//
     .put(userValid.tokenValidate, userCtrl.sentVerifLink)//

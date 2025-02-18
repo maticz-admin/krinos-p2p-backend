@@ -54,6 +54,7 @@ import { newNotification } from './notification.controller'
 import * as ethCtrl from './coin/eth.controller'
 import * as bnbCtrl from './coin/bnb.controller';
 import * as tronCtrl from './coin/TronGateway';
+import { encode } from 'punycode';
 
 
 
@@ -123,7 +124,7 @@ export const checkMobile = async (req, res, next) => {
 export const sentOtp = async (req, res) => {
     try {
         let reqBody = req.body;
-        console.log('ysdgfyugdsyfugsdyufgyusdgfyugdsyuf----------')
+        console.log('ysdgfyugdsyfugsdyufgyusdgfyugdsyuf----------', reqBody)
 
         if (reqBody.type == 'login') {
             let checkDoc = await User.findOne({ "phoneCode": reqBody.phoneCode, "phoneNo": reqBody.phoneNo });
@@ -1578,25 +1579,26 @@ export const changeNewPhone = async (req, res) => {
         let
             reqBody = req.body,
             smsOtp = Math.floor(100000 + Math.random() * 900000);
-
+        console.log('reqBodyreqBodyreqBody----', reqBody, req.user)
         // let numValidation = await numverify.validation(reqBody.newPhoneCode + reqBody.newPhoneNo);
         // if (!numValidation.valid) {
         //     return res.status(400).json({ "success": false, 'errors': { 'newPhoneNo': "Incorrect format" } })
         // }
 
-        let checkUser = await User.findOne({ "phoneCode": reqBody.newPhoneCode, "phoneNo": reqBody.newPhoneNo })
+        let checkUser = await User.findOne({ "phoneCode": reqBody.newPhoneCode, "phoneNo": reqBody.newPhoneNo });
+        console.log('checkUser------', checkUser, req.user.id);
         if (checkUser) {
             if (checkUser._id.toString() != req.user.id) {
-                return res.status(400).json({ "success": false, 'errors': { 'newPhoneNo': "Phone number already exists" } })
+                return res.status(400).json(encodedata({ "success": false, 'errors': { 'newPhoneNo': "Phone number already exists" } }))
             }
             if (checkUser._id.toString() == req.user.id) {
-                return res.status(400).json({ "success": false, 'errors': { 'newPhoneNo': "Matched your previous mobile number" } })
+                return res.status(400).json(encodedata({ "success": false, 'errors': { 'newPhoneNo': "Matched your previous mobile number" } }))
             }
         }
 
         let siteSetting = await SiteSetting.findOne({}, { 'siteName': 1 });
         if (!siteSetting) {
-            return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
+            return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
         }
 
         let smsContent = {
@@ -1617,24 +1619,27 @@ export const changeNewPhone = async (req, res) => {
                 // "otp": smsOtp,
                 // "otptime": new Date()
             }
-        )
+        );
+
+        console.log('otttttttttttttttt----', ot)
         let { smsStatus,message } = await smsHelper.sentOtp(ot);
+        console.log('smsStatus,message-----', smsStatus,message)
         if(message === "Max send attempts reached"){
-            return res.status(400).json({ "success": false, errors: { phoneNo: "Max send attempts reached" } })
+            return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Max send attempts reached" } }))
         }
       
         else if(message === "Too many requests") {
-            return res.status(400).json({ "success": false, errors: { phoneNo: "Too many requests" } })
+            return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Too many requests" } }))
         }
         else if(!smsStatus) {
-            return res.status(400).json({ "success": false, errors: { phoneNo: "Invalid mobile number" } })
+            return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Invalid mobile number" } }))
         }
 
        
-        return res.status(200).json({ "success": true, "message": "OTP sent successfully, It is only valid for 10 minutes" })
+        return res.status(200).json(encodedata({ "success": true, "message": "OTP sent successfully, It is only valid for 10 minutes" }))
     }
     catch (err) {
-        return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
+        return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
     }
 }
 
@@ -1647,6 +1652,7 @@ export const changeNewPhone = async (req, res) => {
 export const verifyNewPhone = async (req, res) => {
     try {
         let reqBody = req.body, otpTime = new Date(new Date().getTime() - 600000); //2 min
+        console.log('reqBody-----', reqBody)
         let userData = await User.findOne({ "_id": req.user.id });
          var phoneCode = userData.newPhone.phoneCode;
        var phoneNo = userData.newPhone.phoneNo;
@@ -1665,10 +1671,10 @@ export const verifyNewPhone = async (req, res) => {
                     'newPhoneNo':userData.newPhone.phoneNo
             }
         let updateUserData = await userData.save();
-            return res.status(200).json({ 'success': true, 'message': "Mobile number verified", 'result': responseData })
+            return res.status(200).json(encodedata({ 'success': true, 'message': "Mobile number verified", 'result': responseData }))
         }
         else{
-            return res.status(400).json({ "success": false, 'errors': { 'otp': "Invalid OTP" } })
+            return res.status(400).json(encodedata({ "success": false, 'errors': { 'otp': "Invalid OTP" } }))
         }
 
         // if (userData.otptime <= otpTime) {
@@ -1709,7 +1715,7 @@ export const verifyNewPhone = async (req, res) => {
         // }
     }
     catch (err) {
-        return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
+        return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
     }
 }
 

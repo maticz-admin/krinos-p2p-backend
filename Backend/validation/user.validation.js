@@ -641,7 +641,7 @@ export const sentOtp = (req, res, next) => {
     }
 
     if (!isEmpty(errors)) {
-        return res.status(400).json({ "errors": errors })
+        return res.status(400).json(encodedata({ "errors": errors }))
     }
 
     return next();

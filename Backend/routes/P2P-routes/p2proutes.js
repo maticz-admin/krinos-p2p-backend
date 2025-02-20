@@ -60,4 +60,6 @@ router.route("/get-userp2pviewoffer").get(reqQueryDecodedata, usercontroller.Get
 
 router.route("/add-session-id").post(decodedata, apiKeyCtrl.authorization, p2pcontroller.AddSessionIdkyc);
 
+router.route("/check-didit").post(decodedata, apiKeyCtrl.authorization, p2pcontroller.checkdidit);
+
 export default router;                                                                                                                                                                                                                                                                                                                                            

@@ -27,16 +27,26 @@ export const sentSms = async ({ to, body = '' }) => {
     }
 }
 
-export const sentOtp = async (to) => {
+export const sentOtp = async (to , body) => {
     try {
+        console.log("config.smsGateway" , config.smsGateway);
+        
         const client = twilio(
             config.smsGateway.TWILIO_ACCOUT_SID,
             config.smsGateway.TWILIO_AUTH_TOKEN,
         )
+        // client.verify.services
+        // await client.verify.v2.services(config.smsGateway.TWILIO_SERVICE_SID).verifications.create({ to: to, channel: "sms" })
+        // return { smsStatus: true };
 
-        await client.verify.services(config.smsGateway.TWILIO_SERVICE_SID).verifications.create({ to: to, channel: "sms" })
-        return { smsStatus: true };
+        const message = await client.messages.create({
+            body: body,
+            from: "+18314259838",
+            to: to,
+          });
+          return { smsStatus: true };
     } catch (err) {
+        console.log("errir ub send otp" , err);
         return { smsStatus: false, message:err.Error };
     }
 };

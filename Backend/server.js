@@ -14,11 +14,12 @@ import userApi from './routes/user.route';
 import p2p from './routes/P2P-routes/p2proutes';
 import p2pAdmin from './routes/P2P-routes/P2PAdminroutes';
 import { createSocketIO } from './config/socketIO';
+import { UpdateKycStatus } from './controllers/P2PCONTROLLER/p2pcontroller';
 const { swaggerUi, swaggerSpec } = require('./config/swagger.services');
 
 const helmet = require('helmet');
 
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
+// process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 
 const app = express();
 
@@ -33,6 +34,23 @@ var fs = require('fs');
 var myip = ip.address();
 
 app.set('trust proxy', true)
+
+app.post("/webhook", (req, res) => {
+  try {
+    const { session_id, status, vendor_data } = req?.body;
+    console.log(
+      "webdskflkasdjflkjsdalfjasdlk",
+      session_id,
+      status,
+      vendor_data,
+      req?.body
+    );
+    UpdateKycStatus(session_id, status);
+  } catch (error) {
+    console.error("Error in /webhook handler:", error);
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+});
 
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");

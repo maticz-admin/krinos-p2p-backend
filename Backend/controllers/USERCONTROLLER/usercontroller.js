@@ -22,17 +22,13 @@ export const paginationQuery = (query) => {
 
 export const Getuserp2pcreateorder = async (req, res) => {
     try {
-       
         let pagination = paginationQuery(req.query);
         let userId = req.query.userId;
         let buyorsell = req.query.buyorsell;
-
         let matchCriteria = { createrid: userId };
-
         if (buyorsell) {
             matchCriteria.ordertype = buyorsell;
         }
-
         const count = await p2pcreateOrder.countDocuments(matchCriteria);
 
         let result = await p2pcreateOrder.aggregate([

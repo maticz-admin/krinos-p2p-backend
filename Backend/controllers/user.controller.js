@@ -102,14 +102,14 @@ export const checkMobile = async (req, res, next) => {
         let reqBody = req.body;
         let checkDoc = await User.findOne({ "phoneCode": reqBody.phoneCode, "phoneNo": reqBody.phoneNo });
         if (reqBody.type == 'register' && checkDoc) {
-            return res.status(400).json({ "success": false, 'message': "Phone number already exist" })
+            return res.status(400).json(encodedata({ "success": false, 'message': "Phone number already exist" }))
         } else if (reqBody.type == 'login' && !checkDoc) {
-            return res.status(400).json({ "success": false, 'message': "Phone number not exist" })
+            return res.status(400).json(encodedata({ "success": false, 'message': "Phone number not exist" }))
         }
 
         return next();
     } catch (err) {
-        return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
+        return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
     }
 }
 

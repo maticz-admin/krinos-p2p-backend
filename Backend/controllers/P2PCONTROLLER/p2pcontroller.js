@@ -24,6 +24,7 @@ import OwnerWallet from "../../models/ownerwallet";
 import { decodedata, encodedata } from "../../lib/cryptoJS"
 
 import kyc from "../../models/userKyc";
+import { createSession, fetchClientToken, getSessionDecision, stringToObjectId } from "../../config/didithooks";
 
 export const CreateP2Porder = async (req, res) => {
     try {
@@ -1170,6 +1171,85 @@ export const UpdateKycStatus = async (userid, status) => {
     }
     catch (e) {
         console.log("error on update kyc status", e);
+    }
+}
+
+export const AddSessionId = async(sessionid , userid) => {
+    try{
+        let checkkycdoc = await kyc.findOne({ userId: stringToObjectId(userid) });
+        if (checkkycdoc) {
+            let update = await kyc.findOneAndUpdate({ userId: stringToObjectId(userid) }, { $set: { sessionId: sessionid } })
+            return true
+        }
+        let newdoc = new kyc({ userId: stringToObjectId(userid), sessionId: sessionid });
+        await newdoc.save();
+        let updateuserdoc = await User.findOneAndUpdate({ _id: stringToObjectId(userid) }, {
+            $set: {
+                kycId: newdoc?._id
+            }
+        })
+        return true;
+    }
+    catch(e){
+        console.log("error on add session id" , e);
+    }
+}
+
+export const checkdidit = async(req , res) => {
+    try{
+        console.log("req?.user?.userId" , req?.user?.id);
+        let {vendor_data , callback} = req?.body
+        let token = await fetchClientToken();
+        console.log("tokennnnnnnnn" , token);
+        if(token?.access_token){
+            // let userdoc = await User.findOne({_id : req?.user?.userId});
+            let kycdoc = await kyc.findOne({userId : stringToObjectId(req?.user?.id)});
+            if(!kycdoc?.sessionId){
+                let session = await createSession("" , callback , vendor_data , token?.access_token);
+                console.log("Session create result" , session);
+                if(session?.status){
+                    let updateresult = await AddSessionId(session?.sessionid , req?.user?.id);
+                    return res.status(200).json(encodedata({
+                        type: "Success", result : session
+                    })) 
+                }
+                else{
+                    return res.status(400).json(encodedata({
+                        type: "failed", message: "Didit error"
+                    })) 
+                }
+            }
+            else{
+                let decisionres = await getSessionDecision(kycdoc?.sessionId  , token?.access_token);
+                console.log("decision result" , decisionres);
+                
+                if (!decisionres?.status) {
+                    if (decisionres?.data?.status == "Declined" || decisionres?.data?.status == "Expired") {
+                        let session = await createSession();
+                        if (session?.status) {
+                            let updateresult = await AddSessionId(session?.sessionid, req?.user?.id);
+                            return res.status(200).json(encodedata({
+                                type: "Success", result: session
+                            }))
+                        }
+                        else {
+                            return res.status(400).json(encodedata({
+                                type: "failed", message: "Didit error"
+                            }))
+                        }
+                    }
+                }
+                else{
+                    return res.status(200).json(encodedata({
+                        type: "Success", result : decisionres
+                    })) 
+                }
+            }
+        }
+    
+    }
+    catch(e){
+        console.log("error on checfk didit" , e);
     }
 }
 

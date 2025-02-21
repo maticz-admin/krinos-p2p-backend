@@ -167,7 +167,8 @@ export const decodedata = (req, res, next) => {
       } else {
         return next();
       }
-    } else if (reqBody) {
+    } else
+     if (reqBody) {
 
       let decryptedData = CryptoJS.AES.decrypt(reqBody?.encode, config.cryptoSecretKey).toString(CryptoJS.enc.Utf8);
 

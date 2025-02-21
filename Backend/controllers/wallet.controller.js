@@ -124,6 +124,7 @@ export const decryptWallet = (req, res, next) => {
 
 export const getHideZeroStatus = async (req, res) => {
     try {
+        
         let hideZeroStatus = await Wallet.findOne({
             '_id': req.user.id
         }, {
@@ -131,10 +132,11 @@ export const getHideZeroStatus = async (req, res) => {
         }
         )
 
-        return res.status(200).json({ 'success': true, 'hideZeroStatus': hideZeroStatus, })
+        return res.status(200).json(encodedata({ 'success': true, 'hideZeroStatus': hideZeroStatus, }))
 
     } catch (err) {
-        return res.status(500).json({ 'success': false })
+       
+        return res.status(500).json(encodedata({ 'success': false, message: "Internal server error" }))
 
     }
 }
@@ -144,13 +146,17 @@ export const updateHideZeroStatus = async (req, res) => {
     try {
         let reqBody = req.body;
 
-        const updateData = await wallet.findOneAndUpdate({ "_id": ObjectId(req.user.id) }, { hideZeroStatus: reqBody.hideZeroStatus }, { new: true },)
+        const updateData = await wallet.findOneAndUpdate(
+            { "_id": new ObjectId(req.user.id) }, 
+            { hideZeroStatus: reqBody.hideZeroStatus }, 
+            { new: true }
+        );
 
-        return res.status(200).json({ 'success': true, message: "zero balance asstes hide  successfully" })
+        return res.status(200).json({ 'success': true, message: "zero balance assets hidden successfully" });
 
     } catch (err) {
-        return res.status(500).json({ 'success': false })
-
+        console.log('rrrrrrrrrrrrrrrrrrrrr------------', err);
+        return res.status(500).json({ 'success': false });
     }
 }
 export const getWallet = async (req, res) => {

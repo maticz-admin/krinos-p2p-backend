@@ -115,11 +115,11 @@ export const Getalloffertag = async (req, res) => {
         let filter = await filterSearchQuery(req.query, ['Name', 'Description']);
         // console.log('filter----', filter)
 
-        const count =  await OfferTag.find(filter).count();
+        const count =  await OfferTag.countDocuments(filter);
         // console.log('count----', count)
 
         const result =  await OfferTag.find(filter).sort({createdAt : -1}).skip(pagination.skip).limit(pagination.limit);
-    //   console.log('result-----', result)
+      console.log('result-----', result)
         if (result == "" || result == null) {
             return res.send(encodedata({ 
                 "status" : "success",
@@ -352,25 +352,33 @@ export const gettradehistory = async(req , res) => {
     }
 }
 
-export const getpaymenttypes = async(req , res) => {
-    try{
-            let pagination = paginationQuery(req.query);
-            let filter = await filterSearchQuery(req.query, ['Name', 'Description']);
-            const count =  await PaymentTypes.find(filter).count();
-            const result =  await PaymentTypes.find(filter).sort({createdAt : -1}).skip(pagination.skip).limit(pagination.limit);
-            return res.json({
-                type: "success",
-                data: result,
-                count: count
-            });
+export const getpaymenttypes = async (req, res) => {
+    try {
+      let pagination = paginationQuery(req.query);
+      
+      let filter = await filterSearchQuery(req.query, ['Name', 'Description']);
+      
+      // Use countDocuments instead of count
+      const count = await PaymentTypes.countDocuments(filter);
+      
+      const result = await PaymentTypes.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(pagination.skip)
+        .limit(pagination.limit);
+            
+      return res.json(encodedata({
+        type: "success",
+        data: result,
+        count: count,
+      }));
+    } catch (e) {
+      return res.json(encodedata({
+        type: "failed",
+        message: "Error found",
+      }));
     }
-    catch(e){
-        return res.json({
-            type : "failed",
-            message : "Error found"
-        })
-    }
-}
+  };
+  
 
 export const addpaymenttypes = async(req , res) => {
     try{
@@ -382,25 +390,25 @@ export const addpaymenttypes = async(req , res) => {
                 value : req?.body?.name
             })
             var result = await newdata.save();
-            return res.json({
+            return res.json(encodedata({
                 type: "success",
                 data: result,
-            });
+            }));
         }
         else{
-            return res.send({ 
+            return res.send(encodedata({ 
                 "status" : "failed",
                 "error" : validation.errors,
                 "message": "Invalid inputs" 
-            })
+            }))
         }
         
     }
     catch(e){
-        return res.json({
+        return res.json(encodedata({
             type : "failed",
             message : "Error found"
-        })
+        }))
     }
 }
 
@@ -421,24 +429,24 @@ export const editpaymenttypes = async(req , res) => {
             _id : req?.body?.id,
         } , {$set : updatedata});
 
-        return res.json({
+        return res.json(encodedata({
             type: "success",
             data: result,
-        });
+        }));
         }
         else{
-            return res.send({ 
+            return res.send(encodedata({ 
                 "status" : "failed",
                 "error" : validation.errors,
                 "message": "Invalid inputs" 
-            })
+            }))
         }
     }
     catch(e){
-        return res.json({
+        return res.json(encodedata({
             type : "failed",
             message : "Error found"
-        })
+        }))
     }
 }
 

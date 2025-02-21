@@ -343,7 +343,7 @@ export const apikey = async (apikey, next, req, res) => {
 }
 
 export const verifyToken = async (req, res, next) => {
-    const token = req.header('Authorization').split('Bearer ').join('');
+    const token = req.header('Authorization')?.split('Bearer ').join('');
     try {
         let decoding = new User().decodejwt(token)
         let userDoc = await UserToken.findOne({ 'userId': decoding._id, 'token': req.header('Authorization') }).populate({ path: "userId", select: "_id userId type email google2Fa status" })
@@ -473,7 +473,7 @@ export const apikeyWithEncode = async (apikey, next, req, res) => {
 
 
 export const verifyTokenWithEncode = async (req, res, next) => {
-    const token = req.header('Authorization').split('Bearer ').join('');
+    const token = req.header('Authorization')?.split('Bearer ').join('');
     try {
         let decoding = new User().decodejwt(token)
         let userDoc = await UserToken.findOne({ 'userId': decoding._id, 'token': req.header('Authorization') }).populate({ path: "userId", select: "_id userId type email google2Fa status" })

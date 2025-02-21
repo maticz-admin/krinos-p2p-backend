@@ -245,11 +245,9 @@ export const generateTokenAddr = async ({ currencyList = [], walletData }) => {
         if (!Array.isArray(currencyList)) {
             return []
         }
-
         // if (isEmpty(walletData)) {
         //     return []
         // }
-
         let assetList = []
         for (let currency of currencyList) {
             // && walletData.assets && walletData.assets.length > 0

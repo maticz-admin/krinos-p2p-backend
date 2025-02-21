@@ -527,6 +527,7 @@ export const newPhoneValidate = (req, res, next) => {
 */
 export const editPhoneValidate = (req, res, next) => {
     let errors = {}, reqBody = req.body;
+    console.log('reqBodreqBody----y,', reqBody)
     let mobileRegex = /^\d+$/;
 
     if (isEmpty(reqBody.newPhoneCode)) {
@@ -629,7 +630,7 @@ export const newsletterValid = (req, res, next) => {
 export const sentOtp = (req, res, next) => {
     let errors = {}, reqBody = req.body;
     let mobileRegex = /^\d+$/;
-
+    console.log('reqreqBodyreqBodyreqBody-----Body', reqBody)
     if (isEmpty(reqBody.phoneCode)) {
         errors.phoneCode = "Phone code field is required";
     }

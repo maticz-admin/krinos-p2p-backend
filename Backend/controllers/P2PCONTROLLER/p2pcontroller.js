@@ -264,8 +264,14 @@ export const Getsingleuser = async (req, res) => {
     try {
         console.log('req?.query-----', req?.query)
         var result = await User.findOne({ "userId": req?.query?.userid ? req?.query?.userid : req?.user?.userId });
+        // var result = await User.findOne({ "userId": req?.user?.userId });
+        // console.log('resultresultresultresult------', result)
         var kyc = await UserKyc.findOne({ userId: result?._id });
+        // console.log('kyc------', kyc)
+
         var wallet = await Wallet.findOne({ userId: result?.userId });
+        // console.log('wallet------', wallet)
+
         // result = {...result , "kyc" : kyc}
         updatelastseen(req?.query?.userid)
         return res.json(encodedata({
@@ -548,7 +554,6 @@ export const singlesaledetail = async (req, res) => {
             variablepercent = (currencyvalue - resmarketvalue) / onepercent;
         }
         updatelastseen(req?.query?.userid);
-
         return res.json(encodedata({
             type: "success",
             data: result,
@@ -640,13 +645,16 @@ export const getcurrencydata = async (req, res) => {
 
 export const Adminassetupdate = async (req, res) => {
     try {
-
-        var admin = await wallet.findOne({ userId: "13841853" });//config.OWNERUSERID
-
+        console.log("body" , req?.body , config.OWNERUSERID);
+        
+        var admin = await wallet.findOne({ userId: config.OWNERUSERID });//config.OWNERUSERID
+        console.log("owner" , admin);
         var adminarray = await walletupdate(admin?.assets, req?.body?.coin, req?.body?.adminbalance, true, req?.body?.adminbalance);
-        var updateadminasset = await wallet.findOneAndUpdate({ userId: "13841853" }, //config.OWNERUSERID
+        var updateadminasset = await wallet.findOneAndUpdate({ userId: config.OWNERUSERID }, //config.OWNERUSERID
             { $set: { assets: adminarray } }, { new: true });
         var owner = await wallet.findOne({ userId: req?.body?.ownerid });
+        
+        
         var ownerarray = await walletupdate(owner?.assets, req?.body?.coin, req?.body?.ownerbalance, false, req?.body?.adminbalance);
         var updateownerasset = await wallet.findOneAndUpdate({ userId: req?.body?.ownerid },
             { $set: { assets: ownerarray } }, { new: true });
@@ -714,8 +722,9 @@ export const updateuseronlinestatus = async (req, res) => {
 
 export const Getcms = async (req, res) => {
     try {
+        console.log('req?.query?.identifier---', req?.query?.identifier)
         var result = await Cms.findOne({ identifier: req?.query?.identifier, status: "active" });
-
+        console.log('result-----', result)
         return res.json(encodedata({
             type: "success",
             data: result
@@ -884,10 +893,10 @@ export const gettotaluserbalance = async (req, res) => {
             var newprice = coinprice ? coinprice : 0
             totalbalance = totalbalance + newprice;
         }
-        return res.json({
+        return res.json(encodedata({
             type: "success",
             data: totalbalance
-        });
+        }));
     }
     catch (e) {
 
@@ -929,16 +938,16 @@ export const gettradespeed = async (req, res) => {
         })
         var difference = endtime - starttime;
         var average = difference / result?.length;
-        return res.json({
+        return res.json(encodedata({
             type: "success",
             data: average
-        });
+        }));
     }
     catch (e) {
-        return res.json({
+        return res.json(encodedata({
             type: "failed",
             message: "Error found"
-        })
+        }))
     }
 }
 const profileStorage = multer.diskStorage({

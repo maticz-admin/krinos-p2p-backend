@@ -18,10 +18,8 @@ const UseWallet = async (key = PRIVATE_KEY , web3) => {
 // console.log('web3------', web3.eth.accounts.privateKeyToAccount(key))
 
 export const UseAccount = async (key = PRIVATE_KEY , web3) => {
-    console.log('key = PRIVATE_KEY----', key = PRIVATE_KEY, key, PRIVATE_KEY);
 
     const accountInfo = await web3.eth.accounts.privateKeyToAccount(key);
-    console.log('accountInfo----', accountInfo);
     
     return accountInfo.address;
 }

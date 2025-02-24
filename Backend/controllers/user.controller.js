@@ -55,6 +55,7 @@ import * as ethCtrl from './coin/eth.controller'
 import * as bnbCtrl from './coin/bnb.controller';
 import * as tronCtrl from './coin/TronGateway';
 import { encode } from 'punycode';
+import axios from 'axios';
 
 const crypto = require('crypto');
 
@@ -198,13 +199,14 @@ export const createNewUser = async (req, res) => {
         // if (recaptcha && recaptcha.status == false) {
         //     return res.status(500).json({ "success": false, 'message': "Invalid reCaptcha" })
         // }
+        console.log('reqBody-----', reqBody);
+
         let newData = {
             'password': reqBody.password,
         }
 
         if (reqBody.formType == 'email') {
             reqBody.email = reqBody.email.toLowerCase();
-            // console.log('reqBody-----', reqBody);
 
             let checkUser = await User.findOne(({ 'email': reqBody.email }))
 
@@ -220,10 +222,10 @@ export const createNewUser = async (req, res) => {
                 return res.status(400).json(encodedata({ "success": false, 'erros': { 'phoneNo': "Phone number already exist" } }))
             }
             console.log('checkDoc-----', checkDoc, reqBody)
-            let checkUserDeatils ;
+            let checkUserDeatils;
             if (checkDoc == null) {
                 checkUserDeatils = ''
-            }else{
+            } else {
                 checkUserDeatils = checkDoc
             }
 
@@ -421,7 +423,8 @@ export const userLogin = async (req, res) => {
         // console.log("req.body", req.body);
         let reqBody = req.body, checkUser;
 
-        let isLoginHistory = !isEmpty(req.body.loginHistory)
+        
+        let isLoginHistory = !isEmpty(req.body.loginHistory);
 
         if (reqBody.formType == 'email') {
             reqBody.email = reqBody.email.toLowerCase();
@@ -500,7 +503,7 @@ export const userLogin = async (req, res) => {
                 }
 
                 let to = `+${checkUser.phoneCode}${checkUser.phoneNo}`;
-                
+
 
                 let { smsStatus, message } = await smsHelper.sentOtp(to, reqBody.otp);
                 // client.messages
@@ -1477,7 +1480,7 @@ export const checkForgotPassword = async (req, res) => {
         if (reqBody.type == 'mobile') {
             let checkDoc = await User.findOne({ "phoneCode": reqBody.phoneCode, "phoneNo": reqBody.phoneNo });
             let to = `+${reqBody.phoneCode}${reqBody.phoneNo}`;
-            let { smsStatus } = await smsHelper.verifyOtp(to, reqBody.otp);
+            let { smsStatus } = await smsHelper.verifyOtp(checkDoc, reqBody.otp, 'registerMobile');
             if (!smsStatus) {
                 return res.status(400).json(encodedata({ "success": false, errors: { otp: 'invalid OTP' } }));
             }
@@ -1676,8 +1679,8 @@ export const changeNewPhone = async (req, res) => {
                 _id: req.user.id
             },
             {
-                otp: otp,  
-                otptime: new Date()  
+                otp: otp,
+                otptime: new Date()
             },
             { new: true }
         );
@@ -1695,7 +1698,7 @@ export const changeNewPhone = async (req, res) => {
             return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Invalid mobile number" } }))
         }
 
-        
+
         return res.status(200).json(encodedata({ "success": true, "message": "OTP sent successfully, It is only valid for 10 minutes" }))
     }
     catch (err) {
@@ -1712,7 +1715,7 @@ export const changeNewPhone = async (req, res) => {
 export const verifyNewPhone = async (req, res) => {
     try {
         let reqBody = req.body, otpTime = new Date(new Date().getTime() - 600000); //2 min
-        console.log('reqBody-----', reqBody)
+
         const id = req.user.id;
         let userData = await User.findOne({ "_id": req.user.id });
         var phoneCode = userData.newPhone.phoneCode;

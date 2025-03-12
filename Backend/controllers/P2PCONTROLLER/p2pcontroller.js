@@ -262,7 +262,7 @@ export const Updateofferviews = async (req, res) => {
 
 export const Getsingleuser = async (req, res) => {
     try {
-        console.log('req?.query-----', req?.query)
+        console.log('req?.query----- in user detail', req?.query)
         var result = await User.findOne({ "userId": req?.query?.userid ? req?.query?.userid : req?.user?.userId });
         // var result = await User.findOne({ "userId": req?.user?.userId });
         // console.log('resultresultresultresult------', result)
@@ -271,9 +271,11 @@ export const Getsingleuser = async (req, res) => {
 
         var wallet = await Wallet.findOne({ userId: result?.userId });
         // console.log('wallet------', wallet)
-
+        
+        
         // result = {...result , "kyc" : kyc}
-        updatelastseen(req?.query?.userid)
+        // updatelastseen(req?.query?.userid)
+        console.log("single user detail" , result);
         return res.json(encodedata({
             type: "success",
             data: result,
@@ -282,6 +284,7 @@ export const Getsingleuser = async (req, res) => {
         }))
     }
     catch (e) {
+        console.log("Error on get single user" , e);
         return res.json(encodedata({
             type: "failed",
             message: "Error found"
@@ -1175,7 +1178,6 @@ export const AddSessionIdkyc = async (req, res) => {
 export const UpdateKycStatus = async (userid, status) => {
     try {
         console.log("webhookkkk called", userid, status);
-
         let result = await kyc.findOneAndUpdate({ sessionId: userid }, { $set: { status: status } });
     }
     catch (e) {

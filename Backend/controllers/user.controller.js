@@ -132,7 +132,7 @@ export const sentOtp = async (req, res) => {
             let checkDoc = await User.findOne({ "phoneCode": reqBody.phoneCode, "phoneNo": reqBody.phoneNo });
             if (isEmpty(checkDoc) && reqBody.type == 'forgot') {
                 console.log('ysdgfyugdsyfugsdyufgyusdgfyugdsyuf----------')
-                return res.status(400).json(encodedata({ "success": false, errors: { phone: 'Phone number not exists' } }));
+                return res.status(400).json(encodedata({ "success": false, errors: { phone: 'The phone number does not exist' } }));
             }
             if (!checkDoc.authenticate(reqBody.password)) {
                 console.log('ysdgfyugdsyfugsdyufgyusdgfyugdsyuf----------')
@@ -143,7 +143,7 @@ export const sentOtp = async (req, res) => {
         let checkDoc = await User.findOne({ "phoneCode": reqBody.phoneCode, "phoneNo": reqBody.phoneNo });
         if (isEmpty(checkDoc) && reqBody.type == 'forgot') {
 
-            return res.status(400).json(encodedata({ "success": false, errors: { phone: 'Phone number not exists' } }));
+            return res.status(400).json(encodedata({ "success": false, errors: { phone: 'The phone number does not exist' } }));
         }
         let to = `+${reqBody.phoneCode}${reqBody.phoneNo}`;
         const otp = generateOTP();
@@ -2200,5 +2200,4 @@ export const checkEmail = async (req, res) => {
     } catch (err) {
         return res.status(500).json({ 'success': false, message: 'error on server' })
     }
-
 } 

@@ -328,7 +328,8 @@ export const currencyList = async (req, res) => {
  * BODY : name, symbol, coin, image, contractAddress, minABI, contractDecimal, decimal, tokenType, bankName, accountNo, holderName, bankcode, country, withdrawFee, minimumWithdraw, depositType, fundLimit, fundFee, fundInterval
  */
 export const addCurrency = async (req, res) => {
-  try {
+  try {console.log();
+  
     let reqBody = req.body,
       reqFile = req.files;
     let checkCurrency = await Currency.findOne({ coin: reqBody.symbol });

@@ -393,6 +393,7 @@ export const getAllUserKyc = async (req, res) => {
                         "type": 1,
                         "status": 1
                     },
+                    "status" : 1
                 }
             },
             { "$match": filter },

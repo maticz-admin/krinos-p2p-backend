@@ -97,7 +97,6 @@ const UserKycSchema = new Schema({
             default: 1    // 1-new, 2-pending, 3-approved, 4-rejected
         },
     },
-
     status : {
         type : String,
         default : "Not Started"  //Pending , Approved , Rejected

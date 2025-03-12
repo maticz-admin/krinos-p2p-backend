@@ -128,12 +128,11 @@ export const getHideZeroStatus = async (req, res) => {
         let hideZeroStatus = await Wallet.findOne({
             '_id': req.user.id
         }, {
-            "hideZeroStatus": 1,
+            "hideZeroStatus": true,
         }
         )
 
         return res.status(200).json(encodedata({ 'success': true, 'hideZeroStatus': hideZeroStatus, }))
-
     } catch (err) {
        
         return res.status(500).json(encodedata({ 'success': false, message: "Internal server error" }))
@@ -145,15 +144,14 @@ export const getHideZeroStatus = async (req, res) => {
 export const updateHideZeroStatus = async (req, res) => {
     try {
         let reqBody = req.body;
-
+        console.log("reqBody" , reqBody);
+        
         const updateData = await wallet.findOneAndUpdate(
             { "_id": new ObjectId(req.user.id) }, 
             { hideZeroStatus: reqBody.hideZeroStatus }, 
             { new: true }
         );
-
         return res.status(200).json({ 'success': true, message: "zero balance assets hidden successfully" });
-
     } catch (err) {
         console.log('rrrrrrrrrrrrrrrrrrrrr------------', err);
         return res.status(500).json({ 'success': false });
@@ -1034,7 +1032,6 @@ export const fundTransfer = async (req, res) => {
         if (!toUserData) {
             return res.status(500).json({ "success": false, 'errors': { 'toUserEmail': 'Email Not Exit' } })
         }
-
         let usrWallet = await Wallet.findOne({ "_id": req.user.id });
         if (!usrWallet) {
             return res.status(400).json({ 'success': false, 'message': 'NO_DATA' })

@@ -13,16 +13,14 @@ import isEmpty, { isBoolean } from '../lib/isEmpty';
 export const addValid = (req, res, next) => {
     let errors = {}, reqBody = req.body, reqFile = req.files;
     console.log('errors-----', errors, reqBody, reqFile)
-    return false;
+    // return false;
     const regex = new RegExp(/[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/);
     if (isEmpty(reqBody.name)) {
         errors.name = "Name field is required";
     }
-
     if (isEmpty(reqBody.coin)) {
         errors.coin = "Coin field is required";
     }
-
     if (isEmpty(reqBody.symbol)) {
         errors.symbol = "Symbol field is required";
     }
@@ -31,7 +29,6 @@ export const addValid = (req, res, next) => {
             errors.coinpaymentsymbol = "Coinpayment Symbol field is required";
         }
     }
-    
 
     if (isEmpty(reqFile.image)) {
         errors.image = "REQUIRED";

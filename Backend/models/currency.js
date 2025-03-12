@@ -143,6 +143,10 @@ let CurrencySchema = new Schema(
     key : {
       type : String,
       default : ""
+    },
+    bitgosymbol : {
+      type : String,
+      default : ""
     }
   },
   {

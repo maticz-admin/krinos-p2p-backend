@@ -4,7 +4,7 @@ const { BitGo } = require('bitgo');
 // const ACCESS_TOKEN = "v2x42e290fb414f996a7b6fa9d3837bc11e4009276ae75cc3ce305914d8a35fe9f4"  //client new
 
 // const ACCESS_TOKEN = "v2x757e5a80f6b2a412b8ff2f6d77f791e025d68d9ab3f67419a9cc1e91d882c385" //ip
-const ACCESS_TOKEN = "v2x6e5c38b17ddcf2f1cdb545245cfa77378988bfa46755f389697b4b2c0754d501"//without ip
+const ACCESS_TOKEN = "v2x804d0259b4b2da43e6290d6aaf6049d08ddcbe2d9841f1efe5a953f30ff6ffce"//without ip
 const bitgo = new BitGo({
     accessToken: ACCESS_TOKEN,
     env: 'test',
@@ -20,11 +20,10 @@ export const CreateWallet = async(symbol) => {
             // enterprise: '67bf20b0cb4ae0362b9d9321ec3fcd83' //client
             enterprise : "67c9458ecaef5bed16fc5d5ea8331431"
         });
-        let stimulate = await wallet.simulateWebhook
         let addwebhok = await wallet.addWebhook({
           type: 'transfer',
           allToken: false,
-          url: 'https://krinosp2p-backend.maticz.in/bitgo-webhook',
+          url: 'https://qc3kj71m-2053.inc1.devtunnels.ms/bitgo-webhook',
           label: 'For Testing purpose',
         })
         // const address = await wallet.createAddress();

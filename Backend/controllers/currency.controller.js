@@ -354,7 +354,8 @@ export const addCurrency = async (req, res) => {
       withdrawStatus: reqBody.withdrawStatus,
       commisionfee: reqBody?.commisionfee,
       decimal: reqBody.decimals,
-      coinpaymentsymbol: reqBody?.coinpaymentsymbol
+      // coinpaymentsymbol: reqBody?.coinpaymentsymbol
+      bitgosymbol : reqBody?.coinpaymentsymbol
     });
     if (reqBody.depositType == "local") {
       newDoc["api"] = reqBody?.api,
@@ -433,9 +434,9 @@ export const updateCurrency = async (req, res) => {
     currencyDoc.depositStatus = reqBody.depositStatus;
     currencyDoc.withdrawStatus = reqBody.withdrawStatus;
     currencyDoc.commisionfee = reqBody?.commisionfee;
-    currencyDoc.coinpaymentsymbol = reqBody?.coinpaymentsymbol
+    currencyDoc.coinpaymentsymbol = reqBody?.coinpaymentsymbol;
     if (reqBody.depositType == "local") {
-      currencyDoc.api = reqBody?.api,
+        currencyDoc.api = reqBody?.api,
         currencyDoc.key = reqBody?.key
     }
     if (reqBody.type == "token") {

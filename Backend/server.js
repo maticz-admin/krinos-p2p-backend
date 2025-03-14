@@ -37,7 +37,7 @@ app.set('trust proxy', true)
 
 app.post("/bitgo-webhook", (req, res) => {
   try {
-    console.log("req?.body" ,  "bodddyy", req?.body);
+    console.log("bitgo webhook req?.body" ,  "bodddyy", req?.body);
   } catch (error) {
     console.error("Error in /webhook handler:", error);
     return res.status(401).json({ message: "Unauthorized" });

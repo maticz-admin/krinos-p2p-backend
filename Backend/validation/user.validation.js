@@ -13,6 +13,7 @@ import { encodedata , decodedata} from '../lib/cryptoJS'
 */
 export const registerValidate = (req, res, next) => {
     let errors = {}, reqBody = req.body;
+    console.log('reqBody----reqBody---', reqBody)
     let passwordRegex = /^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*\W).{6,18}(?!\S)/g;
     let emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,6}))$/;
 
@@ -55,8 +56,8 @@ export const registerValidate = (req, res, next) => {
         errors.confirmPassword = "Passwords must match";
     }
 
-    if (isEmpty(reqBody.reCaptcha)) {
-        errors.reCaptcha = "ReCAPTCHA field is required";
+    if (isEmpty(reqBody.recaptcha)) {
+        errors.recaptcha = "ReCAPTCHA field is required";
     }
 
     // if (!(reqBody.isTerms == true)) {
@@ -65,6 +66,7 @@ export const registerValidate = (req, res, next) => {
 
 
     if (!isEmpty(errors)) {
+        console.log('errors----', errors)
         return res.status(400).json(encodedata({ "errors": errors }))
     }
 

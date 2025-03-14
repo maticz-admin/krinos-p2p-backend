@@ -36,13 +36,14 @@ import * as p2pValid from '../validation/p2p.validation';
 import * as contactUsValid from '../validation/contactus.validation'
 
 import { decodedata, reqQueryDecodedata } from '../lib/cryptoJS'
+import { verifyRecaptcha } from '../middleware/verifyRecaptcha';
 
 const router = express();
 const passportAuth = passport.authenticate("usersAuth", { session: false });
 
 // User
-router.route('/register').post(decodedata,userValid.registerValidate, userCtrl.createNewUser);//
-router.route('/login').post(decodedata,userValid.loginValidate, userCtrl.userLogin);//
+router.route('/register').post(decodedata,verifyRecaptcha, userValid.registerValidate, userCtrl.createNewUser);//
+router.route('/login').post(decodedata, verifyRecaptcha,userValid.loginValidate, userCtrl.userLogin);//
 router.route('/resend-otp').post(decodedata, userCtrl.resendOTP);
 router.route('/confirm-mail').post(userValid.confirmMailValidate, userCtrl.confirmMail);
 router.route('/check-deposit').get(apiKeyCtrl.authorization, userCtrl.checkDeposit)//
@@ -67,7 +68,7 @@ router.route('/userSetting')
 router.route('/editNotif').put(apiKeyCtrl.authorization, userValid.editNotifValid, userCtrl.editNotif)
 router.route('/forgotPassword').post(decodedata, userValid.checkForgotPwdValidate, userCtrl.checkForgotPassword);
 
-router.route('/resetPassword').post(decodedata, userValid.resetPwdValidate, userCtrl.resetPassword);
+router.route('/resetPassword').post(decodedata, verifyRecaptcha, userValid.resetPwdValidate, userCtrl.resetPassword);
 router.route('/phoneChange') //
     .post(decodedata,apiKeyCtrl.authorization, userValid.newPhoneValidate, userCtrl.changeNewPhone)
     .put(decodedata, apiKeyCtrl.authorization, userValid.editPhoneValidate, userCtrl.verifyNewPhone);

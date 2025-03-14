@@ -81,7 +81,7 @@ export const coinWithdraw = async ({
            var destTag = "";
             return await coinPayment.createWithdrawal({
                 currencySymbol: coin,
-                amount: amount,
+                amount: amount,  
                 address: toAddress,
                 destTag: destTag
             })

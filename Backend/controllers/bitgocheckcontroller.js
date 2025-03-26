@@ -4,7 +4,8 @@ const { BitGo } = require('bitgo');
 // const ACCESS_TOKEN = "v2x42e290fb414f996a7b6fa9d3837bc11e4009276ae75cc3ce305914d8a35fe9f4"  //client new
 
 // const ACCESS_TOKEN = "v2x757e5a80f6b2a412b8ff2f6d77f791e025d68d9ab3f67419a9cc1e91d882c385" //ip
-const ACCESS_TOKEN = "v2x804d0259b4b2da43e6290d6aaf6049d08ddcbe2d9841f1efe5a953f30ff6ffce"//without ip
+// const ACCESS_TOKEN = "v2x804d0259b4b2da43e6290d6aaf6049d08ddcbe2d9841f1efe5a953f30ff6ffce"//without ip
+const ACCESS_TOKEN = "v2x85c52e8937e65884ac4641b0d943314d2f176abbe0b6b3b674619a7236db013e"
 const bitgo = new BitGo({
     accessToken: ACCESS_TOKEN,
     env: 'test',
@@ -12,23 +13,23 @@ const bitgo = new BitGo({
 
 export const CreateWallet = async(symbol) => {
     try{
-        const result = await bitgo.session();
-        console.dir(result);
-          const { wallet } = await bitgo.coin('tbtc').wallets().generateWallet({
-            label: 'murugavelrajmaticz@gmail.com',
-            passphrase: 'murugavelwallet',
-            // enterprise: '67bf20b0cb4ae0362b9d9321ec3fcd83' //client
-            enterprise : "67c9458ecaef5bed16fc5d5ea8331431"
-        });
-        let addwebhok = await wallet.addWebhook({
-          type: 'transfer',
-          allToken: false,
-          url: 'https://qc3kj71m-2053.inc1.devtunnels.ms/bitgo-webhook',
-          label: 'For Testing purpose',
-        })
-        // const address = await wallet.createAddress();
-        console.log("created address" ,addwebhok ,  "wallets" , wallet , wallet.id());
-        // Finalsendtransaction()
+        // const result = await bitgo.session();
+        // console.dir(result);
+        //   const { wallet } = await bitgo.coin('tbtc').wallets().generateWallet({
+        //     label: 'murugavelrajmaticz@gmail.com',
+        //     passphrase: 'murugavelwallet',
+        //     // enterprise: '67bf20b0cb4ae0362b9d9321ec3fcd83' //client
+        //     enterprise : "67c9458ecaef5bed16fc5d5ea8331431"
+        // });
+        // let addwebhok = await wallet.addWebhook({
+        //   type: 'transfer',
+        //   allToken: false,
+        //   url: 'https://qc3kj71m-2053.inc1.devtunnels.ms/bitgo-webhook',
+        //   label: 'For Testing purpose',
+        // })
+        // // const address = await wallet.createAddress();
+        // console.log("created address" ,addwebhok ,  "wallets" , wallet , wallet.id() , wallet);
+        Finalsendtransaction()
         // Createtransactlist()
     }
     catch(e){
@@ -108,13 +109,13 @@ export const sendanotherway = async () => {
 export const Finalsendtransaction = async() => {
     try {
         // Define the wallet ID (replace with actual wallet ID)
-        const wallet = await bitgo.coin("tbtc").wallets().get({ id: "67ce6ad6ab3f0afd9d8f857ba3f5c068" });
+        const wallet = await bitgo.coin("tbtc").wallets().get({ id: "67dbaaefc9532fc37ee600f1ba71dc42" });
         let bal = await wallet.balance()
         console.log("wallet" , wallet ,bal);
         
     
         // Define the recipient address and amount to send (in satoshis)
-        const recipientAddress = 'tb1qkfht7nnd64d6cg578sr6qv75ksjuw6ck6nq7yn';
+        const recipientAddress = 'tb1pdy5gcfknrpyy2myja5csyteky2y5r9jcleyzj0lnfjv0hpnu2tas6fqg86';
         const amountToSend = 10000; // Example amount in satoshis (0.0001 BTC)
     
         // Create a transaction
@@ -142,12 +143,12 @@ export const Finalsendtransaction = async() => {
 
 export const Createtransactlist = async(symbol) => {
   try{
-    const wallet = await bitgo.coin("tbtc").wallets().get({ id: "67ce8b8a092629e8eb2b10539ed5b324" });
+    const wallet = await bitgo.coin("tbtc").wallets().get({ id: "67dace8747425cbe905d49fd34b0a6bc" });
     let transferlist = await wallet.transfers();
     console.log("list of transaction" , transferlist);
     const stimulate = await wallet.simulateWebhook({
-      transferId : "67ce928745535b5ed953f2bf40b46909",
-      webhookId : " "
+      transferId : "67dacefcac89a1eee0c9b511dcbc8d69",
+      webhookId : "67dace896eb3c9360ee678f8e999b84a"
     })
     
   }

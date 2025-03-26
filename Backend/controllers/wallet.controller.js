@@ -277,7 +277,7 @@ export const updateAddress = async (assetList, userId, option = {}) => {
                             }
                         }
                     ],
-                }
+            }
             },
         ]);
         let walletData;

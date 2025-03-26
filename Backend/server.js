@@ -15,6 +15,7 @@ import p2p from './routes/P2P-routes/p2proutes';
 import p2pAdmin from './routes/P2P-routes/P2PAdminroutes';
 import { createSocketIO } from './config/socketIO';
 import { UpdateKycStatus } from './controllers/P2PCONTROLLER/p2pcontroller';
+import { depositwebhook } from './controllers/bitgo.controller';
 const { swaggerUi, swaggerSpec } = require('./config/swagger.services');
 
 const helmet = require('helmet');
@@ -35,14 +36,7 @@ var myip = ip.address();
 
 app.set('trust proxy', true)
 
-app.post("/bitgo-webhook", (req, res) => {
-  try {
-    console.log("bitgo webhook req?.body" ,  "bodddyy", req?.body);
-  } catch (error) {
-    console.error("Error in /webhook handler:", error);
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-});
+
 
 app.post("/webhook", (req, res) => {
   try {
@@ -93,15 +87,17 @@ app.use(helmet.xssFilter());
 
 app.use(helmet.referrerPolicy({ policy: 'no-referrer' }));
 
-app.use(bodyParser.urlencoded({
+app.use(express.urlencoded({
   limit: 5242880, extended: true 
 }));
 
-app.use(bodyParser.json());
+app.use(express.json());
 
 app.use(passport.initialize());
 
 require("./config/passport").adminAuth(passport);
+
+app.post("/bitgo-webhook", depositwebhook);
 
 app.use(express.static(__dirname + '/public'));
 

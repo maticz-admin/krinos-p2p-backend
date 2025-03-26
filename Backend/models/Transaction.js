@@ -54,14 +54,17 @@ const TransactionSchema = new Schema({
 	txid: {
 		type: String,
 	},
+	transfer_id : {
+		type : String
+	},
 	status: {
 		type: String,
 		enum: ['new', 'time_expired', 'pending', 'completed', 'rejected', 'cancelled']
 	},
 	type: {
 		type: String,
-		enum: ['local', 'coin_payment', 'binance'],
-		default: 'local'
+		enum: ['local', 'coin_payment', 'binance' , 'bitgo'],
+		default: 'bitgo'
 	},
 	paymentType: {
 		type: String,

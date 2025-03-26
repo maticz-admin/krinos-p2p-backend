@@ -232,19 +232,17 @@ export const generateCryptoAddr = async ({ currencyList = [], option = {} }) => 
                 }
                 else if (currency.depositType == 'bitgo') {
                     let label = 'KRINOS' + option.emailId; // user registered address
-                    let phrase = config?.IPN_URL;  // config ipn url
-                    var coinpayment_details = await bitgoPayment.CreateAddress(currency.bitgosymbol, label , phrase)
+                    let phrase = 'KRINOS' + option.emailId;  // config ipn url
+                    var bitgo_details = await bitgoPayment.CreateAddress(currency.bitgosymbol, label , phrase)
 
                     let assetObj = {
                         "_id": currency._id,
                         "coin": currency.coin,
-                        "privateKey": coinpayment_details.privateKey
                     }
-
-                    assetObj['address'] = coinpayment_details.address
-                    assetObj['destTag'] = coinpayment_details.destTag
+                    assetObj['address'] = bitgo_details.address
+                    assetObj['bitgo_id'] = bitgo_details.walletid,
+                    assetObj["bitgo_webhookid"] = bitgo_details?.webhookid
                     assetList.push(assetObj)
-
                 }
             }
         }
@@ -321,20 +319,19 @@ export const generateTokenAddr = async ({ currencyList = [], walletData }) => {
                 //     }
                 //     assetList.push(assetObj)
                 // }
-
-
                 if (currency.depositType == 'bitgo') {
                     let label = 'KRINOS' + option.emailId; // user registered address
                     let phrase = config?.IPN_URL;  // config ipn url
-                    var coinpayment_details = await bitgoPayment.CreateAddress(currency.bitgosymbol, label , phrase)
+                    var bitgo_details = await bitgoPayment.CreateAddress(currency.bitgosymbol, label , phrase)
 
                     let assetObj = {
                         "_id": currency._id,
                         "coin": currency.coin,
-                        "privateKey": coinpayment_details.privateKey
+                        // "privateKey": coinpayment_details.privateKey
                     }
-                    assetObj['address'] = coinpayment_details.address
-                    assetObj['destTag'] = coinpayment_details.destTag
+                    assetObj['address'] = bitgo_details.address
+                    assetObj['bitgo_id'] = bitgo_details.walletid,
+                    assetObj["bitgo_webhookid"] = bitgo_details?.webhookid
                     assetList.push(assetObj)
                 }
             }
@@ -354,7 +351,6 @@ export const generateFiatAddr = async ({ currencyList = [] }) => {
         if (!Array.isArray(currencyList)) {
             return []
         }
-
         let assetList = []
         for (let currency of currencyList) {
             if (currency && currency.type == 'fiat') {

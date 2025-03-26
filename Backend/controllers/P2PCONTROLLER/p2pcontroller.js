@@ -1262,7 +1262,7 @@ export const checkdidit = async(req , res) => {
     catch(e){
         console.log("error on checfk didit" , e);
     }
-}
+} 
 
 
 

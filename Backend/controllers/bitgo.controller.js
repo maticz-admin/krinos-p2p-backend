@@ -7,7 +7,8 @@ import { createPassBook } from './passbook.controller';
 import { mailTemplateLang } from '../controllers/emailTemplate.controller';
 
 
-const ACCESS_TOKEN = "v2x6e5c38b17ddcf2f1cdb545245cfa77378988bfa46755f389697b4b2c0754d501"//without ip
+const ACCESS_TOKEN = "v2x4f64554b8e88600a5a12ef8d37193cd6739f3b6db4dbd2a5982d8fe276f6c89c"
+//"v2x6e5c38b17ddcf2f1cdb545245cfa77378988bfa46755f389697b4b2c0754d501"//without ip
 const ENTERPRICE_ID = "67c9458ecaef5bed16fc5d5ea8331431"
 const WEBHOOK_URL = "";
 
@@ -208,3 +209,33 @@ export const WithdrawAmount = async(req , res) => {
         console.log("error on withdraw amount" , e);
     }
 }
+
+
+
+const WALLET_ID = "67dbaaefc9532fc37ee600f1ba71dc42";  // Your Source Wallet ID
+const DESTINATION_WALLET_ID = "tb1p5c4p0uk4cv6juzrxcypgdstydds9x2crllcspc28cn4sre6jhg9skrkgyr"; // Your Destination Wallet ID
+const COIN_TYPE = "tbtc"; // Use "btc", "eth", or "tbtc" (testnet BTC)
+
+export async function internalTransfer() {
+    try {
+        const wallet = await bitgo.coin(COIN_TYPE).wallets().get({ id: WALLET_ID });
+
+        console.log(`Wallet Found: ${wallet.label()} (${wallet.id()})`);
+
+        // Internal Transfer
+        const transfer = await wallet.send({
+            amount: 1,  // Amount in satoshis (e.g., 100000 = 0.00000001 BTC)
+            address: DESTINATION_WALLET_ID, // Destination Wallet ID within BitGo
+            //walletPassphrase: process.env.WALLET_PASSPHRASE, // Needed if using a password-protected wallet
+            type: "internal" // Internal transfer (avoids blockchain fees)
+        });
+
+        console.log("Transfer Successful:", transfer);
+    //     const wallet = await bitgo.coin("tbtc").wallets().get({ id: "67dace8747425cbe905d49fd34b0a6bc" });
+    // let transferlist = await wallet.transfers();
+    // console.log("list of transaction" , transferlist);
+    } catch (error) {
+        console.error("Error in Internal Transfer:", error.message);
+    }
+}
+

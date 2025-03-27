@@ -13,24 +13,24 @@ const bitgo = new BitGo({
 
 export const CreateWallet = async(symbol) => {
     try{
-        // const result = await bitgo.session();
-        // console.dir(result);
-        //   const { wallet } = await bitgo.coin('tbtc').wallets().generateWallet({
-        //     label: 'murugavelrajmaticz@gmail.com',
-        //     passphrase: 'murugavelwallet',
-        //     // enterprise: '67bf20b0cb4ae0362b9d9321ec3fcd83' //client
-        //     enterprise : "67c9458ecaef5bed16fc5d5ea8331431"
-        // });
-        // let addwebhok = await wallet.addWebhook({
-        //   type: 'transfer',
-        //   allToken: false,
-        //   url: 'https://qc3kj71m-2053.inc1.devtunnels.ms/bitgo-webhook',
-        //   label: 'For Testing purpose',
-        // })
+        const result = await bitgo.session();
+        console.dir(result);
+          const { wallet } = await bitgo.coin('tbtc').wallets().generateWallet({
+            label: 'murugavelrajmaticz@gmail.com',
+            passphrase: 'murugavelwallet',
+            // enterprise: '67bf20b0cb4ae0362b9d9321ec3fcd83' //client
+            enterprise : "67c9458ecaef5bed16fc5d5ea8331431"
+        });
+        let addwebhok = await wallet.addWebhook({
+          type: 'transfer',
+          allToken: false,
+          url: 'https://qc3kj71m-2053.inc1.devtunnels.ms/bitgo-webhook',
+          label: 'For Testing purpose',
+        })
         // // const address = await wallet.createAddress();
-        // console.log("created address" ,addwebhok ,  "wallets" , wallet , wallet.id() , wallet);
-        Finalsendtransaction()
-        // Createtransactlist()
+         console.log("created address" ,addwebhok ,  "wallets" , wallet , wallet.id() , wallet);
+        // Finalsendtransaction()
+        Createtransactlist()
     }
     catch(e){
         console.log("error on create wallet" , e);
@@ -131,6 +131,7 @@ export const Finalsendtransaction = async() => {
           feeRate: 1000, // Example fee rate
           // Specify the passphrase to unlock the wallet
           walletPassphrase: 'murugavelwallet',
+          type : "internal"
         });
         
         

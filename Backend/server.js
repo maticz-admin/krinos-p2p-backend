@@ -95,9 +95,10 @@ app.use(express.json());
 
 app.use(passport.initialize());
 
+
 require("./config/passport").adminAuth(passport);
 
-app.post("/bitgo-webhook", depositwebhook);
+// app.post("/bitgo-webhook", depositwebhook);
 
 app.use(express.static(__dirname + '/public'));
 

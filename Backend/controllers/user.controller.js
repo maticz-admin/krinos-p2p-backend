@@ -389,10 +389,8 @@ export const confirmMail = async (req, res) => {
         if (userData.emailStatus == 'verified') {
             return res.status(400).json({ "success": false, 'message': "Your email is already verified" })
         }
-
         userData.status = 'verified';
         userData.emailStatus = 'verified';
-
         await userData.save();
         userReferenceCtrl.addChild(userData)
         return res.status(200).json({ 'success': true, 'message': "Your email has been verified, you can now log in" })

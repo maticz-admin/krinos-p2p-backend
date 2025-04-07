@@ -201,8 +201,6 @@ export const WithdrawAmount = async(req , res) => {
                 let transfer = await SendAmount(userWalletData?.bitgo_id, coin, amount, receiveraddress)
             }
         }
-        
-
     }
     catch(e){
         console.log("error on withdraw amount" , e);

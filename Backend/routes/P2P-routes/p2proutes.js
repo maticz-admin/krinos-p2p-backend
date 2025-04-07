@@ -32,7 +32,7 @@ router.route("/update-order-status").post(decodedata, apiKeyCtrl.authorization, 
 router.route("/get-currency-data").get(p2pcontroller.getcurrencydata);
 router.route("/assetupdate").post(apiKeyCtrl.authorization, p2pcontroller.Adminassetupdate);
 
-router.route("/update-user-status").post(decodedata, p2pcontroller.updateuseronlinestatus);
+router.route("/update-user-status").post(p2pcontroller.updateuseronlinestatus);
 
 router.route("/get-cms").get(reqQueryDecodedata, p2pcontroller.Getcms); //
 router.route("/get-faq").get(p2pcontroller.Getfaq); //

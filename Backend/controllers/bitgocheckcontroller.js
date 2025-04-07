@@ -5,7 +5,7 @@ const { BitGo } = require('bitgo');
 
 // const ACCESS_TOKEN = "v2x757e5a80f6b2a412b8ff2f6d77f791e025d68d9ab3f67419a9cc1e91d882c385" //ip
 // const ACCESS_TOKEN = "v2x804d0259b4b2da43e6290d6aaf6049d08ddcbe2d9841f1efe5a953f30ff6ffce"//without ip
-const ACCESS_TOKEN = "v2x85c52e8937e65884ac4641b0d943314d2f176abbe0b6b3b674619a7236db013e"
+const ACCESS_TOKEN = "v2x4f64554b8e88600a5a12ef8d37193cd6739f3b6db4dbd2a5982d8fe276f6c89c"
 const bitgo = new BitGo({
     accessToken: ACCESS_TOKEN,
     env: 'test',
@@ -24,13 +24,13 @@ export const CreateWallet = async(symbol) => {
         let addwebhok = await wallet.addWebhook({
           type: 'transfer',
           allToken: false,
-          url: 'https://qc3kj71m-2053.inc1.devtunnels.ms/bitgo-webhook',
-          label: 'For Testing purpose',
+          url: 'https://webhook-test.com/8138716ea198df73b529f69755b0faa7',
+          label: 'BitGo Webhook Test ENV',
         })
         // // const address = await wallet.createAddress();
          console.log("created address" ,addwebhok ,  "wallets" , wallet , wallet.id() , wallet);
         // Finalsendtransaction()
-        Createtransactlist()
+        //Createtransactlist()
     }
     catch(e){
         console.log("error on create wallet" , e);

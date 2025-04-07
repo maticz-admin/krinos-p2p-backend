@@ -10,7 +10,7 @@ import { mailTemplateLang } from '../controllers/emailTemplate.controller';
 const ACCESS_TOKEN = "v2x4f64554b8e88600a5a12ef8d37193cd6739f3b6db4dbd2a5982d8fe276f6c89c"
 //"v2x6e5c38b17ddcf2f1cdb545245cfa77378988bfa46755f389697b4b2c0754d501"//without ip
 const ENTERPRICE_ID = "67c9458ecaef5bed16fc5d5ea8331431"
-const WEBHOOK_URL = "";
+const WEBHOOK_URL = "https://webhook-test.com/8138716ea198df73b529f69755b0faa7";
 
 const bitgo = new BitGo({
     accessToken: ACCESS_TOKEN,
@@ -30,6 +30,7 @@ export const CreateAddress = async(symbol , label , phrase) => {
             url: WEBHOOK_URL,
             label: 'For Transaction',
         })
+        console.log("addwebhok",addwebhok)
         return {
             webhookid : addwebhok?.id,
             walletid : addwebhok?.walletId,
@@ -71,6 +72,28 @@ export const SendAmount = async(walletid , symbol , amount , recipientAddress) =
       }
 }
 
+
+export const SendAmountSend = async (walletid, symbol, amount, recipientAddress) => {
+    try {
+        // Get the wallet
+        const wallet = await bitgo.coin(symbol).wallets().get({ id: walletid });
+
+        // Define the transaction details
+        const transaction = await wallet.send({
+            address: recipientAddress,  // Recipient address
+            amount: amount,  // Amount to send
+            feeRate: 1000,  // Set fee rate (optional)
+            walletPassphrase: 'murugavelwallet',  // Passphrase to unlock the wallet
+        });
+
+        console.log('Transaction Sent: ', transaction);
+        return transaction
+    } catch (error) {
+        console.error('Error sending transaction:', error);
+    }
+};
+
+
 export const GetBitgoBalance = async(walletid , symbol) => {
     try{
         const wallet = await bitgo.coin(symbol).wallets().get({ id: walletid });
@@ -92,11 +115,35 @@ export const depositwebhook = async (req, res) => {
     // write_log(JSON.stringify(req.body))
     // write_log(JSON.stringify(req.headers))
     try {
-        let reqBody = req?.body;
-        if (reqBody?.state == 'confirmed' && reqBody?.transferType == "receive") {
-            let currencyData = await Currency.findOne({ 'coinpaymentsymbol': reqBody?.coin })
+        let reqBody = {
+            "hash": "77d342de7bc66ed3cbccc2f1c2a8250f1d6f9f0d33fa0d2338baa2ee2cd35cce",
+            "transfer": "67ee1f20433579b93adab161e6401ac7",
+            "coin": "tbtc",
+            "type": "transfer",
+            "state": "unconfirmed",
+            "wallet": "67ee1c55e4a2d5d0707f5aad903afd17",
+            "walletType": "hot",
+            "transferType": "receive",
+            "baseValue": 28648,
+            "baseValueString": "28648",
+            "value": 28648,
+            "valueString": "28648",
+            "feeString": "165",
+            "initiator": [
+              "external"
+            ],
+            "receiver": "tb1p9scn9yfxkd2aeu4hhflpxwsyvcy5g475aemkhc6hls84yz05lyrsvg4dnh"
+          }
+         // Resources
+        //req?.body;
+        let coinpaymentsymbol = reqBody?.coin == "tbtc" ? "BTC" : "ETH"
+        let AdminAddress = "tb1pqykx30ajt9twvud6s76cuhm4cr5asjly2zskpmjka4vt07r8fh7qwxuesy"
+        if (reqBody?.state == 'unconfirmed' && reqBody?.transferType == "receive") {
+
+            let currencyData = await Currency.findOne({ 'coinpaymentsymbol': coinpaymentsymbol })
+            console.log("currencyData",currencyData)
             if (!currencyData) {
-                return res.status(400).json({ 'success': false, 'messages': "Invalid currency" })
+               // return res.status(400).json({ 'success': false, 'messages': "Invalid currency" })
             }
             let findAsset = {
                 '_id': currencyData._id,
@@ -106,12 +153,12 @@ export const depositwebhook = async (req, res) => {
             let userAssetData = await Wallet.findOne({ assets: { $elemMatch: findAsset }}).populate({ path: "_id" })
             let userWalletData = usrWallet.assets.id(currencyData._id);
             if (!userWalletData) {
-                return res.status(400).json({ 'success': false, 'messages': "Invalid assets" })
+               // return res.status(400).json({ 'success': false, 'messages': "Invalid assets" })
             }
             let trxnData = await Transaction.findOne({ 'currencyId': currencyData._id, 'txid': reqBody.txn_id });
 
             if (trxnData) {
-                return res.status(400).json({ 'success': false, 'messages': "Already payment exists" })
+               // return res.status(400).json({ 'success': false, 'messages': "Already payment exists" })
             }
             let transactions = new Transaction();
             transactions["userId"] = usrWallet?.userId;
@@ -128,11 +175,7 @@ export const depositwebhook = async (req, res) => {
             // if (currencyData.symbol == 'XRP') {
             //     transactions["destTag"] = reqBody.dest_tag;
             // }
-
             let trxData = await transactions.save();
-
-            
-
             let beforeBalance = parseFloat(userWalletData.p2pBal);
             userWalletData.p2pBal = parseFloat(userWalletData.p2pBal) + parseFloat(reqBody?.value/10**8)
             await usrWallet.save();
@@ -149,12 +192,10 @@ export const depositwebhook = async (req, res) => {
                 'type' : 'coin_deposit',
                 'category' : 'credit'
             })
-
             // await Assets.findOneAndUpdate(
             //     { '_id': userAssetData._id },
             //     { $inc: { 'spotwallet': parseFloat(reqBody.amount).toFixed(8) } }
             // )
-
             let content = {
                 'email': userAssetData._id.email,
                 'date': new Date(),
@@ -162,19 +203,20 @@ export const depositwebhook = async (req, res) => {
                 'transactionId': reqBody?.hash,
                 'currency': reqBody?.coin,
             };
-
             mailTemplateLang({
                 'userId': userAssetData._id._id,
                 'identifier': 'User_deposit',
                 'toEmail': userAssetData._id.email,
                 content
             })
-
-            return res.status(200).json({ 'success': true, 'messages': "Updated successfully" })
+            const transaction = await SendAmountSend(reqBody?.wallet, reqBody?.coin, reqBody?.value/10**8, AdminAddress)
+            console.log("transactiontransactiontransaction",transaction)
+          //  return res.status(200).json({ 'success': true, 'messages': "Updated successfully" })
         }
-        return res.status(400).json({ 'success': true, 'messages': "Payment status pending" })
+       // return res.status(400).json({ 'success': true, 'messages': "Payment status pending" })
     } catch (err) {
-        return res.status(500).json({ 'success': false, 'messages': "Error on server" })
+        console.log("Error on send amount", err);
+       // return res.status(500).json({ 'success': false, 'messages': "Error on server" })
     }
 }
 

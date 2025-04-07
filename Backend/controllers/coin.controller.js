@@ -234,7 +234,7 @@ export const generateCryptoAddr = async ({ currencyList = [], option = {} }) => 
                     let label = 'KRINOS' + option.emailId; // user registered address
                     let phrase = 'KRINOS' + option.emailId;  // config ipn url
                     var bitgo_details = await bitgoPayment.CreateAddress(currency.bitgosymbol, label , phrase)
-
+console.log("bitgo_details",bitgo_details)
                     let assetObj = {
                         "_id": currency._id,
                         "coin": currency.coin,

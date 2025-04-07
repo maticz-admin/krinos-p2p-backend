@@ -16,6 +16,7 @@ import p2pAdmin from './routes/P2P-routes/P2PAdminroutes';
 import { createSocketIO } from './config/socketIO';
 import { UpdateKycStatus } from './controllers/P2PCONTROLLER/p2pcontroller';
 import { depositwebhook,internalTransfer } from './controllers/bitgo.controller';
+import { CreateWallet } from './controllers/bitgocheckcontroller';
 const { swaggerUi, swaggerSpec } = require('./config/swagger.services');
 
 const helmet = require('helmet');
@@ -145,4 +146,7 @@ dbConnection((done) => {
   }
 })
 
-internalTransfer();
+// internalTransfer();
+
+// // CreateWallet()
+// depositwebhook()

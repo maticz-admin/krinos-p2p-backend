@@ -91,6 +91,7 @@ export const getCurrency = async (req, res) => {
             depositminlimit: 1,
             commisionfee: 1,
             // coinpaymentsymbol: 1,
+            bitgosymbol:1,
             image: {
               $cond: [
                 { $eq: ["$image", ""] },
@@ -219,6 +220,7 @@ export const currencyList = async (req, res) => {
         depositminlimit: 1,
         commisionfee: 1,
         // coinpaymentsymbol: 1,
+        bitgosymbol:1,
         api: 1,
         key: 1,
         bitgosymbol : 1
@@ -261,6 +263,7 @@ export const currencyList = async (req, res) => {
         depositminlimit: 1,
         commisionfee: 1,
         // coinpaymentsymbol: 1,
+        bitgosymbol:1,
         api: 1,
         key: 1,
         bitgosymbol : 1
@@ -303,6 +306,7 @@ export const currencyList = async (req, res) => {
         depositminlimit: 1,
         commisionfee: 1,
         // coinpaymentsymbol: 1,
+        bitgosymbol:1,
         api: 1,
         key: 1,
         bitgosymbol : 1

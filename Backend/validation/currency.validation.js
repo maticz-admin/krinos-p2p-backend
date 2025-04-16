@@ -30,6 +30,12 @@ export const addValid = (req, res, next) => {
         }
     }
 
+    if(reqBody?.depositType == "bitgo"){
+        if (isEmpty(reqBody.bitgosymbol)) {
+            errors.bitgosymbol = "Bitgo Symbol field is required";
+        }
+    }
+
     if (isEmpty(reqFile.image)) {
         errors.image = "REQUIRED";
     }
@@ -85,7 +91,7 @@ export const addValid = (req, res, next) => {
 
     if (isEmpty(reqBody.depositType)) {
         errors.depositType = "REQUIRED";
-    } else if (!['local', 'coin_payment', 'binance'].includes(reqBody.depositType)) {
+    } else if (!['local', 'coin_payment', 'binance', 'bitgo'].includes(reqBody.depositType)) {
         errors.depositType = "INVALID_TYPE";
     }
     if(reqBody.depositType == "local"){

@@ -171,6 +171,8 @@ export const localWithdraw = async ({
 */
 export const generateCryptoAddr = async ({ currencyList = [], option = {} }) => {
     try {
+        console.log("Generate crypto addr");
+        
         if (!Array.isArray(currencyList)) {
             return []
         }
@@ -234,7 +236,6 @@ export const generateCryptoAddr = async ({ currencyList = [], option = {} }) => 
                     let label = 'KRINOS' + option.emailId; // user registered address
                     let phrase = 'KRINOS' + option.emailId;  // config ipn url
                     var bitgo_details = await bitgoPayment.CreateAddress(currency.bitgosymbol, label , phrase)
-
                     let assetObj = {
                         "_id": currency._id,
                         "coin": currency.coin,

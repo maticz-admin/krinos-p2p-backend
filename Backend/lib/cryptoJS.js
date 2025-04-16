@@ -126,7 +126,7 @@ export const decodedata = (req, res, next) => {
     // }
     var contentype = req?.headers?.["content-type"];
 
-    if (contentype.includes("multipart/form-data") || contentype.includes("multipart/formdata")) {
+    if (contentype?.includes("multipart/form-data") || contentype?.includes("multipart/formdata")) {
 
       let err = "";
       Object.keys(req?.body).map((data) => {

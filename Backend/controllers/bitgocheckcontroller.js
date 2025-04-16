@@ -5,7 +5,9 @@ const { BitGo } = require('bitgo');
 
 // const ACCESS_TOKEN = "v2x757e5a80f6b2a412b8ff2f6d77f791e025d68d9ab3f67419a9cc1e91d882c385" //ip
 // const ACCESS_TOKEN = "v2x804d0259b4b2da43e6290d6aaf6049d08ddcbe2d9841f1efe5a953f30ff6ffce"//without ip
-const ACCESS_TOKEN = "v2x695caf41c15f4ebc4a2026cf947c36feb40476c6060d3e39c5eea37bff6563cd"
+// const ACCESS_TOKEN = "v2x695caf41c15f4ebc4a2026cf947c36feb40476c6060d3e39c5eea37bff6563cd"
+const ACCESS_TOKEN = "v2x4f64554b8e88600a5a12ef8d37193cd6739f3b6db4dbd2a5982d8fe276f6c89c"
+
 const bitgo = new BitGo({
     accessToken: ACCESS_TOKEN,
     env: 'test',
@@ -13,24 +15,24 @@ const bitgo = new BitGo({
 
 export const CreateWallet = async(symbol) => {
     try{
-        // const result = await bitgo.session();
-        // console.dir(result);
-        //   const { wallet } = await bitgo.coin('tbtc').wallets().generateWallet({
-        //     label: 'murugavelrajmaticz@gmail.com',
-        //     passphrase: 'murugavelwallet',
-        //     // enterprise: '67bf20b0cb4ae0362b9d9321ec3fcd83' //client
-        //     enterprise : "67c9458ecaef5bed16fc5d5ea8331431"
-        // });
-        // let addwebhok = await wallet.addWebhook({
-        //   type: 'transfer',
-        //   allToken: false,
-        //   url: 'https://qc3kj71m-2053.inc1.devtunnels.ms/bitgo-webhook',
-        //   label: 'For Testing purpose',
-        // })
+        const result = await bitgo.session();
+        console.dir(result);
+          const { wallet } = await bitgo.coin('tbtc').wallets().generateWallet({
+            label: 'murugavelrajmaticz@gmail.com',
+            passphrase: 'murugavelwallet',
+            // enterprise: '67bf20b0cb4ae0362b9d9321ec3fcd83' //client
+            enterprise : "67c9458ecaef5bed16fc5d5ea8331431"
+        });
+        let addwebhok = await wallet.addWebhook({
+          type: 'transfer',
+          allToken: false,
+          url: 'https://qc3kj71m-2053.inc1.devtunnels.ms/bitgo-webhook',
+          label: 'BitGo Webhook Test ENV',
+        })
         // // const address = await wallet.createAddress();
-        // console.log("created address" ,addwebhok ,  "wallets" , wallet , wallet.id() , wallet);
-        Finalsendtransaction()
-        // Createtransactlist()
+         console.log("created address" ,addwebhok ,  "wallets" , wallet , wallet.id() , wallet);
+        // Finalsendtransaction()
+        //Createtransactlist()
     }
     catch(e){
         console.log("error on create wallet" , e);
@@ -121,19 +123,19 @@ export const Finalsendtransaction = async() => {
     
         // Create a transaction
         // const webhook = await wallet.addWebhook
-        // const transaction = await wallet.sendMany({
-        //   recipients: [
-        //     {
-        //       address: recipientAddress,
-        //       amount: amountToSend,
-        //     },
-        //   ],
-        //   // Optional: Set the fee rate (in satoshis per byte)
-        //   feeRate: 1000, // Example fee rate
-        //   // Specify the passphrase to unlock the wallet
-        //   walletPassphrase: 'murugavelwallet',
-        //   type : "internal"
-        // });
+        const transaction = await wallet.sendMany({
+          recipients: [
+            {
+              address: recipientAddress,
+              amount: amountToSend,
+            },
+          ],
+          // Optional: Set the fee rate (in satoshis per byte)
+          feeRate: 1000, // Example fee rate
+          // Specify the passphrase to unlock the wallet
+          walletPassphrase: 'murugavelwallet',
+          type : "internal"
+        });
         
         
         // console.log('Transaction Sent: ', transaction);

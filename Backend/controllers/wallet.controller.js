@@ -173,10 +173,11 @@ export const getWallet = async (req, res) => {
             "assets.derivativeBal": 1,
             "assets.p2pBal": 1
         })
+        console.log("walletDatawalletData",walletData)
         var userInfo = await User.findOne({
             '_id': req.user.id
         })
-
+        console.log("userInfo",userInfo)
         if (!walletData) {
             return res.status(400).json(encodedata({ 'success': false }))
         }
@@ -188,6 +189,7 @@ export const getWallet = async (req, res) => {
             }
         });
         if (assetList && assetList.length > 0) {
+            console.log("assetListasdas" , assetList);
             let updateAsset = await updateAddress(assetList, req.user.userId, {
                 'walletId': walletData._id,
                 "binSubAcctEmail": req.user.binSubAcctEmail,
@@ -201,6 +203,7 @@ export const getWallet = async (req, res) => {
         return res.status(200).json(encodedata({ 'success': true, 'messages': "successfully", 'result': usrAsset, }))
     }
     catch (err) {
+        console.log("errrrrrrrrrrrrrrrrr",err)
         return res.status(500).json(encodedata({ 'success': false }))
     }
 }
@@ -237,6 +240,8 @@ export const getbalance = async (req, res) => {
 */
 export const updateAddress = async (assetList, userId, option = {}) => {
     try {
+        console.log("update address" );
+        
         let currencyList = await Currency.aggregate([
             { "$match": { "_id": { "$in": assetList } } },
             {
@@ -249,7 +254,8 @@ export const updateAddress = async (assetList, userId, option = {}) => {
                                 "coin": 1,
                                 "depositType": 1,
                                 "tokenType": 1,
-                                "coinpaymentsymbol" : 1
+                                "coinpaymentsymbol" : 1,
+                                "bitgosymbol" : 1
                             }
                         }
                     ],
@@ -261,7 +267,8 @@ export const updateAddress = async (assetList, userId, option = {}) => {
                                 "coin": 1,
                                 "depositType": 1,
                                 "tokenType": 1,
-                                "coinpaymentsymbol" : 1
+                                "coinpaymentsymbol" : 1,
+                                "bitgosymbol" : 1
                             }
                         }
                     ],
@@ -273,13 +280,15 @@ export const updateAddress = async (assetList, userId, option = {}) => {
                                 "coin": 1,
                                 "depositType": 1,
                                 "tokenType": 1,
-                                "coinpaymentsymbol" : 1
+                                "coinpaymentsymbol" : 1,
+                                "bitgosymbol" : 1
                             }
                         }
                     ],
             }
             },
         ]);
+        console.log("currencyListcurrencyList",currencyList)
         let walletData;
         if (currencyList && currencyList.length > 0) {
             if (currencyList[0].crypto && currencyList[0].crypto.length > 0) {
@@ -289,7 +298,7 @@ export const updateAddress = async (assetList, userId, option = {}) => {
                         'option': { ...option, 'userId': userId }
                     })
 
-
+console.log("cryptoDoccryptoDoc",cryptoDoc)
                     walletData = await Wallet.findOneAndUpdate({
                         'userId': userId,
                         'assets._id': cryptoData._id
@@ -411,6 +420,7 @@ export const updateAddress = async (assetList, userId, option = {}) => {
         return []
 
     } catch (err) {
+        console.log("sjnaskdasjdasdas",err)
         return []
     }
 }
@@ -733,7 +743,6 @@ export const withdrawCoinRequest = async (req, res) => {
         let finalAmount = reqBody.finalAmount //+ parseFloat(curData.withdrawFee)
         if (usrAsset.p2pBal < finalAmount) {
             console.log('------------------9');
-
             return res.status(400).json(encodedata({ 'success': false, 'errors': { 'finalAmount': 'INSUFFICIENT_BALANCE' } }))
         }
 
@@ -2027,6 +2036,8 @@ export const fiatDepositApprove = async (req, res) => {
 */
 export const newUsrWallet = async (walletData, option = {}) => {
     try {
+        console.log("new user wallet");
+        
         if (isEmpty(walletData)) {
             return false
         }
@@ -2043,7 +2054,8 @@ export const newUsrWallet = async (walletData, option = {}) => {
                                 "coin": 1,
                                 "depositType": 1,
                                 "tokenType": 1,
-                                "coinpaymentsymbol" : 1
+                                "coinpaymentsymbol" : 1,
+                                "bitgosymbol":1
                             }
                         }
                     ],
@@ -2055,7 +2067,8 @@ export const newUsrWallet = async (walletData, option = {}) => {
                                 "coin": 1,
                                 "depositType": 1,
                                 "tokenType": 1,
-                                "coinpaymentsymbol" : 1
+                                "coinpaymentsymbol" : 1,
+                                "bitgosymbol":1
                             }
                         }
                     ],
@@ -2067,7 +2080,8 @@ export const newUsrWallet = async (walletData, option = {}) => {
                                 "coin": 1,
                                 "depositType": 1,
                                 "tokenType": 1,
-                                "coinpaymentsymbol" : 1
+                                "coinpaymentsymbol" : 1,
+                                "bitgosymbol":1
                             }
                         }
                     ],

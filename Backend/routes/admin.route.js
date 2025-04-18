@@ -125,7 +125,7 @@ router.route('/userKyc')
   .post(passportAuth, userKycCtrl.approveUserKyc)
   .put(passportAuth, userKycValid.rejectKycValidate, userKycCtrl.rejectUserKyc);
 router.route('/changeUsrType/:userId').put(passportAuth, userKycCtrl.changeUserType)
-router.route('/kycList').post(userKycCtrl.getKycList)
+router.route('/kycList').post(decodedata, userKycCtrl.getKycList)
 
 // Wallet
 router.route('/depositList').get(passportAuth, walletCtrl.getDepositList)

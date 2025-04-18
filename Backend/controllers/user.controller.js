@@ -738,6 +738,21 @@ export const getUserProfile = async (req, res) => {
     // )
 }
 
+export const profileImage = async (req, res) => {
+    try {
+      
+        const userData = await User.findOne({ "_id": req.body.id })
+        if (userData) {
+            // let result = userProfileDetail(userData)
+            return res.status(200).json(encodedata({ 'success': true, 'result': userData }));
+        } else {
+            return res.status(500).json(encodedata({ "success": false, 'errors': { 'messages': "Error on server" } }))
+        }
+    } catch (e) {
+        return res.status(500).json(encodedata({ "success": false, 'errors': { 'messages': "Error on server" } }))
+    }
+   
+}
 /**
  * Edit User Profile
  * METHOD : PUT

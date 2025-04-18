@@ -644,19 +644,24 @@ export const rejectUserKyc = async (req, res) => {
 */
 export const getKycList = async (req, res) => {
     try {
-        let reqBody = req.body
-        const UserKyc = await UserKyc.aggregate([{ "$match": { 'userId': ObjectId(reqBody.id) } }])
-            if (UserKyc) {
-                return res.status(200).json({ "status": true, "result": UserKyc })
-                
-            }else{
-                return res.status(500).json({ "status": false, 'message': "Something went wrong" })
-            }
-         
+        let reqBody = req.body;
+
+        const userKycData = await UserKyc.aggregate([
+            { "$match": { 'userId': new ObjectId(reqBody.id) } }
+        ]);
+
+
+        if (userKycData) {
+            return res.status(200).json(encodedata({ status: true, result: userKycData }))
+        } else {
+            return res.status(500).json(encodedata({ status: false, message: "Something went wrong" }))
+        }
+
     } catch (err) {
-        return res.status(500).json({ "status": false, 'message': "Something went wrong" })
-     }
-}
+        
+        return res.status(500).json(encodedata({ status: false, message: "Something went wrong" }))
+    }
+};
 /** 
  * Change User Type
  * URL: /api/changeUsrType

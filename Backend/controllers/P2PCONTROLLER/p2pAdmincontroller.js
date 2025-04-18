@@ -355,7 +355,7 @@ export const gettradehistory = async(req , res) => {
 export const getpaymenttypes = async (req, res) => {
     try {
       let pagination = paginationQuery(req.query);
-      
+      console.log('pagination-----', pagination)
       let filter = await filterSearchQuery(req.query, ['Name', 'Description']);
       
       // Use countDocuments instead of count

@@ -49,6 +49,9 @@ router.route('/resend-otp').post(decodedata, userCtrl.resendOTP);
 router.route('/confirm-mail').post(userValid.confirmMailValidate, userCtrl.confirmMail);
 router.route('/check-deposit').get(apiKeyCtrl.authorization, userCtrl.checkDeposit)//
 router.route('/hide-btn').get(apiKeyCtrl.authorizationEncrypt, userCtrl.hideBtn)
+router.route('/profileImage')
+    .post(decodedata, userCtrl.profileImage)
+
 router.route('/userProfile')
     .get(apiKeyCtrl.authorizationEncrypt, userCtrl.getUserProfile)//
     .put(decodedata , apiKeyCtrl.authorization, userCtrl.uploadProfile, userValid.editProfileValidate, userCtrl.editUserProfile);//

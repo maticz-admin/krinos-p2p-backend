@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 
 // import helpers
 import isEmpty, { isBoolean } from '../lib/isEmpty';
+import { encodedata } from '../lib/cryptoJS';
 
 
 /** 
@@ -48,7 +49,7 @@ export const AdminRly = (req,res,next) => {
             errors.rly = 'Required'
         }
         if(!isEmpty(errors)){
-            return res.status(400).json({status:false , errors:errors})
+            return res.status(400).json(encodedata({status:false , errors:errors}))
         }
         return next()
     }catch(err){}

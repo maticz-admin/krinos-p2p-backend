@@ -119,116 +119,98 @@ export const encodedata = (data) => {
 
 export const decodedata = (req, res, next) => {
   try {
-    console.log("decode data" , req?.body);
-    
-    const reqBody = req.body;
-    const reqQuery = req.query;
-    // if (reqBody && reqQuery) {
-    //   return false;
-    // }
-    var contentype = req?.headers?.["content-type"];
+    const contentType = req?.headers?.['content-type'] || '';
+    const isMultipart = contentType.includes('multipart/form-data');
 
-    if (contentype?.includes("multipart/form-data") || contentype?.includes("multipart/formdata")) {
-
-      let err = "";
-      Object.keys(req?.body).map((data) => {
-        if (!req.body[data]) {
-          return res.status(400).json({
-            Status: false,
-            msg: `Missing encrypted data for ${data}`,
-            success: "error",
-          });
-        }
-
-        var bytes = CryptoJS.AES.decrypt(req.body[data], config.cryptoSecretKey);
-        let decryptedData = bytes.toString(CryptoJS.enc.Utf8);
-
-        if (decryptedData) {
-          try {
-            req.body[data] = JSON.parse(decryptedData);
-          } catch (err) {
-            console.log(`Error parsing JSON for ${data}:`, err);
-            req.body[data] = decryptedData; // Fallback to decrypted string
-          }
-        } else {
-          console.log(`Decrypted data is empty for ${data}`);
-          return res.status(400).json({
-            Status: false,
-            msg: `Decrypted data is empty for ${data}`,
-            success: "error",
-          });
-        }
-      });
-
-      if (err != "") {
-        return res.status(200).json({
-          Status: false,
-          msg: "Authentication Failed",
-          success: "error",
-        });
-      } else {
-        return next();
+    // 🔐 Helper to safely decrypt
+    const safeDecrypt = (encrypted) => {
+      if (!encrypted || typeof encrypted !== 'string') return null;
+      try {
+        const bytes = CryptoJS.AES.decrypt(encrypted, config.cryptoSecretKey);
+        const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+        return decrypted || null;
+      } catch (err) {
+        console.error('Decryption error:', err);
+        return null;
       }
-    } else
-     if (reqBody) {
+    };
 
-      let decryptedData = CryptoJS.AES.decrypt(reqBody?.encode, config.cryptoSecretKey).toString(CryptoJS.enc.Utf8);
+    // 🔄 Handle multipart/form-data
+    if (isMultipart) {
+      for (const key of Object.keys(req.body)) {
+        const decryptedData = safeDecrypt(req.body[key]);
+        if (!decryptedData) {
+          return res.status(400).json({
+            Status: false,
+            msg: `Decryption failed or empty for ${key}`,
+            success: 'error',
+          });
+        }
 
-      // console.log('reqBodyreqBody------', decryptedData);
-
-      if (decryptedData) {
         try {
-          req.body = JSON.parse(decryptedData);
+          req.body[key] = JSON.parse(decryptedData);
         } catch (err) {
-          console.log("Error parsing JSON for req.body:", err);
-          req.body = decryptedData; // Fallback to decrypted string
+          console.warn(`JSON parse error for ${key}, using raw string.`);
+          req.body[key] = decryptedData;
         }
-        return next();
-      } else {
-        return res.status(200).json({
+      }
+      return next();
+    }
+
+    // 🔄 Handle JSON body with encrypted 'encode' field
+    if (req.body && req.body.encode) {
+      const decryptedData = safeDecrypt(req.body.encode);
+      if (!decryptedData) {
+        return res.status(400).json({
           Status: false,
-          msg: "Authentication Failed",
-          success: "error",
+          msg: 'Decryption failed for body.encode',
+          success: 'error',
         });
       }
-    }
-    else
-      if (reqQuery) {
-        // console.log('reqBodyreqBody------', reqQuery);
 
-        let decryptedData;
-
-        if (reqQuery.encode) {
-          decryptedData = CryptoJS.AES.decrypt(reqQuery.encode, config.cryptoSecretKey).toString(CryptoJS.enc.Utf8);
-
-        }
-        else {
-          decryptedData = CryptoJS.AES.decrypt(reqQuery, config.cryptoSecretKey).toString(CryptoJS.enc.Utf8);
-        }
-
-        if (decryptedData) {
-          try {
-            req.query = JSON.parse(decryptedData);
-
-          } catch (err) {
-            console.log("Error parsing JSON for req.query:", err);
-            req.query = decryptedData;
-          }
-          return next();
-        } else {
-          return res.status(200).json({
-            Status: false,
-            msg: "Authentication Failed",
-            success: "error",
-          });
-        }
+      try {
+        req.body = JSON.parse(decryptedData);
+      } catch (err) {
+        console.warn('JSON parse error in body.decode, using raw string.');
+        req.body = decryptedData;
       }
-  } catch (err) {
-    console.log("errrrrrrrrrr-----", err);
-    return res.status(200).json({
+      return next();
+    }
+
+    // 🔄 Handle query params with encrypted 'encode'
+    if (req.query && (req.query.encode || Object.keys(req.query).length)) {
+      const encrypted = req.query.encode || req.query;
+      const decryptedData = safeDecrypt(encrypted);
+      if (!decryptedData) {
+        return res.status(400).json({
+          Status: false,
+          msg: 'Decryption failed for query.encode',
+          success: 'error',
+        });
+      }
+
+      try {
+        req.query = JSON.parse(decryptedData);
+      } catch (err) {
+        console.warn('JSON parse error in query.decode, using raw string.');
+        req.query = decryptedData;
+      }
+      return next();
+    }
+
+    // 🧯 If nothing matched
+    return res.status(400).json({
       Status: false,
-      msg: "Authentication Failed",
-      success: "error",
+      msg: 'No encrypted data found in request',
+      success: 'error',
+    });
+
+  } catch (err) {
+    console.error('Unhandled decryption error:', err);
+    return res.status(500).json({
+      Status: false,
+      msg: 'Authentication Failed',
+      success: 'error',
     });
   }
 };

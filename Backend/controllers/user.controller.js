@@ -589,6 +589,7 @@ export const userLogin = async (req, res) => {
         }
 
         if (reqBody.formType == 'email') {
+           
             let content = {
                 'broswername': reqBody.loginHistory && reqBody.loginHistory.broswername,
                 'ipaddress': reqBody.loginHistory && reqBody.loginHistory.ipaddress,
@@ -737,6 +738,21 @@ export const getUserProfile = async (req, res) => {
     // )
 }
 
+export const profileImage = async (req, res) => {
+    try {
+      
+        const userData = await User.findOne({ "_id": req.body.id })
+        if (userData) {
+            // let result = userProfileDetail(userData)
+            return res.status(200).json(encodedata({ 'success': true, 'result': userData }));
+        } else {
+            return res.status(500).json(encodedata({ "success": false, 'errors': { 'messages': "Error on server" } }))
+        }
+    } catch (e) {
+        return res.status(500).json(encodedata({ "success": false, 'errors': { 'messages': "Error on server" } }))
+    }
+   
+}
 /**
  * Edit User Profile
  * METHOD : PUT
@@ -2044,28 +2060,30 @@ export const verifyNewEmail = async (req, res) => {
 
 export const UpdateStatue = async (req, res) => {
     try {
+        console.log('req.bodyreq.body-----', req.body);
+        
         let FindUser = await User.findOne({ _id: req.body.id })
         if (!isEmpty(FindUser)) {
             if (FindUser.status === 'unverified') {
                 let Update = await User.findOneAndUpdate({ _id: FindUser._id }, { $set: { status: 'verified' } })
                 if (!isEmpty(Update)) {
-                    return res.status(200).json({ status: true, message: ' verified user' })
+                    return res.status(200).json(encodedata({ status: true, message: ' User verified successfully' }))
                 } else {
-                    return res.status(400).json({ status: false, message: ' Failed' })
+                    return res.status(400).json(encodedata({ status: false, message: ' Failed' }))
                 }
             } else if (FindUser.status === 'verified') {
                 let Update = await User.findOneAndUpdate({ _id: FindUser._id }, { $set: { status: 'unverified' } })
                 if (!isEmpty(Update)) {
-                    return res.status(200).json({ status: true, message: ' unverified user' })
+                    return res.status(200).json(encodedata({ status: true, message: ' User unverified successdfully' }))
                 } else {
-                    return res.status(400).json({ status: false, message: ' Failed' })
+                    return res.status(400).json(encodedata({ status: false, message: ' Failed' }))
                 }
             } else {
-                return res.status(400).json({ status: false, message: 'user Not Found' })
+                return res.status(400).json(encodedata({ status: false, message: 'user Not Found' }))
             }
         }
     } catch (err) {
-        return res.status(500).json({ status: false, message: 'something went wrong' })
+        return res.status(500).json(encodedata({ status: false, message: 'something went wrong' }))
     }
 
 }

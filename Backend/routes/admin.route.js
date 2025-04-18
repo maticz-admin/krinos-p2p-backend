@@ -166,7 +166,7 @@ router.route('/faqCategory')
   .delete(passportAuth, faqCtrl.deleteFaqCategory);
 router.route('/getFaqCategory').get(passportAuth, faqCtrl.getFaqCategory);
 router.route('/faq')
-  .get(passportAuth, faqCtrl.listFaq)
+  .get(decodedata, passportAuth, faqCtrl.listFaq)
   .post(decodedata, passportAuth, faqCtrl.addFaq)
   .put(decodedata, passportAuth, FaqValid.FaqUpdateValid, faqCtrl.updateFaq)
   .delete(passportAuth, faqCtrl.deleteFaq);

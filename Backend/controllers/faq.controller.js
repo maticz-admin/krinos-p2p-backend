@@ -230,6 +230,7 @@ export const deleteFaq = async (req, res) => {
 */
 export const listFaq = async (req, res) => {
     try {
+        console.log('req.query------', req.query)
         let pagination = paginationQuery(req.query);
         let filter = filterSearchQuery(req.query, ['categoryInfo.name', 'question', 'status']);
         let count = await Faq.countDocuments(filter);
@@ -264,6 +265,7 @@ export const listFaq = async (req, res) => {
         return res.status(200).json(encodedata({ 'success': true, 'message': 'Fetched successfully.', result }))
 
     } catch (err) {
+        console.log('errrrrrrrrrr------------', err)
         return res.status(500).json(encodedata({ 'success': true, 'message': 'Something went wrong.' }))
     }
 }

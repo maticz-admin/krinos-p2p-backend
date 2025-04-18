@@ -51,7 +51,7 @@ router.route('/check-deposit').get(apiKeyCtrl.authorization, userCtrl.checkDepos
 router.route('/hide-btn').get(apiKeyCtrl.authorizationEncrypt, userCtrl.hideBtn)
 router.route('/userProfile')
     .get(apiKeyCtrl.authorizationEncrypt, userCtrl.getUserProfile)//
-    .put(apiKeyCtrl.authorization, userCtrl.uploadProfile, userValid.editProfileValidate, userCtrl.editUserProfile);//
+    .put(decodedata , apiKeyCtrl.authorization, userCtrl.uploadProfile, userValid.editProfileValidate, userCtrl.editUserProfile);//
 router.route('/changePassword').post(decodedata, apiKeyCtrl.authorization, userValid.changePwdValidate, userCtrl.changePassword);//
 router.route('/upgradeUser').post(apiKeyCtrl.authorization, userCtrl.upgradeUser)
 router.route('/security/2fa')

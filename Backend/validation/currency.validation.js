@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 
 // import lib
 import isEmpty, { isBoolean } from '../lib/isEmpty';
+import { encodedata } from '../lib/cryptoJS';
 
 /** 
 * Add Currency
@@ -48,6 +49,17 @@ export const addValid = (req, res, next) => {
         errors.commisionfee = "ALLOW_NUMERIC";
     } else if (parseInt(reqBody.commisionfee) < 0) {
         errors.commisionfee = "Invalid value";
+    }
+
+
+    if (isEmpty(reqBody.buyercommisionfee)) {
+        errors.buyercommisionfee = "Buyercommisionfee field is required";
+    } else if (reqBody.buyercommisionfee <= 0) {
+        errors.buyercommisionfee = "Please Enter Valid Commisionfee";
+    } else if (!isEmpty(reqBody.buyercommisionfee) && isNaN(reqBody.buyercommisionfee)) {
+        errors.buyercommisionfee = "ALLOW_NUMERIC";
+    } else if (parseInt(reqBody.buyercommisionfee) < 0) {
+        errors.buyercommisionfee = "Invalid value";
     }
 
     if (isEmpty(reqBody.withdrawFee)) {
@@ -149,7 +161,7 @@ export const addValid = (req, res, next) => {
     }
     console.log('errors------', errors)
     if (!isEmpty(errors)) {
-        return res.status(400).json({ "errors": errors })
+        return res.status(400).json(encodedata({ "errors": errors }))
     }
 
     return next();
@@ -332,7 +344,7 @@ export const editValid = (req, res, next) => {
     }
 
     if (!isEmpty(errors)) {
-        return res.status(400).json({ "errors": errors })
+        return res.status(400).json(encodedata({ "errors": errors }))
     }
 
     return next();

@@ -136,6 +136,10 @@ let CurrencySchema = new Schema(
       type : String,
       default : ""
     },
+    buyercommisionfee : {
+      type : String,
+      default : ""
+    },
     api : {
       type : String,
       default : ""
@@ -147,7 +151,8 @@ let CurrencySchema = new Schema(
     bitgosymbol : {
       type : String,
       default : ""
-    }
+    },
+
   },
   {
     timestamps: true,

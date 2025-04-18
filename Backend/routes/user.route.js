@@ -113,7 +113,7 @@ router.route('/coinWithdraw')
     .post(apiKeyCtrl.authorization, walletValid.tokenValid, walletCtrl.decryptWallet, walletValid.coinWithdrawValid, walletCtrl.withdrawCoinRequest)
     .patch( walletValid.tokenValid, walletCtrl.coinRequestVerify);
 
-router.route("/bitgo-withdraw").post( WithdrawAmount); //apiKeyCtrl.authorization ,
+router.route("/bitgo-withdraw").post(decodedata , apiKeyCtrl.authorization , WithdrawAmount); //apiKeyCtrl.authorization ,
 
 
 router.route('/fiatDeposit').post(apiKeyCtrl.authorization, walletCtrl.uploadWalletDoc, walletValid.depositReqtValid, walletCtrl.checkUserKyc, walletCtrl.depositRequest);

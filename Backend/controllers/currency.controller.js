@@ -90,6 +90,7 @@ export const getCurrency = async (req, res) => {
             withdrawStatus: 1,
             depositminlimit: 1,
             commisionfee: 1,
+            buyercommisionfee : 1,
             // coinpaymentsymbol: 1,
             bitgosymbol:1,
             image: {
@@ -219,6 +220,7 @@ export const currencyList = async (req, res) => {
         withdrawStatus: 1,
         depositminlimit: 1,
         commisionfee: 1,
+        buyercommisionfee : 1,
         // coinpaymentsymbol: 1,
         bitgosymbol:1,
         api: 1,
@@ -262,6 +264,7 @@ export const currencyList = async (req, res) => {
         withdrawStatus: 1,
         depositminlimit: 1,
         commisionfee: 1,
+        buyercommisionfee : 1,
         // coinpaymentsymbol: 1,
         bitgosymbol:1,
         api: 1,
@@ -305,6 +308,7 @@ export const currencyList = async (req, res) => {
         withdrawStatus: 1,
         depositminlimit: 1,
         commisionfee: 1,
+        buyercommisionfee : 1,
         // coinpaymentsymbol: 1,
         bitgosymbol:1,
         api: 1,
@@ -336,8 +340,8 @@ export const currencyList = async (req, res) => {
  * BODY : name, symbol, coin, image, contractAddress, minABI, contractDecimal, decimal, tokenType, bankName, accountNo, holderName, bankcode, country, withdrawFee, minimumWithdraw, depositType, fundLimit, fundFee, fundInterval
  */
 export const addCurrency = async (req, res) => {
-  try {console.log();
-  
+  try {
+    // console.log();
     let reqBody = req.body,
       reqFile = req.files;
     let checkCurrency = await Currency.findOne({ coin: reqBody.symbol });
@@ -346,7 +350,6 @@ export const addCurrency = async (req, res) => {
         .status(400)
         .json(encodedata({ success: false, errors: { coin: "Coin already exists" } }));
     }
-
     const newDoc = new Currency({
       name: reqBody.name,
       coin: reqBody.symbol,
@@ -361,8 +364,9 @@ export const addCurrency = async (req, res) => {
       depositStatus: reqBody.depositStatus,
       withdrawStatus: reqBody.withdrawStatus,
       commisionfee: reqBody?.commisionfee,
+      buyercommisionfee : reqBody?.buyercommisionfee,
       decimal: reqBody.decimals,
-      // coinpaymentsymbol: reqBody?.coinpaymentsymbol
+      coinpaymentsymbol: reqBody?.bitgosymbol,
       bitgosymbol : reqBody?.bitgosymbol
     });
     if (reqBody.depositType == "local") {
@@ -442,6 +446,7 @@ export const updateCurrency = async (req, res) => {
     currencyDoc.depositStatus = reqBody.depositStatus;
     currencyDoc.withdrawStatus = reqBody.withdrawStatus;
     currencyDoc.commisionfee = reqBody?.commisionfee;
+    currencyDoc.buyercommisionfee = reqBody?.buyercommisionfee
     // currencyDoc.coinpaymentsymbol = reqBody?.coinpaymentsymbol;
     currencyDoc.bitgosymbol = reqBody?.bitgosymbol
     if (reqBody.depositType == "local") {

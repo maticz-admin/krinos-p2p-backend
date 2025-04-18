@@ -1136,7 +1136,7 @@ export const update2faCode = async (req, res) => {
                 { "new": true }
             )
             let result = generateTwoFa(updateData)
-            if (chackStatus.twoFA == true) {
+            if (chackStatus?.twoFA == true) {
                 let content = {
                     'date': new Date(),
                     'status': "enable"
@@ -1163,6 +1163,8 @@ export const update2faCode = async (req, res) => {
         return res.status(400).json({ 'success': false, 'errors': { 'code': "INVALID_CODE" } })
     }
     catch (err) {
+        console.log("error on update 2fa code" , err);
+        
         return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
     }
 }

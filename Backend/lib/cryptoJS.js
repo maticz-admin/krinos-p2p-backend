@@ -119,6 +119,8 @@ export const encodedata = (data) => {
 
 export const decodedata = (req, res, next) => {
   try {
+    console.log("decode data" , req?.body);
+    
     const reqBody = req.body;
     const reqQuery = req.query;
     // if (reqBody && reqQuery) {

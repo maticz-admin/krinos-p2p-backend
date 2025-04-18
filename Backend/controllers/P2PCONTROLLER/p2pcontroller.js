@@ -37,8 +37,10 @@ export const CreateP2Porder = async (req, res) => {
             var checkUser = await User.findOne({ userId: data?.createrid })
             let doc = {
                 'userId': checkUser._id,
-                'title': 'Trade_Request',
-                'description': 'You received one trade request',
+                // 'title': 'Trade_Request',
+                // 'description': 'You received one trade request',
+                'title': 'Offer_Created',
+                'description': 'You have successfully created offer',
             }
             await newNotification(doc)
 
@@ -546,7 +548,6 @@ export const singlesaledetail = async (req, res) => {
         // return false;
 
         var coin = result?.preferedcurrency;
-
         var marketvalue = await axios.get(`https://min-api.cryptocompare.com/data/price?fsym=${result?.coin}&tsyms=${result?.preferedcurrency}`);
         var resmarketvalue = marketvalue?.data[coin];
         var convertedvalue = (resmarketvalue / 100) * parseFloat(result?.offermargin);
@@ -557,6 +558,8 @@ export const singlesaledetail = async (req, res) => {
             variablepercent = (currencyvalue - resmarketvalue) / onepercent;
         }
         updatelastseen(req?.query?.userid);
+        console.log("check crypto compare" , resmarketvalue , result?.fixedmarketrate);
+        
         return res.json(encodedata({
             type: "success",
             data: result,

@@ -1727,7 +1727,6 @@ export const WithdrawApprove = async (req, res) => {
 export const coinWithdrawReject = async (req, res) => {
     try {
         let reqParam = req.params
-
         let trxData = await Transaction.findOneAndUpdate({
             '_id': reqParam.transactionId,
             'paymentType': 'coin_withdraw',

@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 
 // import lib
 import isEmpty, { isBoolean } from '../lib/isEmpty';
+import { encodedata } from '../lib/cryptoJS';
 
 /** 
 * Add Currency
@@ -149,7 +150,7 @@ export const addValid = (req, res, next) => {
     }
     console.log('errors------', errors)
     if (!isEmpty(errors)) {
-        return res.status(400).json({ "errors": errors })
+        return res.status(400).json(encodedata({ "errors": errors }))
     }
 
     return next();

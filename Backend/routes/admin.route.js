@@ -103,7 +103,7 @@ router.route('/anouncement')
 
 // User
 router.route('/user').get(reqQueryDecodedata, passportAuth, userCntrl.getUserList)
-router.route('/user-update').post(passportAuth, userCntrl.UpdateStatue)
+router.route('/user-update').post(decodedata, passportAuth, userCntrl.UpdateStatue)
 router.route('/getUserBalnce').get(passportAuth, userCntrl.getUserBalanceList)
 router.route('/disable-2fa').post(decodedata, passportAuth, userCntrl.Disable2FA)
 
@@ -177,7 +177,7 @@ router.route('/getFaqDropdown').get(passportAuth, faqCtrl.getFaqDropdown)
 //passBook
 router
   .route("/userPassBookHistory")
-  .get(passportAuth, passbookCtrl.userPassbookHistory);
+  .get(decodedata, passportAuth, passbookCtrl.userPassbookHistory);
 
 // P2P
 router.route('/p2pPair')

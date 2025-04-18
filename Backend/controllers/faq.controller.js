@@ -32,6 +32,7 @@ export const addFaqCategory = async (req, res) => {
         await newDoc.save();
         return res.status(200).json(encodedata({ 'success': true, 'message': "Successfully added" }))
     } catch (err) {
+        console.log('errerrerrerrerrerr---------', err)
         return res.status(500).json(encodedata({ 'success': false, 'message': "category name is Required" }))
     }
 }
@@ -141,6 +142,7 @@ export const getFaqCategory = async (req, res) => {
 */
 export const addFaq = async (req, res) => {
     try {
+        console.log('req.body------', req.body)
         let reqBody = req.body;
         let errors = {}
         if (reqBody.categoryId == '') {
@@ -149,11 +151,11 @@ export const addFaq = async (req, res) => {
         if (reqBody.question == '') {
             errors['question'] = 'question field is required'
         }
-        if (reqBody.categoryId == '') {
+        if (reqBody.answer == '') {
             errors['answer'] = 'Answer field is required'
         }
         if (!isEmpty(errors)) {
-            return res.status(400).json({ 'success': false, errors: errors })
+            return res.status(400).json(encodedata({ 'success': false, errors: errors }))
         }
         let checkCategory = await FaqCategory.findOne({ "_id": reqBody.categoryId });
         if (!checkCategory) {
@@ -168,7 +170,7 @@ export const addFaq = async (req, res) => {
         // console.log('newDoc----', newDoc )
         return res.status(200).json(encodedata({ 'success': true, 'message': "Successfully added" }))
     } catch (err) {
-        return res.status(500).json({ 'success': false, 'message': "error on server" })
+        return res.status(500).json(encodedata({ 'success': false, 'message': "error on server" }))
     }
 }
 
@@ -230,7 +232,7 @@ export const deleteFaq = async (req, res) => {
 */
 export const listFaq = async (req, res) => {
     try {
-        console.log('req.query------', req.query)
+      
         let pagination = paginationQuery(req.query);
         let filter = filterSearchQuery(req.query, ['categoryInfo.name', 'question', 'status']);
         let count = await Faq.countDocuments(filter);
@@ -265,7 +267,7 @@ export const listFaq = async (req, res) => {
         return res.status(200).json(encodedata({ 'success': true, 'message': 'Fetched successfully.', result }))
 
     } catch (err) {
-        console.log('errrrrrrrrrr------------', err)
+        
         return res.status(500).json(encodedata({ 'success': true, 'message': 'Something went wrong.' }))
     }
 }

@@ -153,7 +153,7 @@ export const adminLogin = async (req, res) => {
         let isLoginHistory = !isEmpty(req.body.loginHistory)
         let checkUser = await Admin.findOne({ "email": reqBody.email });
         if (!checkUser) {
-            return res.status(404).json({ "success": false, 'errors': { 'email': "Email not found" } })
+            return res.status(404).json(encodedata({ "success": false, 'errors': { 'email': "Email not found" } }))
         }
         let { passwordStatus } = await comparePassword(reqBody.password, checkUser.password);
         if (!passwordStatus) {

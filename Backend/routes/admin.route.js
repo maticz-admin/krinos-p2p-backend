@@ -205,7 +205,7 @@ router.route('/supportCategory')
 
 router.route('/ticketList').get(reqQueryDecodedata, passportAuth, supportCtrl.getTicketList)
 router.route('/ticketMessage')
-  .get(passportAuth, supportCtrl.getTicketMessage)
+  .get(decodedata, passportAuth, supportCtrl.getTicketMessage)
   .put(decodedata, passportAuth, SupprotValid.MessgaeValid, supportCtrl.replyMessage);
 
 // News Letter

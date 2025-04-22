@@ -661,12 +661,13 @@ export const Adminassetupdate = async (req, res) => {
         var owner = await wallet.findOne({ userId: req?.body?.ownerid });
         
         
-        var ownerarray = await walletupdate(owner?.assets, req?.body?.coin, req?.body?.ownerbalance, false, req?.body?.adminbalance);
+        // var ownerarray = await walletupdate(owner?.assets, req?.body?.coin, req?.body?.ownerbalance, false, req?.body?.adminbalance);
+        var ownerarray = await walletupdate(owner?.assets, req?.body?.coin, req?.body?.ownerbalance, false, req?.body?.sellerfee);
         var updateownerasset = await wallet.findOneAndUpdate({ userId: req?.body?.ownerid },
             { $set: { assets: ownerarray } }, { new: true });
 
         var spender = await wallet.findOne({ userId: req?.body?.spenderid });
-        var spenderarray = await walletupdate(spender?.assets, req?.body?.coin, req?.body?.spenderbalance, true, req?.body?.adminbalance);
+        var spenderarray = await walletupdate(spender?.assets, req?.body?.coin, (parseFloat(req?.body?.spenderbalance)-parseFloat(req?.body?.buyerfee)), true, req?.body?.buyerfee);
         var updatespenderasset = await wallet.findOneAndUpdate({ userId: req?.body?.spenderid, "assets.coin": req?.body?.coin },
             { $set: { assets: spenderarray } }, { new: true });
 

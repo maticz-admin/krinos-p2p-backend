@@ -51,6 +51,17 @@ export const addValid = (req, res, next) => {
         errors.commisionfee = "Invalid value";
     }
 
+
+    if (isEmpty(reqBody.buyercommisionfee)) {
+        errors.buyercommisionfee = "Buyercommisionfee field is required";
+    } else if (reqBody.buyercommisionfee <= 0) {
+        errors.buyercommisionfee = "Please Enter Valid Commisionfee";
+    } else if (!isEmpty(reqBody.buyercommisionfee) && isNaN(reqBody.buyercommisionfee)) {
+        errors.buyercommisionfee = "ALLOW_NUMERIC";
+    } else if (parseInt(reqBody.buyercommisionfee) < 0) {
+        errors.buyercommisionfee = "Invalid value";
+    }
+
     if (isEmpty(reqBody.withdrawFee)) {
         errors.withdrawFee = "Withdrawfee field is required";
     } else if (reqBody.withdrawFee <= 0) {
@@ -333,7 +344,7 @@ export const editValid = (req, res, next) => {
     }
 
     if (!isEmpty(errors)) {
-        return res.status(400).json({ "errors": errors })
+        return res.status(400).json(encodedata({ "errors": errors }))
     }
 
     return next();

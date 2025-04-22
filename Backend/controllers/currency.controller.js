@@ -341,7 +341,6 @@ export const currencyList = async (req, res) => {
  */
 export const addCurrency = async (req, res) => {
   try {
-    // console.log();
     let reqBody = req.body,
       reqFile = req.files;
     let checkCurrency = await Currency.findOne({ coin: reqBody.symbol });
@@ -370,7 +369,7 @@ export const addCurrency = async (req, res) => {
       bitgosymbol : reqBody?.bitgosymbol
     });
     if (reqBody.depositType == "local") {
-      newDoc["api"] = reqBody?.api,
+        newDoc["api"] = reqBody?.api,
         newDoc["key"] = reqBody?.key
     }
     if (reqBody.type == "token") {

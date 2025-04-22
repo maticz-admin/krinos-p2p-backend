@@ -2060,21 +2060,21 @@ export const verifyNewEmail = async (req, res) => {
 
 export const UpdateStatue = async (req, res) => {
     try {
-        console.log('req.bodyreq.body-----', req.body);
+       
         
         let FindUser = await User.findOne({ _id: req.body.id })
         if (!isEmpty(FindUser)) {
             if (FindUser.status === 'unverified') {
                 let Update = await User.findOneAndUpdate({ _id: FindUser._id }, { $set: { status: 'verified' } })
                 if (!isEmpty(Update)) {
-                    return res.status(200).json(encodedata({ status: true, message: ' User verified successfully' }))
+                    return res.status(200).json(encodedata({ status: true, message: ' Verified user successfully' }))
                 } else {
                     return res.status(400).json(encodedata({ status: false, message: ' Failed' }))
                 }
             } else if (FindUser.status === 'verified') {
                 let Update = await User.findOneAndUpdate({ _id: FindUser._id }, { $set: { status: 'unverified' } })
                 if (!isEmpty(Update)) {
-                    return res.status(200).json(encodedata({ status: true, message: ' User unverified successdfully' }))
+                    return res.status(200).json(encodedata({ status: true, message: ' Unverified user successfully' }))
                 } else {
                     return res.status(400).json(encodedata({ status: false, message: ' Failed' }))
                 }

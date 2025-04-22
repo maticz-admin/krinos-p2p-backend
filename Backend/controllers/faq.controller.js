@@ -149,7 +149,7 @@ export const addFaq = async (req, res) => {
             errors['categoryId'] = 'Category field is required'
         }
         if (reqBody.question == '') {
-            errors['question'] = 'question field is required'
+            errors['question'] = 'Question field is required'
         }
         if (reqBody.answer == '') {
             errors['answer'] = 'Answer field is required'

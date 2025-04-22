@@ -103,7 +103,7 @@ app.post("/bitgo-webhook", depositwebhook);
 
 app.use(express.static(__dirname + '/public'));
 
-app.use('/adminApi', adminApi);
+app.use('/adminapi', adminApi);
 
 app.use('/api', userApi);
 

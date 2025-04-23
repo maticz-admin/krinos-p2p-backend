@@ -241,7 +241,7 @@ export const getDashBal = async (req, res) => {
 
 export const totalCount = async (req, res) => {
     try {
-        let userCount = await User.countDocuments({ status: "verified" })
+        let userCount = await User.countDocuments({  }) // status: "verified"
         let kycCount = await UserKyc.countDocuments({
                 "$or": [{
                     "idProof.status": {$in:["pending"]},

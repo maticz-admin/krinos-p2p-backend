@@ -142,7 +142,7 @@ export const getFaqCategory = async (req, res) => {
 */
 export const addFaq = async (req, res) => {
     try {
-        console.log('req.body------', req.body)
+        
         let reqBody = req.body;
         let errors = {}
         if (reqBody.categoryId == '') {

@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 
 // import helpers
 import isEmpty from '../lib/isEmpty';
+import { encodedata } from '../lib/cryptoJS';
 
 
 /**
@@ -23,7 +24,7 @@ export const loginValidate = (req, res, next) => {
     }
 
     if (!isEmpty(errors)) {
-        return res.status(400).json({ "errors": errors })
+        return res.status(400).json(encodedata({ "errors": errors }))
     }
 
     return next();
@@ -333,12 +334,12 @@ export const passwordValid = (req, res, next) => {
         }
 
         if (!isEmpty(errors)) {
-            return res.status(400).json({ status: false, errors: errors })
+            return res.status(400).json(encodedata({ status: false, errors: errors }))
         }
         return next();
 
     } catch (err) {
-        return res.status(500).json({ status: false, message: 'something went wrong' })
+        return res.status(500).json(encodedata({ status: false, message: 'something went wrong' }))
     }
 
 }

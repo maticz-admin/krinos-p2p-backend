@@ -261,9 +261,19 @@ export const mailTemplate = async (identifier, toEmail, content, langCode = '') 
                 /** 
                  * ##message##
                 */
+                const formattedDateTime = new Date(content.date).toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                });
+                
                 mailContent['template'] = mailContent['template']
-                    .replace("##DATE##", content.date)
+                    .replace("##DATE##", formattedDateTime)
                     .replace("##rly##", content.AdminMsg);
+                
                 break;
             case "SEND_OTP":
                 /** 
@@ -422,6 +432,6 @@ export const emailTemplateList = async (req, res) => {
         }
         return res.status(200).json(encodedata({ 'success': true, 'message': 'Fetched successfully.', result }))
     } catch (err) {
-        return res.status(500).json({ 'success': true, 'message': 'Something went wrong.' })
+        return res.status(500).json(encodedata({ 'success': true, 'message': 'Something went wrong.' }))
     }
 }

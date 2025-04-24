@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 
 // import lib
 import isEmpty, { isBoolean } from '../lib/isEmpty';
+import { encodedata } from '../lib/cryptoJS';
 
 /** 
 * Add Currency
@@ -13,16 +14,14 @@ import isEmpty, { isBoolean } from '../lib/isEmpty';
 export const addValid = (req, res, next) => {
     let errors = {}, reqBody = req.body, reqFile = req.files;
     console.log('errors-----', errors, reqBody, reqFile)
-    return false;
+    // return false;
     const regex = new RegExp(/[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/);
     if (isEmpty(reqBody.name)) {
         errors.name = "Name field is required";
     }
-
     if (isEmpty(reqBody.coin)) {
         errors.coin = "Coin field is required";
     }
-
     if (isEmpty(reqBody.symbol)) {
         errors.symbol = "Symbol field is required";
     }
@@ -31,7 +30,12 @@ export const addValid = (req, res, next) => {
             errors.coinpaymentsymbol = "Coinpayment Symbol field is required";
         }
     }
-    
+
+    if(reqBody?.depositType == "bitgo"){
+        if (isEmpty(reqBody.bitgosymbol)) {
+            errors.bitgosymbol = "Bitgo Symbol field is required";
+        }
+    }
 
     if (isEmpty(reqFile.image)) {
         errors.image = "REQUIRED";
@@ -45,6 +49,17 @@ export const addValid = (req, res, next) => {
         errors.commisionfee = "ALLOW_NUMERIC";
     } else if (parseInt(reqBody.commisionfee) < 0) {
         errors.commisionfee = "Invalid value";
+    }
+
+
+    if (isEmpty(reqBody.buyercommisionfee)) {
+        errors.buyercommisionfee = "Buyercommisionfee field is required";
+    } else if (reqBody.buyercommisionfee <= 0) {
+        errors.buyercommisionfee = "Please Enter Valid Commisionfee";
+    } else if (!isEmpty(reqBody.buyercommisionfee) && isNaN(reqBody.buyercommisionfee)) {
+        errors.buyercommisionfee = "ALLOW_NUMERIC";
+    } else if (parseInt(reqBody.buyercommisionfee) < 0) {
+        errors.buyercommisionfee = "Invalid value";
     }
 
     if (isEmpty(reqBody.withdrawFee)) {
@@ -88,7 +103,7 @@ export const addValid = (req, res, next) => {
 
     if (isEmpty(reqBody.depositType)) {
         errors.depositType = "REQUIRED";
-    } else if (!['local', 'coin_payment', 'binance'].includes(reqBody.depositType)) {
+    } else if (!['local', 'coin_payment', 'binance', 'bitgo'].includes(reqBody.depositType)) {
         errors.depositType = "INVALID_TYPE";
     }
     if(reqBody.depositType == "local"){
@@ -146,7 +161,7 @@ export const addValid = (req, res, next) => {
     }
     console.log('errors------', errors)
     if (!isEmpty(errors)) {
-        return res.status(400).json({ "errors": errors })
+        return res.status(400).json(encodedata({ "errors": errors }))
     }
 
     return next();
@@ -329,7 +344,7 @@ export const editValid = (req, res, next) => {
     }
 
     if (!isEmpty(errors)) {
-        return res.status(400).json({ "errors": errors })
+        return res.status(400).json(encodedata({ "errors": errors }))
     }
 
     return next();

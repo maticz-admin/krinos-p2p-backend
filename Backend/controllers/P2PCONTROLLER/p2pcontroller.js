@@ -23,6 +23,9 @@ import { mailTemplateLang } from "../emailTemplate.controller";
 import OwnerWallet from "../../models/ownerwallet";
 import { decodedata, encodedata } from "../../lib/cryptoJS"
 
+import kyc from "../../models/userKyc";
+import { createSession, fetchClientToken, getSessionDecision, stringToObjectId } from "../../config/didithooks";
+
 export const CreateP2Porder = async (req, res) => {
     try {
         console.log('req?.bodyreq?.body-----', req?.body);
@@ -34,8 +37,10 @@ export const CreateP2Porder = async (req, res) => {
             var checkUser = await User.findOne({ userId: data?.createrid })
             let doc = {
                 'userId': checkUser._id,
-                'title': 'Trade_Request',
-                'description': 'You received one trade request',
+                // 'title': 'Trade_Request',
+                // 'description': 'You received one trade request',
+                'title': 'Offer_Created',
+                'description': 'You have successfully created offer',
             }
             await newNotification(doc)
 
@@ -259,12 +264,20 @@ export const Updateofferviews = async (req, res) => {
 
 export const Getsingleuser = async (req, res) => {
     try {
-        console.log('req?.query-----', req?.query)
+        console.log('req?.query----- in user detail', req?.query)
         var result = await User.findOne({ "userId": req?.query?.userid ? req?.query?.userid : req?.user?.userId });
+        // var result = await User.findOne({ "userId": req?.user?.userId });
+        // console.log('resultresultresultresult------', result)
         var kyc = await UserKyc.findOne({ userId: result?._id });
+        // console.log('kyc------', kyc)
+
         var wallet = await Wallet.findOne({ userId: result?.userId });
+        // console.log('wallet------', wallet)
+        
+        
         // result = {...result , "kyc" : kyc}
-        updatelastseen(req?.query?.userid)
+        // updatelastseen(req?.query?.userid)
+        console.log("single user detail" , result);
         return res.json(encodedata({
             type: "success",
             data: result,
@@ -273,6 +286,7 @@ export const Getsingleuser = async (req, res) => {
         }))
     }
     catch (e) {
+        console.log("Error on get single user" , e);
         return res.json(encodedata({
             type: "failed",
             message: "Error found"
@@ -534,7 +548,6 @@ export const singlesaledetail = async (req, res) => {
         // return false;
 
         var coin = result?.preferedcurrency;
-
         var marketvalue = await axios.get(`https://min-api.cryptocompare.com/data/price?fsym=${result?.coin}&tsyms=${result?.preferedcurrency}`);
         var resmarketvalue = marketvalue?.data[coin];
         var convertedvalue = (resmarketvalue / 100) * parseFloat(result?.offermargin);
@@ -545,7 +558,8 @@ export const singlesaledetail = async (req, res) => {
             variablepercent = (currencyvalue - resmarketvalue) / onepercent;
         }
         updatelastseen(req?.query?.userid);
-
+        console.log("check crypto compare" , resmarketvalue , result?.fixedmarketrate);
+        
         return res.json(encodedata({
             type: "success",
             data: result,
@@ -637,19 +651,23 @@ export const getcurrencydata = async (req, res) => {
 
 export const Adminassetupdate = async (req, res) => {
     try {
-
-        var admin = await wallet.findOne({ userId: "13841853" });//config.OWNERUSERID
-
+        console.log("body" , req?.body , config.OWNERUSERID);
+        
+        var admin = await wallet.findOne({ userId: config.OWNERUSERID });//config.OWNERUSERID
+        console.log("owner" , admin);
         var adminarray = await walletupdate(admin?.assets, req?.body?.coin, req?.body?.adminbalance, true, req?.body?.adminbalance);
-        var updateadminasset = await wallet.findOneAndUpdate({ userId: "13841853" }, //config.OWNERUSERID
+        var updateadminasset = await wallet.findOneAndUpdate({ userId: config.OWNERUSERID }, //config.OWNERUSERID
             { $set: { assets: adminarray } }, { new: true });
         var owner = await wallet.findOne({ userId: req?.body?.ownerid });
-        var ownerarray = await walletupdate(owner?.assets, req?.body?.coin, req?.body?.ownerbalance, false, req?.body?.adminbalance);
+        
+        
+        // var ownerarray = await walletupdate(owner?.assets, req?.body?.coin, req?.body?.ownerbalance, false, req?.body?.adminbalance);
+        var ownerarray = await walletupdate(owner?.assets, req?.body?.coin, req?.body?.ownerbalance, false, req?.body?.sellerfee);
         var updateownerasset = await wallet.findOneAndUpdate({ userId: req?.body?.ownerid },
             { $set: { assets: ownerarray } }, { new: true });
 
         var spender = await wallet.findOne({ userId: req?.body?.spenderid });
-        var spenderarray = await walletupdate(spender?.assets, req?.body?.coin, req?.body?.spenderbalance, true, req?.body?.adminbalance);
+        var spenderarray = await walletupdate(spender?.assets, req?.body?.coin, (parseFloat(req?.body?.spenderbalance)-parseFloat(req?.body?.buyerfee)), true, req?.body?.buyerfee);
         var updatespenderasset = await wallet.findOneAndUpdate({ userId: req?.body?.spenderid, "assets.coin": req?.body?.coin },
             { $set: { assets: spenderarray } }, { new: true });
 
@@ -711,7 +729,9 @@ export const updateuseronlinestatus = async (req, res) => {
 
 export const Getcms = async (req, res) => {
     try {
+        console.log('req?.query?.identifier---', req?.query?.identifier)
         var result = await Cms.findOne({ identifier: req?.query?.identifier, status: "active" });
+        console.log('result-----', result)
         return res.json(encodedata({
             type: "success",
             data: result
@@ -880,10 +900,10 @@ export const gettotaluserbalance = async (req, res) => {
             var newprice = coinprice ? coinprice : 0
             totalbalance = totalbalance + newprice;
         }
-        return res.json({
+        return res.json(encodedata({
             type: "success",
             data: totalbalance
-        });
+        }));
     }
     catch (e) {
 
@@ -925,16 +945,16 @@ export const gettradespeed = async (req, res) => {
         })
         var difference = endtime - starttime;
         var average = difference / result?.length;
-        return res.json({
+        return res.json(encodedata({
             type: "success",
             data: average
-        });
+        }));
     }
     catch (e) {
-        return res.json({
+        return res.json(encodedata({
             type: "failed",
             message: "Error found"
-        })
+        }))
     }
 }
 const profileStorage = multer.diskStorage({
@@ -1123,6 +1143,130 @@ export const Checkdeposit = async (req, res) => {
         return res.json({ success: false, data: {} });
     }
 }
+
+
+export const AddSessionIdkyc = async (req, res) => {
+    try {
+        let { sessionid } = req?.body;
+        console.log("req?.body", req?.body, req?.user?.userId);
+
+        let checkkycdoc = await kyc.findOne({ userId: stringToObjectId(req?.user?.userId) });
+        console.log("checkkycdoc", checkkycdoc);
+
+        if (checkkycdoc) {
+            let update = await kyc.findOneAndUpdate({ userId: stringToObjectId(req?.profileid) }, { $set: { sessionId: sessionid } })
+            return res.status(200).json(encodedata({
+                type: "Success", message: "session Updated Successfully!"
+            }))
+        }
+        let newdoc = new kyc({ userId: stringToObjectId(req?.profileid), sessionId: sessionid });
+        await newdoc.save();
+        let updateuserdoc = await user.findOneAndUpdate({ _id: stringToObjectId(req?.profileid) }, {
+            $set: {
+                kycId: newdoc?._id
+            }
+        })
+        return res.status(200).json(encodedata({
+            type: "Success", message: "session Updated Successfully!"
+        }))
+    }
+    catch (e) {
+        console.log("error on add session id kyc", e);
+        return res.status(500).json(encodedata({
+            type: "failed",
+            message: "Error found"
+        }))
+    }
+}
+
+export const UpdateKycStatus = async (userid, status) => {
+    try {
+        console.log("webhookkkk called", userid, status);
+        let result = await kyc.findOneAndUpdate({ sessionId: userid }, { $set: { status: status } });
+    }
+    catch (e) {
+        console.log("error on update kyc status", e);
+    }
+}
+
+export const AddSessionId = async(sessionid , userid) => {
+    try{
+        let checkkycdoc = await kyc.findOne({ userId: stringToObjectId(userid) });
+        if (checkkycdoc) {
+            let update = await kyc.findOneAndUpdate({ userId: stringToObjectId(userid) }, { $set: { sessionId: sessionid } })
+            return true
+        }
+        let newdoc = new kyc({ userId: stringToObjectId(userid), sessionId: sessionid });
+        await newdoc.save();
+        let updateuserdoc = await User.findOneAndUpdate({ _id: stringToObjectId(userid) }, {
+            $set: {
+                kycId: newdoc?._id
+            }
+        })
+        return true;
+    }
+    catch(e){
+        console.log("error on add session id" , e);
+    }
+}
+
+export const checkdidit = async(req , res) => {
+    try{
+        console.log("req?.user?.userId" , req?.user?.id);
+        let {vendor_data , callback} = req?.body
+        let token = await fetchClientToken();
+        console.log("tokennnnnnnnn" , token);
+        if(token?.access_token){
+            // let userdoc = await User.findOne({_id : req?.user?.userId});
+            let kycdoc = await kyc.findOne({userId : stringToObjectId(req?.user?.id)});
+            if(!kycdoc?.sessionId){
+                let session = await createSession("" , callback , vendor_data , token?.access_token);
+                console.log("Session create result" , session);
+                if(session?.status){
+                    let updateresult = await AddSessionId(session?.sessionid , req?.user?.id);
+                    return res.status(200).json(encodedata({
+                        type: "Success", result : session
+                    })) 
+                }
+                else{
+                    return res.status(400).json(encodedata({
+                        type: "failed", message: "Didit error"
+                    })) 
+                }
+            }
+            else{
+                let decisionres = await getSessionDecision(kycdoc?.sessionId  , token?.access_token);
+                console.log("decision result" , decisionres);
+                
+                if (!decisionres?.status) {
+                    if (decisionres?.data?.status == "Declined" || decisionres?.data?.status == "Expired") {
+                        let session = await createSession();
+                        if (session?.status) {
+                            let updateresult = await AddSessionId(session?.sessionid, req?.user?.id);
+                            return res.status(200).json(encodedata({
+                                type: "Success", result: session
+                            }))
+                        }
+                        else {
+                            return res.status(400).json(encodedata({
+                                type: "failed", message: "Didit error"
+                            }))
+                        }
+                    }
+                }
+                else{
+                    return res.status(200).json(encodedata({
+                        type: "Success", result : decisionres
+                    })) 
+                }
+            }
+        }
+    
+    }
+    catch(e){
+        console.log("error on checfk didit" , e);
+    }
+} 
 
 
 

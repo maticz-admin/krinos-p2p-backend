@@ -24,7 +24,7 @@ export const addFaqCategory = async (req, res) => {
         let reqBody = req.body;
         let checkDoc = await FaqCategory.findOne({ "name": reqBody.name });
         if (checkDoc) {
-            return res.status(400).json({ 'success': false, 'message': "Category name already exists" })
+            return res.status(400).json(encodedata({ 'success': false, 'message': "Category name already exists" }))
         }
         let newDoc = new FaqCategory({
             'name': reqBody.name
@@ -32,7 +32,8 @@ export const addFaqCategory = async (req, res) => {
         await newDoc.save();
         return res.status(200).json(encodedata({ 'success': true, 'message': "Successfully added" }))
     } catch (err) {
-        return res.status(500).json({ 'success': false, 'message': "category name is Required" })
+        console.log('errerrerrerrerrerr---------', err)
+        return res.status(500).json(encodedata({ 'success': false, 'message': "category name is Required" }))
     }
 }
 
@@ -94,10 +95,10 @@ export const listFaqCategory = async (req, res) => {
         if (data) {
             return res.status(200).json(encodedata({ 'success': true, 'message': "Fetch success", 'result': data }))
         } else {
-            return res.status(500).json({ 'success': false, 'message': "Something went wrong" })
+            return res.status(500).json(encodedata({ 'success': false, 'message': "Something went wrong" }))
         }
     } catch (e) {
-        return res.status(500).json({ 'success': false, 'message': "Something went wrong" })
+        return res.status(500).json(encodedata({ 'success': false, 'message': "Something went wrong" }))
     }
     // FaqCategory.find({}, { "name": 1, "status": 1 }, (err, data) => {
     //     if (err) {
@@ -118,12 +119,12 @@ export const getFaqCategory = async (req, res) => {
             : -1 });
 
         if (data) {
-            return res.status(200).json({ 'success': true, 'message': "Fetch success", 'result': data })
+            return res.status(200).json(encodedata({ 'success': true, 'message': "Fetch success", 'result': data }))
         } else {
-            return res.status(500).json({ 'success': false, 'message': "Something went wrong" })
+            return res.status(500).json(encodedata({ 'success': false, 'message': "Something went wrong" }))
         }
     } catch (e) {
-        return res.status(500).json({ 'success': false, 'message': "Something went wrong" })
+        return res.status(500).json(encodedata({ 'success': false, 'message': "Something went wrong" }))
     }
     // FaqCategory.find({ "status": 'active' }, { "name": 1 }, (err, data) => {
     //     if (err) {
@@ -141,6 +142,7 @@ export const getFaqCategory = async (req, res) => {
 */
 export const addFaq = async (req, res) => {
     try {
+        console.log('req.body------', req.body)
         let reqBody = req.body;
         let errors = {}
         if (reqBody.categoryId == '') {
@@ -149,11 +151,11 @@ export const addFaq = async (req, res) => {
         if (reqBody.question == '') {
             errors['question'] = 'question field is required'
         }
-        if (reqBody.categoryId == '') {
+        if (reqBody.answer == '') {
             errors['answer'] = 'Answer field is required'
         }
         if (!isEmpty(errors)) {
-            return res.status(400).json({ 'success': false, errors: errors })
+            return res.status(400).json(encodedata({ 'success': false, errors: errors }))
         }
         let checkCategory = await FaqCategory.findOne({ "_id": reqBody.categoryId });
         if (!checkCategory) {
@@ -168,7 +170,7 @@ export const addFaq = async (req, res) => {
         // console.log('newDoc----', newDoc )
         return res.status(200).json(encodedata({ 'success': true, 'message': "Successfully added" }))
     } catch (err) {
-        return res.status(500).json({ 'success': false, 'message': "error on server" })
+        return res.status(500).json(encodedata({ 'success': false, 'message': "error on server" }))
     }
 }
 
@@ -184,7 +186,7 @@ export const updateFaq = async (req, res) => {
 
         let checkCategory = await FaqCategory.findOne({ "_id": reqBody.categoryId });
         if (!checkCategory) {
-            return res.status(400).json({ 'success': false, 'message': "There is no category" })
+            return res.status(400).json(encodedata({ 'success': false, 'message': "There is no category" }))
         }
 
         await Faq.updateOne({ "_id": reqBody.id }, {
@@ -198,7 +200,7 @@ export const updateFaq = async (req, res) => {
 
         return res.status(200).json(encodedata({ 'success': true, 'message': "Successfully updated" }))
     } catch (err) {
-        return res.status(500).json({ 'success': false, 'message': "category question and answer is required" })
+        return res.status(500).json(encodedata({ 'success': false, 'message': "category question and answer is required" }))
     }
 }
 
@@ -230,6 +232,7 @@ export const deleteFaq = async (req, res) => {
 */
 export const listFaq = async (req, res) => {
     try {
+      
         let pagination = paginationQuery(req.query);
         let filter = filterSearchQuery(req.query, ['categoryInfo.name', 'question', 'status']);
         let count = await Faq.countDocuments(filter);
@@ -264,7 +267,8 @@ export const listFaq = async (req, res) => {
         return res.status(200).json(encodedata({ 'success': true, 'message': 'Fetched successfully.', result }))
 
     } catch (err) {
-        return res.status(500).json({ 'success': true, 'message': 'Something went wrong.' })
+        
+        return res.status(500).json(encodedata({ 'success': true, 'message': 'Something went wrong.' }))
     }
 }
 

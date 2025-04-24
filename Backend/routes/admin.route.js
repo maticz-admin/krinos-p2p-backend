@@ -103,9 +103,9 @@ router.route('/anouncement')
 
 // User
 router.route('/user').get(reqQueryDecodedata, passportAuth, userCntrl.getUserList)
-router.route('/user-update').post(passportAuth, userCntrl.UpdateStatue)
+router.route('/user-update').post(decodedata, passportAuth, userCntrl.UpdateStatue)
 router.route('/getUserBalnce').get(passportAuth, userCntrl.getUserBalanceList)
-router.route('/disable-2fa').post(passportAuth, userCntrl.Disable2FA)
+router.route('/disable-2fa').post(decodedata, passportAuth, userCntrl.Disable2FA)
 
 
 // User Reference 
@@ -125,7 +125,7 @@ router.route('/userKyc')
   .post(passportAuth, userKycCtrl.approveUserKyc)
   .put(passportAuth, userKycValid.rejectKycValidate, userKycCtrl.rejectUserKyc);
 router.route('/changeUsrType/:userId').put(passportAuth, userKycCtrl.changeUserType)
-router.route('/kycList').post(userKycCtrl.getKycList)
+router.route('/kycList').post(decodedata, userKycCtrl.getKycList)
 
 // Wallet
 router.route('/depositList').get(passportAuth, walletCtrl.getDepositList)
@@ -166,7 +166,7 @@ router.route('/faqCategory')
   .delete(passportAuth, faqCtrl.deleteFaqCategory);
 router.route('/getFaqCategory').get(passportAuth, faqCtrl.getFaqCategory);
 router.route('/faq')
-  .get(passportAuth, faqCtrl.listFaq)
+  .get(decodedata, passportAuth, faqCtrl.listFaq)
   .post(decodedata, passportAuth, faqCtrl.addFaq)
   .put(decodedata, passportAuth, FaqValid.FaqUpdateValid, faqCtrl.updateFaq)
   .delete(passportAuth, faqCtrl.deleteFaq);
@@ -177,7 +177,7 @@ router.route('/getFaqDropdown').get(passportAuth, faqCtrl.getFaqDropdown)
 //passBook
 router
   .route("/userPassBookHistory")
-  .get(passportAuth, passbookCtrl.userPassbookHistory);
+  .get(decodedata, passportAuth, passbookCtrl.userPassbookHistory);
 
 // P2P
 router.route('/p2pPair')
@@ -210,7 +210,7 @@ router.route('/ticketMessage')
 
 // News Letter
 router.route('/subscriber-all').get(passportAuth, newsLetterCtrl.allSubscriber)
-router.route('/subscriber/sendNews').post(passportAuth, NewsValid.newsValid, newsLetterCtrl.sendNews)
+router.route('/subscriber/sendNews').post(decodedata , passportAuth, NewsValid.newsValid, newsLetterCtrl.sendNews)
 
 
 // Common

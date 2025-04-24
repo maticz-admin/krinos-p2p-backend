@@ -4,6 +4,7 @@ import { PassBook } from '../models';
 import { IncCntObjId } from '../lib/generalFun';
 import isEmpty from '../lib/isEmpty'
 import { paginationQuery, filterSearchQuery } from "../lib/adminHelpers";
+import { encodedata } from '../lib/cryptoJS';
 
 /*
  CREATE ADMIN PROFIT
@@ -67,6 +68,8 @@ export const getPassBookList = async (req, res) => {
 }
 
 export const userPassbookHistory = async (req, res) => {
+    try {
+        
     let pagination = paginationQuery(req.query);
     let filter = filterSearchQuery(req.query, [ "coin", "type", "category" ]);
     filter['userCodeId'] = req.query.userId
@@ -80,7 +83,12 @@ export const userPassbookHistory = async (req, res) => {
         count: count,
         data,
       }
-      return res.status(200).json({ 'status': true, result })
+      return res.status(200).json(encodedata({ 'status': true, result,  }))
+
+    } catch (error) {
+      return res.status(500).json(encodedata({ 'status': false, errors: errors }))
+        
+    }
   }
     
 // // CREATE PASS_BOOK

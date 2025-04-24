@@ -16,6 +16,14 @@ const AssetsSchema = new Schema({
 		type: String,
 		default: '',
 	},
+	bitgo_id : {
+		type : String,
+		default : ""
+	},
+	bitgo_webhookid : {
+		type : String,
+		default : ""
+	},
 	destTag: {
 		type: String,   // For XRP Currency
 		default: ''

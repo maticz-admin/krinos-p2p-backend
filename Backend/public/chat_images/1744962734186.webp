@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36">
+  <g id="tron" transform="translate(11860 18386)">
+    <g id="Group_60704" data-name="Group 60704" transform="translate(-11858 -18385)">
+      <g id="b20b0edee896b04e170e8427158174f8" transform="translate(0)">
+        <circle id="Ellipse_34" data-name="Ellipse 34" cx="16" cy="16" r="16" transform="translate(0)" fill="#009393"/>
+      </g>
+    </g>
+    <rect id="Rectangle_16320" data-name="Rectangle 16320" width="36" height="36" transform="translate(-11860 -18386)" fill="none"/>
+    <path id="_27dda159a3e29f95379d97e52ed60735" data-name="27dda159a3e29f95379d97e52ed60735" d="M23.889,23.969v-2.5h5.682V17.53H13.8v3.941h5.7v2.5c-4.774.23-8.357,1.188-8.357,2.336s3.58,2.1,8.357,2.336v8.243h4.392V28.64c4.773-.228,8.357-1.186,8.357-2.336S28.667,24.2,23.889,23.969Zm-2.2,3.925c-5.169,0-9.359-.8-9.359-1.761,0-.829,3.053-1.523,7.159-1.709v2.821c.707.032,1.441.05,2.2.05s1.493-.018,2.2-.05V24.424c4.107.186,7.159.88,7.159,1.709C31.053,27.1,26.862,27.894,21.693,27.894Z" transform="translate(-11863.693 -18395.207)" fill="#fff"/>
+    <g id="Group_60714" data-name="Group 60714" transform="translate(-1 -135)">
+      <circle id="Ellipse_72" data-name="Ellipse 72" cx="6" cy="6" r="6" transform="translate(-11837 -18228)" fill="#2b2a2f"/>
+      <g id="Tron_x2C__crypto_1_" transform="translate(-11836.38 -18226.305)">
+        <g id="XMLID_2520_" transform="translate(4.654 3.168)">
+          <path id="XMLID_434_" d="M13.117,15.065a.115.115,0,0,1-.048-.01A.122.122,0,0,1,13,14.927l.6-4.345a.123.123,0,0,1,.1-.1L16.96,10a.124.124,0,0,1,.123.06.116.116,0,0,1-.01.135l-3.862,4.828A.123.123,0,0,1,13.117,15.065Zm.71-4.359L13.3,14.527l3.4-4.246Z" transform="translate(-12.995 -9.995)" fill="#263238" stroke="#e2331a" stroke-width="0.4"/>
+        </g>
+        <g id="XMLID_2671_" transform="translate(2 0.997)">
+          <path id="XMLID_431_" d="M5.381,3.9A.136.136,0,0,1,5.3,3.871L2.045,1.216a.122.122,0,0,1-.031-.145A.117.117,0,0,1,2.144,1l5.238.917a.121.121,0,0,1,.06.21L5.463,3.869A.131.131,0,0,1,5.381,3.9ZM2.556,1.32l2.822,2.3,1.714-1.5Z" transform="translate(-2.001 -1.002)" fill="#263238" stroke="#e2331a" stroke-width="0.4"/>
+        </g>
+        <g id="XMLID_4521_" transform="translate(5.26 3.168)">
+          <path id="XMLID_430_" d="M15.624,10.72a.12.12,0,0,1-.118-.1.122.122,0,0,1,.1-.138L18.866,10a.121.121,0,0,1,.036.239l-3.259.483A.06.06,0,0,1,15.624,10.72Z" transform="translate(-15.505 -9.995)" fill="#263238" stroke="#e2331a" stroke-width="0.4"/>
+        </g>
+        <g id="XMLID_4522_" transform="translate(2 0.996)">
+          <path id="XMLID_429_" d="M5.379,3.893A.136.136,0,0,1,5.3,3.867L2.043,1.212a.124.124,0,0,1-.017-.171A.119.119,0,0,1,2.2,1.023L5.454,3.679a.119.119,0,0,1,.017.169A.108.108,0,0,1,5.379,3.893Z" transform="translate(-2 -0.996)" fill="#263238" stroke="#e2331a" stroke-width="0.4"/>
+        </g>
+        <g id="XMLID_4520_" transform="translate(4.654 1.916)">
+          <path id="XMLID_428_" d="M13.118,11.13H13.1a.123.123,0,0,1-.1-.135l.6-4.345a.128.128,0,0,1,.041-.075l1.979-1.738a.121.121,0,0,1,.159.183L13.835,6.73l-.6,4.3A.122.122,0,0,1,13.118,11.13Z" transform="translate(-12.997 -4.808)" fill="#263238" stroke="#e2331a" stroke-width="0.4"/>
+        </g>
+        <g id="XMLID_4518_" transform="translate(2 0.997)">
+          <path id="XMLID_425_" d="M4.776,8.243a.053.053,0,0,1-.019,0,.119.119,0,0,1-.094-.077l-2.655-7a.124.124,0,0,1,.019-.118A.12.12,0,0,1,2.14,1l5.238.917a.108.108,0,0,1,.063.034L8.72,3.211a.122.122,0,0,1,.01.162L4.867,8.2A.119.119,0,0,1,4.776,8.243ZM2.309,1.277l2.506,6.6L8.476,3.3,7.3,2.153Z" transform="translate(-2 -1.002)" fill="#263238" stroke="#e2331a" stroke-width="0.4"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -90,7 +90,9 @@ export const getCurrency = async (req, res) => {
             withdrawStatus: 1,
             depositminlimit: 1,
             commisionfee: 1,
-            coinpaymentsymbol: 1,
+            buyercommisionfee : 1,
+            // coinpaymentsymbol: 1,
+            bitgosymbol:1,
             image: {
               $cond: [
                 { $eq: ["$image", ""] },
@@ -106,7 +108,8 @@ export const getCurrency = async (req, res) => {
             },
             fundFee: 1,
             api: 1,
-            key: 1
+            key: 1,
+            bitgosymbol : 1
           },
         },
       ])
@@ -217,9 +220,12 @@ export const currencyList = async (req, res) => {
         withdrawStatus: 1,
         depositminlimit: 1,
         commisionfee: 1,
-        coinpaymentsymbol: 1,
+        buyercommisionfee : 1,
+        // coinpaymentsymbol: 1,
+        bitgosymbol:1,
         api: 1,
-        key: 1
+        key: 1,
+        bitgosymbol : 1
       }).sort({ createdAt: -1 });
 
       let csvData = [header];
@@ -258,9 +264,12 @@ export const currencyList = async (req, res) => {
         withdrawStatus: 1,
         depositminlimit: 1,
         commisionfee: 1,
-        coinpaymentsymbol: 1,
+        buyercommisionfee : 1,
+        // coinpaymentsymbol: 1,
+        bitgosymbol:1,
         api: 1,
-        key: 1
+        key: 1,
+        bitgosymbol : 1
       }).sort({ createdAt: -1 });
       // .skip(pagination.skip).limit(pagination.limit);
 
@@ -272,7 +281,7 @@ export const currencyList = async (req, res) => {
 
       return res
         .status(200)
-        .json({ success: true, message: "FETCH_SUCCESS", result });
+        .json(encodedata({ success: true, message: "FETCH_SUCCESS", result }));
     } else {
       let data = await Currency.find(filter, {
         _id: 1,
@@ -299,9 +308,12 @@ export const currencyList = async (req, res) => {
         withdrawStatus: 1,
         depositminlimit: 1,
         commisionfee: 1,
-        coinpaymentsymbol: 1,
+        buyercommisionfee : 1,
+        // coinpaymentsymbol: 1,
+        bitgosymbol:1,
         api: 1,
-        key: 1
+        key: 1,
+        bitgosymbol : 1
       })
         .sort({ createdAt: -1 })
         .skip(pagination.skip)
@@ -317,7 +329,7 @@ export const currencyList = async (req, res) => {
         .json(encodedata({ success: true, message: "FETCH_SUCCESS", result }));
     }
   } catch (err) {
-    return res.status(500).json({ success: true, message: "SOMETHING_WRONG" });
+    return res.status(500).json(encodedata({ success: true, message: "SOMETHING_WRONG" }));
   }
 };
 
@@ -335,9 +347,8 @@ export const addCurrency = async (req, res) => {
     if (checkCurrency) {
       return res
         .status(400)
-        .json({ success: false, errors: { coin: "Coin already exists" } });
+        .json(encodedata({ success: false, errors: { coin: "Coin already exists" } }));
     }
-
     const newDoc = new Currency({
       name: reqBody.name,
       coin: reqBody.symbol,
@@ -352,11 +363,13 @@ export const addCurrency = async (req, res) => {
       depositStatus: reqBody.depositStatus,
       withdrawStatus: reqBody.withdrawStatus,
       commisionfee: reqBody?.commisionfee,
+      buyercommisionfee : reqBody?.buyercommisionfee,
       decimal: reqBody.decimals,
-      coinpaymentsymbol: reqBody?.coinpaymentsymbol
+      coinpaymentsymbol: reqBody?.bitgosymbol,
+      bitgosymbol : reqBody?.bitgosymbol
     });
     if (reqBody.depositType == "local") {
-      newDoc["api"] = reqBody?.api,
+        newDoc["api"] = reqBody?.api,
         newDoc["key"] = reqBody?.key
     }
     if (reqBody.type == "token") {
@@ -380,12 +393,12 @@ export const addCurrency = async (req, res) => {
     newAssetAllUsr(newData);
     return res
       .status(200)
-      .json({ success: true, message: "Coin added successfully" });
+      .json(encodedata({ success: true, message: "Coin added successfully" }))
   } catch (err) {
     console.log('errrrrrrrrrrrrr-------------', err)
     return res
       .status(500)
-      .json({ success: false, message: "Something went wrong" });
+      .json(encodedata({ success: false, message: "Something went wrong" }))
   }
 };
 
@@ -432,9 +445,11 @@ export const updateCurrency = async (req, res) => {
     currencyDoc.depositStatus = reqBody.depositStatus;
     currencyDoc.withdrawStatus = reqBody.withdrawStatus;
     currencyDoc.commisionfee = reqBody?.commisionfee;
-    currencyDoc.coinpaymentsymbol = reqBody?.coinpaymentsymbol
+    currencyDoc.buyercommisionfee = reqBody?.buyercommisionfee
+    // currencyDoc.coinpaymentsymbol = reqBody?.coinpaymentsymbol;
+    currencyDoc.bitgosymbol = reqBody?.bitgosymbol
     if (reqBody.depositType == "local") {
-      currencyDoc.api = reqBody?.api,
+        currencyDoc.api = reqBody?.api,
         currencyDoc.key = reqBody?.key
     }
     if (reqBody.type == "token") {

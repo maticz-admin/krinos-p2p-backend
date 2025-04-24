@@ -35,22 +35,27 @@ import * as supportValid from "../validation/support.validation"
 import * as p2pValid from '../validation/p2p.validation';
 import * as contactUsValid from '../validation/contactus.validation'
 
-import { decodedata } from '../lib/cryptoJS'
+import { decodedata, reqQueryDecodedata } from '../lib/cryptoJS'
+import { verifyRecaptcha } from '../middleware/verifyRecaptcha';
+import { WithdrawAmount } from '../controllers/bitgo.controller';
 
 const router = express();
 const passportAuth = passport.authenticate("usersAuth", { session: false });
 
 // User
-router.route('/register').post(decodedata,userValid.registerValidate, userCtrl.createNewUser);//
-router.route('/login').post(decodedata,userValid.loginValidate, userCtrl.userLogin);//
-router.route('/resend-otp').post(userCtrl.resendOTP);
+router.route('/register').post(decodedata,verifyRecaptcha, userValid.registerValidate, userCtrl.createNewUser);//
+router.route('/login').post(decodedata, verifyRecaptcha,userValid.loginValidate, userCtrl.userLogin);//
+router.route('/resend-otp').post(decodedata, userCtrl.resendOTP);
 router.route('/confirm-mail').post(userValid.confirmMailValidate, userCtrl.confirmMail);
 router.route('/check-deposit').get(apiKeyCtrl.authorization, userCtrl.checkDeposit)//
 router.route('/hide-btn').get(apiKeyCtrl.authorizationEncrypt, userCtrl.hideBtn)
+router.route('/profileImage')
+    .post(decodedata, userCtrl.profileImage)
+
 router.route('/userProfile')
     .get(apiKeyCtrl.authorizationEncrypt, userCtrl.getUserProfile)//
-    .put(apiKeyCtrl.authorization, userCtrl.uploadProfile, userValid.editProfileValidate, userCtrl.editUserProfile);//
-router.route('/changePassword').post(apiKeyCtrl.authorization, userValid.changePwdValidate, userCtrl.changePassword);//
+    .put(decodedata , apiKeyCtrl.authorization, userCtrl.uploadProfile, userValid.editProfileValidate, userCtrl.editUserProfile);//
+router.route('/changePassword').post(decodedata, apiKeyCtrl.authorization, userValid.changePwdValidate, userCtrl.changePassword);//
 router.route('/upgradeUser').post(apiKeyCtrl.authorization, userCtrl.upgradeUser)
 router.route('/security/2fa')
     .get(apiKeyCtrl.authorization, userCtrl.get2faCode)
@@ -65,17 +70,18 @@ router.route('/userSetting')
     .get(decodedata, apiKeyCtrl.authorization, userCtrl.getUserSetting)//
     .put(decodedata, apiKeyCtrl.authorization, userValid.editSettingValid, userCtrl.editUserSetting);
 router.route('/editNotif').put(apiKeyCtrl.authorization, userValid.editNotifValid, userCtrl.editNotif)
-router.route('/forgotPassword').post(userValid.checkForgotPwdValidate, userCtrl.checkForgotPassword);
+router.route('/forgotPassword').post(decodedata, userValid.checkForgotPwdValidate, userCtrl.checkForgotPassword);
 
-router.route('/resetPassword').post(userValid.resetPwdValidate, userCtrl.resetPassword);
+router.route('/resetPassword').post(decodedata, verifyRecaptcha, userValid.resetPwdValidate, userCtrl.resetPassword);
 router.route('/phoneChange') //
-    .post(apiKeyCtrl.authorization, userValid.newPhoneValidate, userCtrl.changeNewPhone)
-    .put(apiKeyCtrl.authorization, userValid.editPhoneValidate, userCtrl.verifyNewPhone);
+    .post(decodedata,apiKeyCtrl.authorization, userValid.newPhoneValidate, userCtrl.changeNewPhone)
+    .put(decodedata, apiKeyCtrl.authorization, userValid.editPhoneValidate, userCtrl.verifyNewPhone);
 router.route('/emailChange') //
     .post(apiKeyCtrl.authorization, userValid.editEmailValidate, userCtrl.editEmail)//
     .put(userValid.tokenValidate, userCtrl.sentVerifLink)//
     .patch(userValid.tokenValidate, userCtrl.verifyNewEmail);//
-router.route('/sentOTP').post(userValid.sentOtp, userCtrl.checkMobile, userCtrl.sentOtp)//
+router.route('/sentOTP').post(decodedata, userValid.sentOtp, userCtrl.checkMobile, userCtrl.sentOtp)//
+router.route('/spot/tradepair').get(spotTradeCtrl.getPairList)//
 
 // kyc
 router.route('/kycdetail').get(apiKeyCtrl.authorizationEncrypt, userKycCtrl.getUserKycDetail);//
@@ -108,13 +114,17 @@ router.route('/fiatWithdraw')
     .patch(walletValid.tokenValid, walletCtrl.fiatRequestVerify);
 router.route('/coinWithdraw')
     .post(apiKeyCtrl.authorization, walletValid.tokenValid, walletCtrl.decryptWallet, walletValid.coinWithdrawValid, walletCtrl.withdrawCoinRequest)
-    .patch(walletValid.tokenValid, walletCtrl.coinRequestVerify);
+    .patch( walletValid.tokenValid, walletCtrl.coinRequestVerify);
+
+router.route("/bitgo-withdraw").post(decodedata , apiKeyCtrl.authorization , WithdrawAmount); //apiKeyCtrl.authorization ,
+
+
 router.route('/fiatDeposit').post(apiKeyCtrl.authorization, walletCtrl.uploadWalletDoc, walletValid.depositReqtValid, walletCtrl.checkUserKyc, walletCtrl.depositRequest);
 router.route('/walletTransfer').post(apiKeyCtrl.authorization, walletValid.walletTransferValid, walletCtrl.walletTransfer);
 router.route('/fundTransfer').post(apiKeyCtrl.authorization, walletValid.fundTransferValid, walletCtrl.fundTransfer);
 router.route('/withdrawfee').post(apiKeyCtrl.authorization, walletCtrl.withdrawfee)
 
-router.route('/history/transaction/:paymentType').get(apiKeyCtrl.authorization, walletCtrl.getTrnxHistory);
+router.route('/history/transaction/:paymentType').get(reqQueryDecodedata, apiKeyCtrl.authorization, walletCtrl.getTrnxHistory);
 
 // Dashboard
 router.route('/recentTransaction').get(apiKeyCtrl.authorization, dashboardCtrl.getRecentTransaction);//
@@ -157,7 +167,7 @@ router.route('/getFaqTrend').get(commonCtrl.getFaqTrend)
 router.route('/getPairData').get(apiKeyCtrl.authorization, commonCtrl.getPairData)
 router.route('/priceConversion').get(apiKeyCtrl.authorization, commonCtrl.getPriceCNV)//
 router.route('/historyFilter').get(apiKeyCtrl.authorization, commonCtrl.historyFilter)
-router.route('/contact').post(contactUsValid.newContactValid, contactCtrl.newContact)
+router.route('/contact').post(decodedata, contactUsValid.newContactValid, contactCtrl.newContact)
 
 // Announcement
 router.route('/announcement').get(anouncementCtrl.getAnnouncement)
@@ -200,7 +210,7 @@ router.route("/p2p/orderHistory").get(apiKeyCtrl.authorization, p2pCtrl.orderHis
 router.route("/p2p/orderHistoryDoc").get(apiKeyCtrl.authorization, p2pCtrl.orderHistoryDoc);
 
 // News Letter
-router.route("/newsLetter/subscribe").post(newsLetterCtrl.newSubscribe);//
+router.route("/newsLetter/subscribe").post(decodedata, newsLetterCtrl.newSubscribe);//
 
 // Webhook
 router.route('/depositwebhook').post(coinpaymentCtrl.verifySign, coinpaymentCtrl.depositwebhook)

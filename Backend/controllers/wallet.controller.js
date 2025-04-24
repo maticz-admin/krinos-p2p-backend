@@ -124,17 +124,18 @@ export const decryptWallet = (req, res, next) => {
 
 export const getHideZeroStatus = async (req, res) => {
     try {
+        
         let hideZeroStatus = await Wallet.findOne({
             '_id': req.user.id
         }, {
-            "hideZeroStatus": 1,
+            "hideZeroStatus": true,
         }
         )
 
-        return res.status(200).json({ 'success': true, 'hideZeroStatus': hideZeroStatus, })
-
+        return res.status(200).json(encodedata({ 'success': true, 'hideZeroStatus': hideZeroStatus, }))
     } catch (err) {
-        return res.status(500).json({ 'success': false })
+       
+        return res.status(500).json(encodedata({ 'success': false, message: "Internal server error" }))
 
     }
 }
@@ -143,14 +144,17 @@ export const getHideZeroStatus = async (req, res) => {
 export const updateHideZeroStatus = async (req, res) => {
     try {
         let reqBody = req.body;
-
-        const updateData = await wallet.findOneAndUpdate({ "_id": ObjectId(req.user.id) }, { hideZeroStatus: reqBody.hideZeroStatus }, { new: true },)
-
-        return res.status(200).json({ 'success': true, message: "zero balance asstes hide  successfully" })
-
+        console.log("reqBody" , reqBody);
+        
+        const updateData = await wallet.findOneAndUpdate(
+            { "_id": new ObjectId(req.user.id) }, 
+            { hideZeroStatus: reqBody.hideZeroStatus }, 
+            { new: true }
+        );
+        return res.status(200).json({ 'success': true, message: "zero balance assets hidden successfully" });
     } catch (err) {
-        return res.status(500).json({ 'success': false })
-
+        console.log('rrrrrrrrrrrrrrrrrrrrr------------', err);
+        return res.status(500).json({ 'success': false });
     }
 }
 export const getWallet = async (req, res) => {
@@ -169,10 +173,11 @@ export const getWallet = async (req, res) => {
             "assets.derivativeBal": 1,
             "assets.p2pBal": 1
         })
+        console.log("walletDatawalletData",walletData)
         var userInfo = await User.findOne({
             '_id': req.user.id
         })
-
+        console.log("userInfo",userInfo)
         if (!walletData) {
             return res.status(400).json(encodedata({ 'success': false }))
         }
@@ -184,6 +189,7 @@ export const getWallet = async (req, res) => {
             }
         });
         if (assetList && assetList.length > 0) {
+            console.log("assetListasdas" , assetList);
             let updateAsset = await updateAddress(assetList, req.user.userId, {
                 'walletId': walletData._id,
                 "binSubAcctEmail": req.user.binSubAcctEmail,
@@ -197,6 +203,7 @@ export const getWallet = async (req, res) => {
         return res.status(200).json(encodedata({ 'success': true, 'messages': "successfully", 'result': usrAsset, }))
     }
     catch (err) {
+        console.log("errrrrrrrrrrrrrrrrr",err)
         return res.status(500).json(encodedata({ 'success': false }))
     }
 }
@@ -233,6 +240,8 @@ export const getbalance = async (req, res) => {
 */
 export const updateAddress = async (assetList, userId, option = {}) => {
     try {
+        console.log("update address" );
+        
         let currencyList = await Currency.aggregate([
             { "$match": { "_id": { "$in": assetList } } },
             {
@@ -245,7 +254,8 @@ export const updateAddress = async (assetList, userId, option = {}) => {
                                 "coin": 1,
                                 "depositType": 1,
                                 "tokenType": 1,
-                                "coinpaymentsymbol" : 1
+                                "coinpaymentsymbol" : 1,
+                                "bitgosymbol" : 1
                             }
                         }
                     ],
@@ -257,7 +267,8 @@ export const updateAddress = async (assetList, userId, option = {}) => {
                                 "coin": 1,
                                 "depositType": 1,
                                 "tokenType": 1,
-                                "coinpaymentsymbol" : 1
+                                "coinpaymentsymbol" : 1,
+                                "bitgosymbol" : 1
                             }
                         }
                     ],
@@ -269,13 +280,15 @@ export const updateAddress = async (assetList, userId, option = {}) => {
                                 "coin": 1,
                                 "depositType": 1,
                                 "tokenType": 1,
-                                "coinpaymentsymbol" : 1
+                                "coinpaymentsymbol" : 1,
+                                "bitgosymbol" : 1
                             }
                         }
                     ],
-                }
+            }
             },
         ]);
+        console.log("currencyListcurrencyList",currencyList)
         let walletData;
         if (currencyList && currencyList.length > 0) {
             if (currencyList[0].crypto && currencyList[0].crypto.length > 0) {
@@ -285,7 +298,7 @@ export const updateAddress = async (assetList, userId, option = {}) => {
                         'option': { ...option, 'userId': userId }
                     })
 
-
+console.log("cryptoDoccryptoDoc",cryptoDoc)
                     walletData = await Wallet.findOneAndUpdate({
                         'userId': userId,
                         'assets._id': cryptoData._id
@@ -407,6 +420,7 @@ export const updateAddress = async (assetList, userId, option = {}) => {
         return []
 
     } catch (err) {
+        console.log("sjnaskdasjdasdas",err)
         return []
     }
 }
@@ -659,7 +673,8 @@ export const withdrawCoinRequest = async (req, res) => {
     try {
         let api_key = req.header("x-api-key");
         if(api_key!==null && api_key!== undefined && req.user.withdraw !==true){
-             return res.status(400).json({ 'status': false, 'message': "You don't have permission to WithdrawCoinRequest" });      
+            console.log('------------------1');
+             return res.status(400).json(encodedata({ 'status': false, 'message': "You don't have permission to WithdrawCoinRequest" }));      
         }
         else{
         let reqBody = req.body;
@@ -667,12 +682,16 @@ export const withdrawCoinRequest = async (req, res) => {
         let userData = await User.findOne({ "_id": req.user.id });
 
         if (userData.google2Fa.secret == '') {
-            return res.status(500).json({ "success": false, 'errors': { 'twoFACode': 'TWO_FA_MSG' } })
+            console.log('------------------2');
+
+            return res.status(500).json(encodedata({ "success": false, 'errors': { 'twoFACode': 'TWO_FA_MSG' } }))
         }
 
         let verifyTwoFaCode = node2fa.verifyToken(userData.google2Fa.secret, reqBody.twoFACode);
         if (!(verifyTwoFaCode && verifyTwoFaCode.delta == 0)) {
-            return res.status(400).json({ "success": false, 'errors': { 'twoFACode': "INVALID_CODE" } })
+            console.log('------------------3');
+
+            return res.status(400).json(encodedata({ "success": false, 'errors': { 'twoFACode': "INVALID_CODE" } }))
         }
 
         let usrWallet = await Wallet.findOne({
@@ -689,31 +708,42 @@ export const withdrawCoinRequest = async (req, res) => {
             "assets.p2pBal": 1,
         })
         if (!usrWallet) {
-            return res.status(400).json({ 'success': false, 'message': 'NO_DATA' })
+            console.log('------------------4');
+
+            return res.status(400).json(encodedata({ 'success': false, 'message': 'NO_DATA' }))
         }
 
         let usrAsset = usrWallet.assets.id(reqBody.currencyId);
         if (!usrAsset) {
-            return res.status(400).json({ 'success': false, 'message': 'NO_DATA' })
+            console.log('------------------5');
+
+            return res.status(400).json(encodedata({ 'success': false, 'message': 'NO_DATA' }))
         }
 
         if (reqBody.coin != 'XRP' && usrAsset.address == reqBody.receiverAddress) {
-            return res.status(400).json({ 'success': false, 'errors': { 'receiverAddress': 'RECEIVER_ADDRESS_SHOULD_DIFFER' } })
+            console.log('------------------6');
+
+            return res.status(400).json(encodedata({ 'success': false, 'errors': { 'receiverAddress': 'RECEIVER_ADDRESS_SHOULD_DIFFER' } }))
         }
 
         if (reqBody.coin == 'XRP' && usrAsset.destTag == reqBody.destTag) {
-            return res.status(400).json({ 'success': false, 'errors': { 'destTag': 'RECEIVER_TAG_SHOULD_DIFFER' } })
+            console.log('------------------7');
+
+            return res.status(400).json(encodedata({ 'success': false, 'errors': { 'destTag': 'RECEIVER_TAG_SHOULD_DIFFER' } }))
         }
 
         let curData = await Currency.findOne({ '_id': reqBody.currencyId })
         if (!curData) {
-            return res.status(400).json({ 'success': false, 'message': 'NO_DATA' })
+            console.log('------------------8');
+
+            return res.status(400).json(encodedata({ 'success': false, 'message': 'NO_DATA' }))
         }
 
         // let finalAmount = reqBody.amount + precentConvetPrice(reqBody.amount, curData.withdrawFee)
         let finalAmount = reqBody.finalAmount //+ parseFloat(curData.withdrawFee)
         if (usrAsset.p2pBal < finalAmount) {
-            return res.status(400).json({ 'success': false, 'errors': { 'finalAmount': 'INSUFFICIENT_BALANCE' } })
+            console.log('------------------9');
+            return res.status(400).json(encodedata({ 'success': false, 'errors': { 'finalAmount': 'INSUFFICIENT_BALANCE' } }))
         }
 
         var transactions = new Transaction();
@@ -780,11 +810,13 @@ export const withdrawCoinRequest = async (req, res) => {
         //     'paymentType': trxData.paymentType,
         //     'status': trxData.status,
         // })
-        return res.status(200).json({ "success": true, 'message': 'VERIFICATION_LINK', 'result': updateWallet.assets })
+        return res.status(200).json(encodedata({ "success": true, 'message': 'VERIFICATION_LINK', 'result': updateWallet.assets }))
     }
 }
     catch (err) {
-        return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
+        console.log('------------------', err);
+
+        return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
     }
 }
 
@@ -1009,7 +1041,6 @@ export const fundTransfer = async (req, res) => {
         if (!toUserData) {
             return res.status(500).json({ "success": false, 'errors': { 'toUserEmail': 'Email Not Exit' } })
         }
-
         let usrWallet = await Wallet.findOne({ "_id": req.user.id });
         if (!usrWallet) {
             return res.status(400).json({ 'success': false, 'message': 'NO_DATA' })
@@ -1118,7 +1149,7 @@ export const getTrnxHistory = async (req, res) => {
         let filter = filterSearchQuery(req.query, ['currencySymbol', 'status']);
 
         if (!['fiat', 'crypto','token'.includes(paymentType)]) {
-            return res.status(400).json({ 'success': false, 'message': 'Invalid type' })
+            return res.status(400).json(encodedata({ 'success': false, 'message': 'Invalid type' }))
         }
         if (paymentType == 'crypto') {
             if (req.query.type == 'all') {
@@ -1171,9 +1202,9 @@ export const getTrnxHistory = async (req, res) => {
             data,
             count: count
         }
-        return res.status(200).json({ "success": true, result })
+        return res.status(200).json(encodedata({ "success": true, result }))
     } catch (err) {
-        return res.status(500).json({ "success": false, 'message': 'Error on server' })
+        return res.status(500).json(encodedata({ "success": false, 'message': 'Error on server' }))
     }
 }
 
@@ -1375,7 +1406,7 @@ export const getWithdrawList = async (req, res) => {
             return res.status(200).json(encodedata({ "success": true, result }))
         }
     } catch (err) {
-        return res.status(500).json({ "success": false, 'message': 'Error on server' })
+        return res.status(500).json(encodedata({ "success": false, 'message': 'Error on server' }))
     }
 }
 
@@ -1696,7 +1727,6 @@ export const WithdrawApprove = async (req, res) => {
 export const coinWithdrawReject = async (req, res) => {
     try {
         let reqParam = req.params
-
         let trxData = await Transaction.findOneAndUpdate({
             '_id': reqParam.transactionId,
             'paymentType': 'coin_withdraw',
@@ -2005,6 +2035,8 @@ export const fiatDepositApprove = async (req, res) => {
 */
 export const newUsrWallet = async (walletData, option = {}) => {
     try {
+        console.log("new user wallet");
+        
         if (isEmpty(walletData)) {
             return false
         }
@@ -2021,7 +2053,8 @@ export const newUsrWallet = async (walletData, option = {}) => {
                                 "coin": 1,
                                 "depositType": 1,
                                 "tokenType": 1,
-                                "coinpaymentsymbol" : 1
+                                "coinpaymentsymbol" : 1,
+                                "bitgosymbol":1
                             }
                         }
                     ],
@@ -2033,7 +2066,8 @@ export const newUsrWallet = async (walletData, option = {}) => {
                                 "coin": 1,
                                 "depositType": 1,
                                 "tokenType": 1,
-                                "coinpaymentsymbol" : 1
+                                "coinpaymentsymbol" : 1,
+                                "bitgosymbol":1
                             }
                         }
                     ],
@@ -2045,7 +2079,8 @@ export const newUsrWallet = async (walletData, option = {}) => {
                                 "coin": 1,
                                 "depositType": 1,
                                 "tokenType": 1,
-                                "coinpaymentsymbol" : 1
+                                "coinpaymentsymbol" : 1,
+                                "bitgosymbol":1
                             }
                         }
                     ],

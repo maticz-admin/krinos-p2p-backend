@@ -22,6 +22,7 @@ export const newNotification = async (doc) => {
         socketEmitOne('notice', data, newDoc.userId)
         return true
     } catch (err) {
+        console.log("error on new notification" , err);
         return false
     }
 }
@@ -63,7 +64,6 @@ export const getNotification = async (req, res) => {
 
 const FetchUnReadNotice = async (id) => {
     try {
-
         let NoticeData = await Notification.find({ userId: id, isRead: false }).select({ 'description': 1, 'createdAt': 1 }).sort({ createdAt: -1 })
         if (!isEmpty(NoticeData)) {
             return NoticeData

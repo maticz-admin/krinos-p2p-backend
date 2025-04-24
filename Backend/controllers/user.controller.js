@@ -54,6 +54,10 @@ import { newNotification } from './notification.controller'
 import * as ethCtrl from './coin/eth.controller'
 import * as bnbCtrl from './coin/bnb.controller';
 import * as tronCtrl from './coin/TronGateway';
+import { encode } from 'punycode';
+import axios from 'axios';
+
+const crypto = require('crypto');
 
 
 
@@ -80,7 +84,6 @@ let profileUpload = multer({
 ])
 
 export const uploadProfile = (req, res, next) => {
-    // console.log('req--------', req)
     profileUpload(req, res, function (err) {
         if (!isEmpty(req.validationError)) {
             return res.status(400).json({ "success": false, 'errors': { [req.validationError.fieldname]: req.validationError.messages } })
@@ -103,14 +106,14 @@ export const checkMobile = async (req, res, next) => {
         let reqBody = req.body;
         let checkDoc = await User.findOne({ "phoneCode": reqBody.phoneCode, "phoneNo": reqBody.phoneNo });
         if (reqBody.type == 'register' && checkDoc) {
-            return res.status(400).json({ "success": false, 'message': "Phone number already exist" })
+            return res.status(400).json(encodedata({ "success": false, 'message': "Phone number already exist" }))
         } else if (reqBody.type == 'login' && !checkDoc) {
-            return res.status(400).json({ "success": false, 'message': "Phone number not exist" })
+            return res.status(400).json(encodedata({ "success": false, 'message': "Phone number not exist" }))
         }
 
         return next();
     } catch (err) {
-        return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
+        return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
     }
 }
 
@@ -124,34 +127,60 @@ export const checkMobile = async (req, res, next) => {
 export const sentOtp = async (req, res) => {
     try {
         let reqBody = req.body;
+        console.log('ysdgfyugdsyfugsdyufgyusdgfyugdsyuf----------', reqBody)
+
         if (reqBody.type == 'login') {
             let checkDoc = await User.findOne({ "phoneCode": reqBody.phoneCode, "phoneNo": reqBody.phoneNo });
             if (isEmpty(checkDoc) && reqBody.type == 'forgot') {
-                return res.status(400).json({ "success": false, errors: { phone: 'Phone number not exists' } });
+                console.log('ysdgfyugdsyfugsdyufgyusdgfyugdsyuf----------')
+                return res.status(400).json(encodedata({ "success": false, errors: { phone: 'The phone number does not exist' } }));
             }
             if (!checkDoc.authenticate(reqBody.password)) {
-                return res.status(400).json({ 'success': false, 'errors': { 'password': "Password incorrect" } });
+                console.log('ysdgfyugdsyfugsdyufgyusdgfyugdsyuf----------')
+
+                return res.status(400).json(encodedata({ 'success': false, 'errors': { 'password': "Password incorrect" } }));
             }
         }
         let checkDoc = await User.findOne({ "phoneCode": reqBody.phoneCode, "phoneNo": reqBody.phoneNo });
         if (isEmpty(checkDoc) && reqBody.type == 'forgot') {
-            return res.status(400).json({ "success": false, errors: { phone: 'Phone number not exists' } });
+
+            return res.status(400).json(encodedata({ "success": false, errors: { phone: 'The phone number does not exist' } }));
         }
         let to = `+${reqBody.phoneCode}${reqBody.phoneNo}`;
-        let { smsStatus,message } = await smsHelper.sentOtp(to);
-       
-        if(message === "Max send attempts reached"){
-            return res.status(400).json({ "success": false, errors: { phoneNo: "Max send attempts reached" } })
+        const otp = generateOTP();
+        console.log('ysdgfyugdsyfugsdyufgyusdgfyugdsyuf----------', otp)
+
+        let { smsStatus, message } = await smsHelper.sentOtp(to, otp);
+
+        if (message === "Max send attempts reached") {
+
+            return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Max send attempts reached" } }))
         }
-        if(message === " Too many requests") {
-            return res.status(400).json({ "success": false, errors: { phoneNo: "Too many requests" } })
+        if (message === " Too many requests") {
+
+            return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Too many requests" } }))
         }
-        if(!smsStatus) {
-            return res.status(400).json({ "success": false, errors: { phoneNo: "Invalid mobile number" } })
+        if (!smsStatus) {
+
+            return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Invalid mobile number" } }))
+        };
+        console.log('checkDoc---', checkDoc)
+        if (checkDoc) {
+
+            const updateOtp = await User.findOneAndUpdate(
+                {
+                    _id: checkDoc._id
+                },
+                {
+                    otp: otp,  // New OTP value
+                    otptime: new Date()  // Update the OTP time to the current timestamp
+                },
+                { new: true }  // Return the updated document
+            );
         }
-        return res.status(200).json({ "success": true, "message": "OTP sent successfully, It is only valid for 10 minutes" });
+        return res.status(200).json(encodedata({ "success": true, "message": "OTP sent successfully, It is only valid for 10 minutes" }));
     } catch (err) {
-        return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
+        return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
     }
 }
 
@@ -166,24 +195,25 @@ export const createNewUser = async (req, res) => {
     try {
         let reqBody = req.body;
         // return false;
-        let recaptcha = await recaptchaFun.checkToken(reqBody.reCaptcha);
-        if (recaptcha && recaptcha.status == false) {
-            return res.status(500).json({ "success": false, 'message': "Invalid reCaptcha" })
-        }
+        // let recaptcha = await recaptchaFun.checkToken(reqBody.reCaptcha);
+        // if (recaptcha && recaptcha.status == false) {
+        //     return res.status(500).json({ "success": false, 'message': "Invalid reCaptcha" })
+        // }
+        console.log('reqBody-----', reqBody);
+
         let newData = {
             'password': reqBody.password,
         }
 
         if (reqBody.formType == 'email') {
             reqBody.email = reqBody.email.toLowerCase();
-            // console.log('reqBody-----', reqBody);
 
             let checkUser = await User.findOne(({ 'email': reqBody.email }))
-            console.log("check user" , checkUser);
-            
+
             if (checkUser) {
                 return res.status(400).json(encodedata({ 'success': false, 'errors': { 'email': "Email already exists" } }));
             }
+
             newData['email'] = reqBody.email;
 
         } else if (reqBody.formType == 'mobile') {
@@ -191,15 +221,24 @@ export const createNewUser = async (req, res) => {
             if (checkDoc) {
                 return res.status(400).json(encodedata({ "success": false, 'erros': { 'phoneNo': "Phone number already exist" } }))
             }
-            let to = `+${reqBody.phoneCode}${reqBody.phoneNo}`;
-            let { smsStatus,message } = await smsHelper.verifyOtp(to, reqBody.otp);
-            if(message === "Max send attempts reached"){
-                return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Max send attempts reached" } }))
+            console.log('checkDoc-----', checkDoc, reqBody)
+            let checkUserDeatils;
+            if (checkDoc == null) {
+                checkUserDeatils = ''
+            } else {
+                checkUserDeatils = checkDoc
             }
-            else if(message === "Too many requests") {
+
+
+            let to = `+${reqBody.phoneCode}${reqBody.phoneNo}`;
+            let { smsStatus, message } = await smsHelper.verifyOtp(checkUserDeatils, reqBody.otp, 'registerMobile');
+            if (message === "Max send attempts reached") {
+                return res.status(200).json(encodedata({ "success": false, errors: { phoneNo: "Max send attempts reached" } }))
+            }
+            else if (message === "Too many requests") {
                 return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Too many requests" } }))
             }
-            else if(!smsStatus) {
+            else if (!smsStatus) {
                 return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Invalid mobile number" } }))
             }
 
@@ -240,10 +279,10 @@ export const createNewUser = async (req, res) => {
         userReferenceCtrl.newUsrReference(newDoc._id)
         walletCtrl.newUsrWallet(walletDoc, {
             'walletId': newDoc._id,
-            'emailId':reqBody.email
+            'emailId': reqBody.email
         })
         const defaultsetting = await defaultUserSetting(newDoc);
-        if(reqBody.formType == 'email'){
+        if (reqBody.formType == 'email') {
             const mailtemplate = await mailTemplateLang({
                 'userId': newDoc._id,
                 'identifier': 'activate_register_user',
@@ -251,7 +290,7 @@ export const createNewUser = async (req, res) => {
                 content
             })
         }
-        
+
         // binanceSubAcc(newDoc, walletDoc)
 
         // mailTemplate('activate_register_user', reqBody.langCode, reqBody.email, content)
@@ -262,7 +301,7 @@ export const createNewUser = async (req, res) => {
         return res.status(200).json(encodedata({ "success": true, "message": message }))
     }
     catch (err) {
-        console.log("ansdkjnaskdas",err);
+        console.log("ansdkjnaskdas", err);
         return res.status(500).json(encodedata({ "success": false, 'message': "Something went wrong" }))
     }
 }
@@ -350,10 +389,8 @@ export const confirmMail = async (req, res) => {
         if (userData.emailStatus == 'verified') {
             return res.status(400).json({ "success": false, 'message': "Your email is already verified" })
         }
-
         userData.status = 'verified';
         userData.emailStatus = 'verified';
-
         await userData.save();
         userReferenceCtrl.addChild(userData)
         return res.status(200).json({ 'success': true, 'message': "Your email has been verified, you can now log in" })
@@ -369,12 +406,23 @@ export const confirmMail = async (req, res) => {
  * URL : /api/login 
  * BODY : email, phoneCode, phoneNo, formType, password, loginHistory, langCode, twoFACode
 */
+
+
+const generateOTP = (length = 6) => {
+    const otp = crypto.randomInt(100000, 999999);
+    return otp.toString().padStart(length, '0');
+}
+
+
+
+
 export const userLogin = async (req, res) => {
     try {
-
+        // console.log("req.body", req.body);
         let reqBody = req.body, checkUser;
-        console.log('reqBody-login----', reqBody);
-        let isLoginHistory = !isEmpty(req.body.loginHistory)
+
+        
+        let isLoginHistory = !isEmpty(req.body.loginHistory);
 
         if (reqBody.formType == 'email') {
             reqBody.email = reqBody.email.toLowerCase();
@@ -383,98 +431,109 @@ export const userLogin = async (req, res) => {
                 return res.status(404).json(encodedata({ 'success': false, 'errors': { 'email': "Email not found" } }));
             }
 
-//iprestriction
-            if(checkUser?.loginhistory?.length > 0 && !checkUser?.loginhistory?.find((e) => e?.ipaddress == reqBody?.loginHistory?.ipaddress) && reqBody?.reftype != "ipotp" && isEmpty(reqBody.twoFACode)){
+            //iprestriction
+            if (checkUser?.loginhistory?.length > 0 && !checkUser?.loginhistory?.find((e) => e?.ipaddress == reqBody?.loginHistory?.ipaddress) && reqBody?.reftype != "ipotp" && isEmpty(reqBody.twoFACode)) {
                 if (!checkUser.authenticate(reqBody.password)) {
                     // loginHistory({ ...reqBody.loginHistory, ...{ "status": 'Failed', "reason": "Password incorrect", "userId": checkUser._id } })
                     return res.status(400).json(encodedata({ 'success': false, 'errors': { 'password': "Password incorrect" } }));
                 }
-                var otp = Math.floor(Math.random()*(9999-1000+1)+1000);
-                var otpupdate = await User.findOneAndUpdate({'_id' : checkUser?._id} , {$set : {
-                    otp : otp , otptime : new Date(Date.now())
-                }})
+                var otp = Math.floor(Math.random() * (9999 - 1000 + 1) + 1000);
+                var otpupdate = await User.findOneAndUpdate({ '_id': checkUser?._id }, {
+                    $set: {
+                        otp: otp, otptime: new Date(Date.now())
+                    }
+                })
                 let content = {
-                    OTP : otp,
-                    date : new Date(Date.now())
+                    OTP: otp,
+                    date: new Date(Date.now())
                 }
-                mailTemplate('SEND_OTP' , checkUser.email, content);
-                   
-                return res.status(200).json(encodedata({ 'success': true, result : "otpsent" , 'message' : "OTP send to your mail id"}))
+                mailTemplate('SEND_OTP', checkUser.email, content);
+
+                return res.status(200).json(encodedata({ 'success': true, result: "otpsent", 'message': "OTP send to your mail id" }))
             }
-            
-            if(reqBody?.reftype == "ipotp"){
+
+            if (reqBody?.reftype == "ipotp") {
                 var checkotp = await User.findOne({
                     _id: checkUser._id,
                     otptime: {
-                      $gt: new Date(new Date().getTime() - 300000),
+                        $gt: new Date(new Date().getTime() - 300000),
                     },
                     otp: reqBody?.otp,
-                  });
+                });
 
-                if(!checkotp){
-                    return res.status(400).json(encodedata({ 'success': false, 'errors': { 'twoFACode': "INVALID_CODE" }  , 'message' : "OTP is invalid or expired"}))
+                if (!checkotp) {
+                    return res.status(400).json(encodedata({ 'success': false, 'errors': { 'twoFACode': "INVALID_CODE" }, 'message': "OTP is invalid or has expired." }))
                 }
             }
         } else if (reqBody.formType == 'mobile') {
+
             checkUser = await User.findOne({ 'phoneCode': reqBody.phoneCode, 'phoneNo': reqBody.phoneNo })
+            // console.log('reqBody-login----', checkUser);
+
             if (!checkUser) {
                 return res.status(404).json(encodedata({ 'success': false, 'errors': { 'phoneNo': "Mobile number not found" } }));
             }
-            if (isEmpty(reqBody.twoFACode)&& reqBody?.reftype != "ipotp") {
+
+            if (isEmpty(reqBody.twoFACode) && reqBody?.reftype != "ipotp") {
+
                 let to = `+${reqBody.phoneCode}${reqBody.phoneNo}`;
-                let { smsStatus,message } = await smsHelper.verifyOtp(to, reqBody.otp);
-                if(message === "Max send attempts reached"){
+
+                let { smsStatus, message } = await smsHelper.verifyOtp(checkUser, reqBody.otp);
+                if (message === "Max send attempts reached") {
                     return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Max send attempts reached" } }))
                 }
-                else if(message === "Too many requests") {
+                else if (message === "Too many requests") {
                     return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Too many requests" } }))
                 }
-                else if(!smsStatus) {
+                else if (!smsStatus) {
                     return res.status(400).json(encodedata({ "success": false, errors: { otp: "Invalid OTP or expired" } }))
                 }
-                else if(!smsStatus) {
+                else if (!smsStatus) {
                     return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Invalid Mobile number" } }))
                 }
             }
 
-            // ip restriction 
 
-            if(checkUser?.loginhistory?.length > 0 && !checkUser?.loginhistory?.find((e) => e?.ipaddress == reqBody?.loginHistory?.ipaddress) && reqBody?.reftype != "ipotp" && isEmpty(reqBody.twoFACode)){
+            if (checkUser?.loginhistory?.length > 0 && !checkUser?.loginhistory?.find((e) => e?.ipaddress == reqBody?.loginHistory?.ipaddress) && reqBody?.reftype != "ipotp" && isEmpty(reqBody.twoFACode)) {
                 if (!checkUser.authenticate(reqBody.password)) {
                     // loginHistory({ ...reqBody.loginHistory, ...{ "status": 'Failed', "reason": "Password incorrect", "userId": checkUser._id } })
                     return res.status(400).json(encodedata({ 'success': false, 'errors': { 'password': "Password incorrect" } }));
                 }
-                
+
                 let to = `+${checkUser.phoneCode}${checkUser.phoneNo}`;
-                let { smsStatus,message} = await smsHelper.sentOtp(to);
+
+
+                let { smsStatus, message } = await smsHelper.sentOtp(to, reqBody.otp);
                 // client.messages
                 // .create({
                 //   from: keys.TWILIO_PHONE_NUMBER,
                 //   to: tonumber,
                 //   body: "Your " + keys.fromName + " OTP Code is: " + otp,
                 // })
-                if(message === "Max send attempts reached"){
+                if (message === "Max send attempts reached") {
                     return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Max send attempts reached" } }))
                 }
-                else if(message === "Too many requests") {
+                else if (message === "Too many requests") {
                     return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Too many requests" } }))
                 }
-                else if(!smsStatus) {
+                else if (!smsStatus) {
                     return res.status(400).json(encodedata({ "success": false, errors: { otp: "Invalid OTP or expired" } }))
                 }
-                return res.status(200).json(encodedata({ "success": true, result : "otpsent" , "message": "OTP sent successfully, It is only valid for 10 minutes" }));
+                return res.status(200).json(encodedata({ "success": true, result: "otpsent", "message": "OTP sent successfully, It is only valid for 10 minutes" }));
             }
-            if(reqBody?.reftype == "ipotp"){
-                
+
+            if (reqBody?.reftype == "ipotp") {
+
                 let to = `+${checkUser.phoneCode}${checkUser.phoneNo}`;
-                let {smsStatus ,message} = await smsHelper.verifyOtp(to , reqBody?.otp); 
+
+                let { smsStatus, message } = await smsHelper.verifyOtp(checkUser, reqBody.otp);
                 // if(message === "Max send attempts reached"){
                 //     return res.status(400).json({ "success": false, errors: { phoneNo: "Max send attempts reached" } })
                 // }
                 // else if(message === "Too many requests") {
                 //     return res.status(400).json({ "success": false, errors: { phoneNo: "Too many requests" } })
                 // }
-                if(!smsStatus) {
+                if (!smsStatus) {
                     return res.status(400).json(encodedata({ "success": false, errors: { invalidip: "Invalid  OTP or expired" } }))
                 }
                 // return res.status(200).json({ "success": true, "message": "OTP sent successfully, It is only valid for 10 minutes" });
@@ -497,6 +556,7 @@ export const userLogin = async (req, res) => {
             return res.status(400).json(encodedata({ 'success': false, 'errors': { 'password': "Password incorrect" } }));
         }
 
+        console.log("checkUser.google2Fa && !isEmpty(checkUser.google2Fa.secret)", checkUser.google2Fa && !isEmpty(checkUser.google2Fa.secret));
 
         if (checkUser.google2Fa && !isEmpty(checkUser.google2Fa.secret)) {
             if (isEmpty(reqBody.twoFACode)) {
@@ -512,7 +572,7 @@ export const userLogin = async (req, res) => {
 
 
         //ip restriction
-        
+
 
         let tokenId = new ObjectId()
         let payloadData = {
@@ -529,6 +589,7 @@ export const userLogin = async (req, res) => {
         }
 
         if (reqBody.formType == 'email') {
+           
             let content = {
                 'broswername': reqBody.loginHistory && reqBody.loginHistory.broswername,
                 'ipaddress': reqBody.loginHistory && reqBody.loginHistory.ipaddress,
@@ -551,14 +612,15 @@ export const userLogin = async (req, res) => {
         newNotification(doc)
         // mailTemplate('Login_notification', reqBody.langCode, checkUser.email, content)
         let result = userProfileDetail(checkUser)
+        console.log('token-----', token, result)
         let userSetting = await UserSetting.findOne({ "userId": checkUser._id }, {
             "_id": 0, "theme": 1, "afterLogin": 1
         })
-        console.log('resultresult------',  userSetting);
+        console.log('resultresult------', userSetting);
         return res.status(200).json(encodedata({ 'success': true, 'status': "SUCCESS", 'message': "Login successfully", token, result, userSetting }))
 
     } catch (err) {
-        console.log("errerrerrerr",err);
+        console.log("errerrerrerr", err);
         return res.status(500).json(encodedata({ "success": false, 'message': "Error on server" }))
     }
 }
@@ -594,7 +656,7 @@ const loginHistory = async ({
     //     },
     // }, (err, data) => { })
     const UserUpdate = await User.updateOne(
-        { _id: userId }, 
+        { _id: userId },
         {
             $push: {
                 loginhistory: data,
@@ -610,11 +672,11 @@ const loginHistory = async ({
  * URL : /api/login 
  * BODY : email, phoneCode, phoneNo, formType, password, loginHistory, langCode, twoFACode
 */
-export const resendOTP= async (req, res) => {
-    try{
-        var email =req.body.email
-        let updateData = await User.findOne({ 'email': email})
-        var otp = Math.floor(Math.random()*(9999-1000+1)+1000);
+export const resendOTP = async (req, res) => {
+    try {
+        var email = req.body.email
+        let updateData = await User.findOne({ 'email': email })
+        var otp = Math.floor(Math.random() * (9999 - 1000 + 1) + 1000);
         updateData.otp = otp
         updateData.otptime = new Date(Date.now())
         // var otpupdate = await User.findOneAndUpdate({'email': email} , {$set : {
@@ -622,24 +684,24 @@ export const resendOTP= async (req, res) => {
         // }})
         await updateData.save()
         let content = {
-            OTP : updateData.otp,
-            date : new Date(Date.now())
+            OTP: updateData.otp,
+            date: new Date(Date.now())
         }
-        mailTemplate('SEND_OTP' , updateData.email, content);
-           
-        return res.status(200).json({ 'success': true, result : "otpsent" , 'message' : "OTP send to your mail id"})
-    //     let { smsStatus } = await smsHelper.sentOtp(to);
-    
-    // if (!smsStatus) {
-    //     return res.status(400).json({ "success": false, errors: { phoneNo: "Invalid mobile number" } })
-    // }
-    // return res.status(200).json({ "success": true, result : "otpsent" , "message": "OTP sent successfully, It is only valid for 10 minutes" });
+        mailTemplate('SEND_OTP', updateData.email, content);
+
+        return res.status(200).json(encodedata({ 'success': true, result: "otpsent", 'message': "OTP send to your mail id" }))
+        //     let { smsStatus } = await smsHelper.sentOtp(to);
+
+        // if (!smsStatus) {
+        //     return res.status(400).json({ "success": false, errors: { phoneNo: "Invalid mobile number" } })
+        // }
+        // return res.status(200).json({ "success": true, result : "otpsent" , "message": "OTP sent successfully, It is only valid for 10 minutes" });
 
     }
-    
-  
+
+
     catch (err) {
-        return res.status(500).json({ "success": false, 'message': "Error on server" })
+        return res.status(500).json(encodedata({ "success": false, 'message': "Error on server" }))
     }
 }
 
@@ -651,18 +713,18 @@ export const resendOTP= async (req, res) => {
  * METHOD : GET
  * URL : /api/userProfile
 */
-export const getUserProfile = async(req, res) => {
-    try{
-    const userData = await User.findOne({ "_id": req.user.id })
-    if(userData){
-        let result = userProfileDetail(userData)
-        return res.status(200).json(encodedata({ 'success': true, 'result': result }));
-    }else{
+export const getUserProfile = async (req, res) => {
+    try {
+        const userData = await User.findOne({ "_id": req.user.id })
+        if (userData) {
+            let result = userProfileDetail(userData)
+            return res.status(200).json(encodedata({ 'success': true, 'result': result }));
+        } else {
+            return res.status(500).json(encodedata({ "success": false, 'errors': { 'messages': "Error on server" } }))
+        }
+    } catch (e) {
         return res.status(500).json(encodedata({ "success": false, 'errors': { 'messages': "Error on server" } }))
     }
-}catch(e){
-    return res.status(500).json(encodedata({ "success": false, 'errors': { 'messages': "Error on server" } }))
-}
     // User.findOne(
     //     { "_id": req.user.id },
     //     (err, userData) => {
@@ -676,6 +738,21 @@ export const getUserProfile = async(req, res) => {
     // )
 }
 
+export const profileImage = async (req, res) => {
+    try {
+      
+        const userData = await User.findOne({ "_id": req.body.id })
+        if (userData) {
+            // let result = userProfileDetail(userData)
+            return res.status(200).json(encodedata({ 'success': true, 'result': userData }));
+        } else {
+            return res.status(500).json(encodedata({ "success": false, 'errors': { 'messages': "Error on server" } }))
+        }
+    } catch (e) {
+        return res.status(500).json(encodedata({ "success": false, 'errors': { 'messages': "Error on server" } }))
+    }
+   
+}
 /**
  * Edit User Profile
  * METHOD : PUT
@@ -733,7 +810,7 @@ const userProfileDetail = (userData) => {
         'createAt': moment(userData.createAt).format('DD MMM YYYY'),
         'loginHistory': (userData.loginhistory && userData.loginhistory.slice(-1).length > 0) ? userData.loginhistory.slice(-1)[0] : {},
         'bankDetail': {},
-        "level" : userData.level
+        "level": userData.level
     }
 
     if (userData.bankDetails && userData.bankDetails.length > 0) {
@@ -847,29 +924,29 @@ export const updateBankDetail = async (req, res) => {
  * METHOD : GET
  * URL : /api/bankdetail
  */
-export const getBankDetail = async(req, res) => {
-    try{
-    const userData = await User.findOne(
-        { "_id": req.user.id },
-        {
-            "bankDetails._id": 1,
-            "bankDetails.bankName": 1,
-            "bankDetails.holderName": 1,
-            "bankDetails.accountNo": 1,
-            "bankDetails.bankcode": 1,
-            "bankDetails.country": 1,
-            "bankDetails.city": 1,
-            "bankDetails.bankAddress": 1,
-            "bankDetails.currencyId": 1,
-            "bankDetails.currencySymbol": 1,
-            "bankDetails.isPrimary": 1
-        })
-        if(userData){
+export const getBankDetail = async (req, res) => {
+    try {
+        const userData = await User.findOne(
+            { "_id": req.user.id },
+            {
+                "bankDetails._id": 1,
+                "bankDetails.bankName": 1,
+                "bankDetails.holderName": 1,
+                "bankDetails.accountNo": 1,
+                "bankDetails.bankcode": 1,
+                "bankDetails.country": 1,
+                "bankDetails.city": 1,
+                "bankDetails.bankAddress": 1,
+                "bankDetails.currencyId": 1,
+                "bankDetails.currencySymbol": 1,
+                "bankDetails.isPrimary": 1
+            })
+        if (userData) {
             return res.status(200).json({ 'success': true, 'message': "Success", 'result': userData.bankDetails })
-        }else{
+        } else {
             return res.status(500).json({ "success": false, 'message': "Error on server" })
         }
-    }catch(e){
+    } catch (e) {
         return res.status(500).json({ "success": false, 'message': "Error on server" })
     }
     // User.findOne(
@@ -972,16 +1049,16 @@ export const changePassword = async (req, res) => {
         let chackStatus = await UserSetting.findOne({ userId: req.user.id })
         let userData = await User.findOne({ "_id": req.user.id });
         if (!userData) {
-            return res.status(500).json({ "success": false, 'message': "User not found" })
+            return res.status(500).json(encodedata({ "success": false, 'message': "User not found" }))
         }
         if (reqBody.oldPassword) {
             if (reqBody.oldPassword === reqBody.password) {
-                return res.status(400).json({ 'success': false, 'message': "Old and New password must be different" });
+                return res.status(400).json(encodedata({ 'success': false, 'message': "Old and New password must be different" }))
 
             }
         }
         if (!userData.authenticate(reqBody.oldPassword)) {
-            return res.status(400).json({ 'success': false, 'errors': { 'oldPassword': "PASSWORD_INCORRECT" } });
+            return res.status(400).json(encodedata({ 'success': false, 'errors': { 'oldPassword': "PASSWORD_INCORRECT" } }))
         }
         userData.password = reqBody.password;
         await userData.save();
@@ -1016,10 +1093,10 @@ export const changePassword = async (req, res) => {
             'description': 'Your password has been updated',
         }
         newNotification(doc)
-        return res.status(200).json({ 'success': true, 'message': "PASSWORD_CHANGE_SUCCESS" });
+        return res.status(200).json(encodedata({ 'success': true, 'message': "PASSWORD_CHANGE_SUCCESS" }));
     }
     catch (err) {
-        return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
+        return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
     }
 }
 
@@ -1029,20 +1106,18 @@ export const changePassword = async (req, res) => {
  * URL : /api/security/2fa
  */
 export const get2faCode = async (req, res) => {
-    try{
-    let result = {};
-    const userData = await  User.findOne({ "_id": req.user.id })
-    console.log("asdsadsadasdas",userData,req.user.id,req.user);
-    if(userData){
-        let result = await generateTwoFa(userData)
-        console.log("result generateTwoFa",result);
-        return res.status(200).json({ 'success': true, 'result': result })
-    }else{
+    try {
+        let result = {};
+        const userData = await User.findOne({ "_id": req.user.id })
+        if (userData) {
+            let result = await generateTwoFa(userData)
+            return res.status(200).json({ 'success': true, 'result': result })
+        } else {
+            return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
+        }
+    } catch (e) {
         return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
     }
-}catch(e){
-    return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })  
-}
     // User.findOne(
     //     { "_id": req.user.id },
     //     (err, userData) => {
@@ -1077,7 +1152,7 @@ export const update2faCode = async (req, res) => {
                 { "new": true }
             )
             let result = generateTwoFa(updateData)
-            if (chackStatus.twoFA == true) {
+            if (chackStatus?.twoFA == true) {
                 let content = {
                     'date': new Date(),
                     'status': "enable"
@@ -1104,6 +1179,8 @@ export const update2faCode = async (req, res) => {
         return res.status(400).json({ 'success': false, 'errors': { 'code': "INVALID_CODE" } })
     }
     catch (err) {
+        console.log("error on update 2fa code" , err);
+        
         return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
     }
 }
@@ -1190,7 +1267,7 @@ export const generateTwoFa = async (userData) => {
         const GenORcode = await QRCode.toDataURL(decodedURI);
 
         if (GenORcode) {
-             result = {
+            result = {
                 secret: userData.google2Fa.secret,
                 imageUrl: GenORcode,
                 uri: userData.google2Fa.uri,
@@ -1236,9 +1313,9 @@ export const generateTwoFa = async (userData) => {
         const GenORcode = await QRCode.toDataURL(decodedURI);
 
         if (GenORcode) {
-             result = {
+            result = {
                 secret: newSecret.secret,
-                imageUrl:GenORcode, 
+                imageUrl: GenORcode,
                 uri: newSecret.uri,
                 twoFaStatus: "disabled"
             };
@@ -1265,7 +1342,6 @@ export const generateTwoFa = async (userData) => {
         //     twoFaStatus: "disabled"
         // }
     }
-    console.log("result Qr Node 2fa",result);
     return result;
 }
 
@@ -1276,7 +1352,7 @@ export const defaultUserSetting = async (userData) => {
                 "userId": userData._id
             });
 
-            let currencyData = await Currency.find({ "type": "crypto"})
+            let currencyData = await Currency.find({ "type": "crypto" })
             if (currencyData.length > 0) {
                 newSetting.currencySymbol = currencyData[1].coin;
             }
@@ -1287,8 +1363,8 @@ export const defaultUserSetting = async (userData) => {
             }
             const newsettingSave = await newSetting.save();
             return true
-        } 
-        catch(err) {
+        }
+        catch (err) {
             return false
         }
     }
@@ -1300,16 +1376,16 @@ export const defaultUserSetting = async (userData) => {
  * URL: /api/userSetting
 */
 export const getUserSetting = async (req, res) => {
-    try{
-    const data = await  UserSetting.findOne({ "userId": req.user.id }, { "_id": 0, "createdAt": 0, "updatedAt": 0, })
-    if(data){
-        return res.status(200).json(encodedata({ 'success': true, 'message': "FETCH_SUCCESS", result: data }))
-    }else{
-        return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))   
+    try {
+        const data = await UserSetting.findOne({ "userId": req.user.id }, { "_id": 0, "createdAt": 0, "updatedAt": 0, })
+        if (data) {
+            return res.status(200).json(encodedata({ 'success': true, 'message': "FETCH_SUCCESS", result: data }))
+        } else {
+            return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
+        }
+    } catch (e) {
+        return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
     }
-}catch(e){
-    return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
-}
     // UserSetting.findOne({ "userId": req.user.id }, { "_id": 0, "createdAt": 0, "updatedAt": 0, }, (err, data) => {
     //     if (err) {
     //         return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
@@ -1327,31 +1403,31 @@ export const getUserSetting = async (req, res) => {
 export const editUserSetting = async (req, res) => {
     let reqBody = req.body;
     // console.log('reqBodyreqBody----', reqBody, req.user);
-    try{
-    const UpdateUserSetting = await UserSetting.findOneAndUpdate(
-        { "userId": req.user.id },
-        {
-            // "languageId": reqBody.languageId,
-            "theme": reqBody.theme,
-            "currencySymbol": reqBody.currencySymbol,
-            // "timeZone": reqBody.timeZone,
-            "afterLogin": reqBody.afterLogin,
-        },
-        {
-            "fields": { "_id": 0, "createdAt": 0, "updatedAt": 0 },
-            "new": true
-        })
+    try {
+        const UpdateUserSetting = await UserSetting.findOneAndUpdate(
+            { "userId": req.user.id },
+            {
+                // "languageId": reqBody.languageId,
+                "theme": reqBody.theme,
+                "currencySymbol": reqBody.currencySymbol,
+                // "timeZone": reqBody.timeZone,
+                "afterLogin": reqBody.afterLogin,
+            },
+            {
+                "fields": { "_id": 0, "createdAt": 0, "updatedAt": 0 },
+                "new": true
+            })
         // console.log('UpdateUserSetting-----', UpdateUserSetting);
-    if (UpdateUserSetting) {
-        return res.status(200).json(encodedata({ 'success': true, 'message': "EDIT_SETTING_SUCCESS", result: UpdateUserSetting }))
-    }else{
+        if (UpdateUserSetting) {
+            return res.status(200).json(encodedata({ 'success': true, 'message': "EDIT_SETTING_SUCCESS", result: UpdateUserSetting }))
+        } else {
+            return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
+        }
+    } catch (e) {
         return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
     }
-}catch(e){
-    return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
 }
-}
-    
+
 
 /**
  * Edit User Notification
@@ -1409,13 +1485,20 @@ export const editNotif = async (req, res) => {
 */
 export const checkForgotPassword = async (req, res) => {
     try {
-        let reqBody = req.body
+        console.log('usdghhhhhhhhhhhhhsssssssssssss--------1111111')
+
+        let reqBody = req.body;
+
+        // if(reqBody.email === ""){
+        //     return res.status(400).json(encodedata({ "success": false, 'errors': { 'email': "Email is required" }  }));
+        // }
+
         if (reqBody.type == 'mobile') {
             let checkDoc = await User.findOne({ "phoneCode": reqBody.phoneCode, "phoneNo": reqBody.phoneNo });
             let to = `+${reqBody.phoneCode}${reqBody.phoneNo}`;
-            let { smsStatus } = await smsHelper.verifyOtp(to, reqBody.otp);
+            let { smsStatus } = await smsHelper.verifyOtp(checkDoc, reqBody.otp, 'registerMobile');
             if (!smsStatus) {
-                return res.status(400).json({ "success": false, errors: { otp: 'invalid OTP' } });
+                return res.status(400).json(encodedata({ "success": false, errors: { otp: 'invalid OTP' } }));
             }
             let encryptToken = encryptString(checkDoc._id, true)
             if (!isEmpty(encryptToken)) {
@@ -1423,19 +1506,22 @@ export const checkForgotPassword = async (req, res) => {
                 await checkDoc.save();
             }
             if (smsStatus === true) {
-                return res.status(200).json({ "success": true, message: 'success', result: encryptToken })
+                return res.status(200).json(encodedata({ "success": true, message: 'success', result: encryptToken }))
             }
 
         }
         if (reqBody.type == 'email') {
+            console.log('usdghhhhhhhhhhhhhsssssssssssss--------')
             let userData = await User.findOne({ "email": reqBody.email });
             if (!userData) {
-                return res.status(400).json({ "success": false, 'errors': { 'email': "EMAIL_NOT_EXISTS" } })
+                return res.status(400).json(encodedata({ "success": false, 'errors': { 'email': "EMAIL_NOT_EXISTS" } }))
             }
 
             let recaptcha = await recaptchaFun.checkToken(reqBody.reCaptcha);
             if (recaptcha && recaptcha.status && recaptcha.status == false) {
-                return res.status(500).json({ "success": false, 'message': "Invalid reCaptcha" })
+                console.log('usdghhhhhhhhhhhhhsssssssssssss--------')
+
+                return res.status(500).json(encodedata({ "success": false, 'message': "Invalid reCaptcha" }))
             }
             let encryptToken = encryptString(userData._id, true)
             let content = {
@@ -1452,12 +1538,14 @@ export const checkForgotPassword = async (req, res) => {
                 content
             })
 
-            return res.status(200).json({ 'success': true, "message": "Confirmation Link Sent to Your Mail" })
+            return res.status(200).json(encodedata({ 'success': true, "message": "Confirmation Link Sent to Your Mail" }))
         }
 
 
     } catch (err) {
-        return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
+        console.log('usdghhhhhhhhhhhhhsssssssssssss--------')
+
+        return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
     }
 }
 
@@ -1473,21 +1561,21 @@ export const resetPassword = async (req, res) => {
         let userId = decryptString(reqBody.authToken, true)
         let userData = await User.findOne({ "_id": userId });
         if (!userData) {
-            return res.status(500).json({ "success": false, 'message': "NOT_FOUND" })
+            return res.status(500).json(encodedata({ "success": false, 'message': "NOT_FOUND" }))
         }
 
         if (!(userData.mailToken == reqBody.authToken)) {
-            return res.status(400).json({ "success": false, 'message': "Your link was expiry" })
+            return res.status(400).json(encodedata({ "success": false, 'message': "Your link was expiry" }))
         }
 
         userData.password = reqBody.password;
         userData.mailToken = '';
         await userData.save();
 
-        return res.status(200).json({ 'success': true, "message": "Updated successfully" });
+        return res.status(200).json(encodedata({ 'success': true, "message": "Updated successfully" }))
     }
     catch (err) {
-        return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
+        return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
     }
 }
 
@@ -1558,25 +1646,26 @@ export const changeNewPhone = async (req, res) => {
         let
             reqBody = req.body,
             smsOtp = Math.floor(100000 + Math.random() * 900000);
-
+        console.log('reqBodyreqBodyreqBody----', reqBody, req.user)
         // let numValidation = await numverify.validation(reqBody.newPhoneCode + reqBody.newPhoneNo);
         // if (!numValidation.valid) {
         //     return res.status(400).json({ "success": false, 'errors': { 'newPhoneNo': "Incorrect format" } })
         // }
 
-        let checkUser = await User.findOne({ "phoneCode": reqBody.newPhoneCode, "phoneNo": reqBody.newPhoneNo })
+        let checkUser = await User.findOne({ "phoneCode": reqBody.newPhoneCode, "phoneNo": reqBody.newPhoneNo });
+        console.log('checkUser------', checkUser, req.user.id);
         if (checkUser) {
             if (checkUser._id.toString() != req.user.id) {
-                return res.status(400).json({ "success": false, 'errors': { 'newPhoneNo': "Phone number already exists" } })
+                return res.status(400).json(encodedata({ "success": false, 'errors': { 'newPhoneNo': "Phone number already exists" } }))
             }
             if (checkUser._id.toString() == req.user.id) {
-                return res.status(400).json({ "success": false, 'errors': { 'newPhoneNo': "Matched your previous mobile number" } })
+                return res.status(400).json(encodedata({ "success": false, 'errors': { 'newPhoneNo': "Matches your previously used mobile number." } }))
             }
         }
 
         let siteSetting = await SiteSetting.findOne({}, { 'siteName': 1 });
         if (!siteSetting) {
-            return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
+            return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
         }
 
         let smsContent = {
@@ -1597,24 +1686,39 @@ export const changeNewPhone = async (req, res) => {
                 // "otp": smsOtp,
                 // "otptime": new Date()
             }
-        )
-        let { smsStatus,message } = await smsHelper.sentOtp(ot);
-        if(message === "Max send attempts reached"){
-            return res.status(400).json({ "success": false, errors: { phoneNo: "Max send attempts reached" } })
-        }
-      
-        else if(message === "Too many requests") {
-            return res.status(400).json({ "success": false, errors: { phoneNo: "Too many requests" } })
-        }
-        else if(!smsStatus) {
-            return res.status(400).json({ "success": false, errors: { phoneNo: "Invalid mobile number" } })
+        );
+
+        // console.log('otttttttttttttttt----', ot)
+        const otp = generateOTP();
+        const updateOtp = await User.findOneAndUpdate(
+            {
+                _id: req.user.id
+            },
+            {
+                otp: otp,
+                otptime: new Date()
+            },
+            { new: true }
+        );
+
+        let { smsStatus, message } = await smsHelper.sentOtp(ot, otp);
+        console.log('smsStatus,message-----', smsStatus, message)
+        if (message === "Max send attempts reached") {
+            return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Max send attempts reached" } }))
         }
 
-       
-        return res.status(200).json({ "success": true, "message": "OTP sent successfully, It is only valid for 10 minutes" })
+        else if (message === "Too many requests") {
+            return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Too many requests" } }))
+        }
+        else if (!smsStatus) {
+            return res.status(400).json(encodedata({ "success": false, errors: { phoneNo: "Invalid mobile number" } }))
+        }
+
+
+        return res.status(200).json(encodedata({ "success": true, "message": "OTP sent successfully, It is only valid for 10 minutes" }))
     }
     catch (err) {
-        return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
+        return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
     }
 }
 
@@ -1627,28 +1731,30 @@ export const changeNewPhone = async (req, res) => {
 export const verifyNewPhone = async (req, res) => {
     try {
         let reqBody = req.body, otpTime = new Date(new Date().getTime() - 600000); //2 min
+
+        const id = req.user.id;
         let userData = await User.findOne({ "_id": req.user.id });
-         var phoneCode = userData.newPhone.phoneCode;
-       var phoneNo = userData.newPhone.phoneNo;
+        var phoneCode = userData.newPhone.phoneCode;
+        var phoneNo = userData.newPhone.phoneNo;
         const ot = `+${phoneCode}${phoneNo}`
         const otp = reqBody.otp;
-        let { smsStatus } = await smsHelper.verifyOtp(ot , otp);
-        if(smsStatus){
+        let { smsStatus } = await smsHelper.verifyOtp(id, otp, '');
+        if (smsStatus) {
             userData.phoneCode = userData.newPhone.phoneCode;
-        userData.phoneNo = userData.newPhone.phoneNo;
-        userData.newPhone.phoneCode = '';
-        userData.newPhone.phoneNo = '';
-        userData.otp = '';
-        userData.phoneStatus = 'verified';
+            userData.phoneNo = userData.newPhone.phoneNo;
+            userData.newPhone.phoneCode = '';
+            userData.newPhone.phoneNo = '';
+            userData.otp = '';
+            userData.phoneStatus = 'verified';
             var responseData = {
-                    'newPhoneCode':userData.newPhone.phoneCode,
-                    'newPhoneNo':userData.newPhone.phoneNo
+                'newPhoneCode': userData.newPhone.phoneCode,
+                'newPhoneNo': userData.newPhone.phoneNo
             }
-        let updateUserData = await userData.save();
-            return res.status(200).json({ 'success': true, 'message': "Mobile number verified", 'result': responseData })
+            let updateUserData = await userData.save();
+            return res.status(200).json(encodedata({ 'success': true, 'message': "Mobile number verified", 'result': responseData }))
         }
-        else{
-            return res.status(400).json({ "success": false, 'errors': { 'otp': "Invalid OTP" } })
+        else {
+            return res.status(400).json(encodedata({ "success": false, 'errors': { 'otp': "Invalid OTP" } }))
         }
 
         // if (userData.otptime <= otpTime) {
@@ -1689,7 +1795,7 @@ export const verifyNewPhone = async (req, res) => {
         // }
     }
     catch (err) {
-        return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
+        return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
     }
 }
 
@@ -1702,7 +1808,7 @@ export const verifyNewPhone = async (req, res) => {
 export const getUserList = async (req, res) => {
     try {
         let pagination = paginationQuery(req.query);
-        let filter = filterSearchQuery(req.query, ['email', 'status' , 'phoneNo']);
+        let filter = filterSearchQuery(req.query, ['email', 'status', 'phoneNo']);
 
         let count = await User.countDocuments(filter)
         let data = await User.find(filter, {
@@ -1737,10 +1843,10 @@ export const getUserList = async (req, res) => {
             count,
             data
         }
-        // console.log('result-----', result)
+
         return res.status(200).json(encodedata({ 'success': true, "messages": "success", result }))
     } catch (err) {
-        return res.status(500).json({ "success": false, 'message': "error on server" })
+        return res.status(500).json(encodedata({ "success": false, 'message': "error on server" }))
     }
 }
 
@@ -1789,8 +1895,8 @@ export const getUserBalanceList = async (req, res) => {
 export const editEmail = async (req, res) => {
     try {
         let reqBody = req.body;
-        let Details = await User.findOne({_id:req.user.id})
-        if(!Details.email){
+        let Details = await User.findOne({ _id: req.user.id })
+        if (!Details.email) {
             let checkUser = await User.findOne({ "email": reqBody.newEmail })
             // let checkUser = await User.findOne({ "email": reqBody.newEmail, "_id": { "$ne": req.user.id } })
             if (checkUser) {
@@ -1822,13 +1928,13 @@ export const editEmail = async (req, res) => {
             })
             return res.status(200).json({ "success": true, "message": "Verification link sent to your email address." })
         }
-        else{
+        else {
             let checkUser = await User.findOne({ "email": reqBody.newEmail })
             // let checkUser = await User.findOne({ "email": reqBody.newEmail, "_id": { "$ne": req.user.id } })
             if (checkUser) {
                 return res.status(400).json({ "success": false, 'errors': { 'newEmail': "Email already exists" } })
             }
-    
+
             let encryptToken = encryptString(req.user.id, true)
             let userData = await User.findOneAndUpdate(
                 {
@@ -1852,10 +1958,10 @@ export const editEmail = async (req, res) => {
                 'toEmail': userData.email,
                 content
             })
-    
+
             return res.status(200).json({ "success": true, "message": "Verification link sent to your old email address." })
         }
-        
+
     }
     catch (err) {
         return res.status(500).json({ "success": false, 'message': "Error on server" })
@@ -1954,28 +2060,30 @@ export const verifyNewEmail = async (req, res) => {
 
 export const UpdateStatue = async (req, res) => {
     try {
+        console.log('req.bodyreq.body-----', req.body);
+        
         let FindUser = await User.findOne({ _id: req.body.id })
         if (!isEmpty(FindUser)) {
             if (FindUser.status === 'unverified') {
                 let Update = await User.findOneAndUpdate({ _id: FindUser._id }, { $set: { status: 'verified' } })
                 if (!isEmpty(Update)) {
-                    return res.status(200).json({ status: true, message: ' verified user' })
+                    return res.status(200).json(encodedata({ status: true, message: ' User verified successfully' }))
                 } else {
-                    return res.status(400).json({ status: false, message: ' Failed' })
+                    return res.status(400).json(encodedata({ status: false, message: ' Failed' }))
                 }
             } else if (FindUser.status === 'verified') {
                 let Update = await User.findOneAndUpdate({ _id: FindUser._id }, { $set: { status: 'unverified' } })
                 if (!isEmpty(Update)) {
-                    return res.status(200).json({ status: true, message: ' unverified user' })
+                    return res.status(200).json(encodedata({ status: true, message: ' User unverified successdfully' }))
                 } else {
-                    return res.status(400).json({ status: false, message: ' Failed' })
+                    return res.status(400).json(encodedata({ status: false, message: ' Failed' }))
                 }
             } else {
-                return res.status(400).json({ status: false, message: 'user Not Found' })
+                return res.status(400).json(encodedata({ status: false, message: 'user Not Found' }))
             }
         }
     } catch (err) {
-        return res.status(500).json({ status: false, message: 'something went wrong' })
+        return res.status(500).json(encodedata({ status: false, message: 'something went wrong' }))
     }
 
 }
@@ -2000,15 +2108,15 @@ export const Disable2FA = async (req, res) => {
                 }
                 let Data = await User.findOneAndUpdate({ _id: checkUser._id }, { $set: { google2Fa: Disable } });
                 if (!isEmpty(Data)) {
-                    return res.status(200).json({ status: true, message: '2FA Disabled' })
+                    return res.status(200).json(encodedata({ status: true, message: '2FA Disabled' }))
                 } else {
-                    return res.status(400).json({ status: false, message: 'Disabl Failed' })
+                    return res.status(400).json(encodedata({ status: false, message: 'Disabl Failed' }))
                 }
 
             }
         }
     } catch (err) {
-        return res.status(500).json({ status: false, message: 'something went wrong' })
+        return res.status(500).json(encodedata({ status: false, message: 'something went wrong' }))
     }
 
 }
@@ -2106,12 +2214,11 @@ export const getAllTrade = async (req, res) => {
     }
 }
 
-export const checkEmail = async(req,res)=>{
-    try{
-        var detail=await User.findOne({_id:req.user.id})
+export const checkEmail = async (req, res) => {
+    try {
+        var detail = await User.findOne({ _id: req.user.id })
         return res.status(200).json({ 'success': true, result: detail })
-    }catch(err){
+    } catch (err) {
         return res.status(500).json({ 'success': false, message: 'error on server' })
     }
-  
 } 

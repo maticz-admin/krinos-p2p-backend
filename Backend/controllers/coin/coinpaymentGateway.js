@@ -32,6 +32,8 @@ var coinPayment = new coinpayments({
 
 export const createAddress = async (currencySymbol, emailId, ipnUrl) => {
     try {
+        console.log("create address succ" ,config.coinpaymentGateway ,currencySymbol);
+        
         //emailId = emailId;
       //  ipnUrl = config.IPN_URL;
     //   let cursym = currencySymbol == "BNB(Bep20)" ? "BNB.BSC" : currencySymbol;
@@ -42,6 +44,7 @@ export const createAddress = async (currencySymbol, emailId, ipnUrl) => {
             'destTag': respData.dest_tag       //currencySymbol == 'XRP' ? : ""
         }
     } catch (err) {
+        console.log("error on create address"  , err);
         return {
             'address': '',
             'privateKey': '',
@@ -89,39 +92,28 @@ export const verifySign = (req, res, next) => {
     try {
         let reqBody = req.body;
         let header = req.headers;
-
-
         if (isEmpty(reqBody)) {
             return res.status(400).json({ 'success': false, 'message': 'MISSING_PAYLOAD' })
         }
-
         if (isEmpty(header['hmac'])) {
             return res.status(400).json({ 'success': false, 'message': 'MISSING_API_SIGNATURE' })
         }
-
         if (isEmpty(reqBody.ipn_mode)) {
             return res.status(400).json({ 'success': false, 'message': 'MISSING_IPN_MODE' })
         }
-
         if (reqBody.ipn_mode != 'hmac') {
             return res.status(400).json({ 'success': false, 'message': 'MISMATCH_IPN_MODE' })
         }
-
-
         if (isEmpty(reqBody.merchant)) {
             return res.status(400).json({ 'success': false, 'message': 'MISSING_MERCHANT' })
         }
-
         if (reqBody.merchant != config.coinpaymentGateway.MERCHANT_ID) {
             return res.status(400).json({ 'success': false, 'message': 'MISMATCH_MERCHANT_ID' })
         }
-
         let createSign = generateSign(config.coinpaymentGateway.IPN_SECRET, reqBody)
-
         if (createSign != header['hmac']) {
             return res.status(400).json({ 'success': false, 'message': 'MISMATCH_API_SIGNATURE' })
         }
-
         return next()
     } catch (err) {
         return res.status(500).json({ 'success': false, 'message': 'SOMETHING_WRONG' })
@@ -156,13 +148,10 @@ export const depositwebhook = async (req, res) => {
         let reqBody = req.body;
         if (reqBody.status >= '100') {
             let currencyData = await Currency.findOne({ 'coinpaymentsymbol': reqBody.currency })
-
             if (!currencyData) {
                 return res.status(400).json({ 'success': false, 'messages': "Invalid currency" })
             }
-
             // findOne({ assets: { $elemMatch: { _id: ObjectId("63a97d329b330bcc5ebf67e0") , address: "36kdopUXemzyGPb2tWxFYmMT8oCWBqKXBW" , destTag: '' } }})
-
             let findAsset = {
                 '_id': currencyData._id,
                 'address': reqBody.address
@@ -264,11 +253,8 @@ export const balMoveToBinance = async () => {
     try {
         let currencyData = await Currency.find({ 'type': { "$in": ['crypto'] } })
         if (currencyData && currencyData.length) {
-
             let balDetails = await coinPayment.balances()
-
             for (const [currency, coinBal] of Object.entries(balDetails)) {
-
                 if (coinBal && parseFloat(coinBal.balancef) > 0) {
                     let binanceAddress = await binanceCtrl.depositAddress(currency);
                     if (binanceAddress && binanceAddress.status) {
@@ -280,9 +266,7 @@ export const balMoveToBinance = async () => {
                         })
                     }
                 }
-
             }
-
             balMoveToBNBTask.start()
         }
     } catch (err) {

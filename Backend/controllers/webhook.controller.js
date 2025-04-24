@@ -37,23 +37,18 @@ export const depositwebhook = async (req, res) => {
     try {
         let reqBody = req.body;
         if (reqBody.status >= '100') {
-
             let currencyData = await Currency.findOne({ 'currencySymbol': reqBody.currency })
-
             if (!currencyData) {
                 return res.status(400).json({ 'success': false, 'messages': "Invalid currency" })
             }
-
             let userAssetData = await Assets.findOne({ 'currency': currencyData._id, 'currencyAddress': reqBody.address }).populate({ path: "userId" })
 
             if (!userAssetData) {
                 return res.status(400).json({ 'success': false, 'messages': "Invalid assets" })
             }
-
             if (userAssetData && !userAssetData.userId) {
                 return res.status(400).json({ 'success': false, 'messages': "Invalid user data" })
             }
-
             let trxnData = await Transaction.findOne({ 'currencyId': currencyData._id, 'txid': reqBody.txn_id });
 
             if (trxnData) {

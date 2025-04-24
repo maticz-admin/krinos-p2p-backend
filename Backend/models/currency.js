@@ -108,8 +108,8 @@ let CurrencySchema = new Schema(
     },
     depositType: {
       type: String,
-      enum: ["local", "coin_payment", "binance", "none"],
-      default: "binance", //'local', 'coin_payment', 'binance', 'none'
+      enum: ["local", "coin_payment", "binance", "none" , "bitgo"],
+      default: "bitgo", //'local', 'coin_payment', 'binance', 'none'
     },
     depositminlimit: {
       type: Number,
@@ -127,12 +127,16 @@ let CurrencySchema = new Schema(
       type: Number,
       default: 0,
     },
-    status: {
+    status : {
       type: String,
       enum: ["active", "Inactive"],
       default: "active",
     },
     commisionfee : {
+      type : String,
+      default : ""
+    },
+    buyercommisionfee : {
       type : String,
       default : ""
     },
@@ -143,7 +147,12 @@ let CurrencySchema = new Schema(
     key : {
       type : String,
       default : ""
-    }
+    },
+    bitgosymbol : {
+      type : String,
+      default : ""
+    },
+
   },
   {
     timestamps: true,

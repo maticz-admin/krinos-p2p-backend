@@ -10,6 +10,7 @@ import { mailTemplateLang } from './emailTemplate.controller';
 
 // import lib
 import isEmpty from '../lib/isEmpty';
+import { encodedata } from '../lib/cryptoJS';
 
 /**
  * Add Newsletter
@@ -22,9 +23,9 @@ export const newSubscribe = async (req, res) => {
         let reqBody = req.body;
         let checkDoc = await NewsLetter.findOne({ 'email': reqBody.email })
         if (checkDoc) {
-            return res.status(400).json({ 'status': false, 'message':  'Email already Subscribed'  })
+            return res.status(400).json(encodedata({ 'status': false, 'message':  'Email already Subscribed'  }))
         }else if(reqBody.email==""||reqBody.email==null ||reqBody.email==undefined){
-            return res.status(400).json({ 'status': false, 'message':  'Email must not be empty'})
+            return res.status(400).json(encodedata({ 'status': false, 'message':  'Email must not be empty'}))
         }
         let newDoc = new NewsLetter({
             'email': reqBody.email
@@ -32,9 +33,9 @@ export const newSubscribe = async (req, res) => {
 
         await newDoc.save();
 
-        return res.status(200).json({ 'status': true, 'message': 'Newsletter Subscribe Successfully' })
+        return res.status(200).json(encodedata({ 'status': true, 'message': 'Newsletter Subscribe Successfully' }))
     } catch (err) {
-        return res.status(500).json({ 'status': false, 'message': 'Error on server' })
+        return res.status(500).json(encodedata({ 'status': false, 'message': 'Error on server' }))
     }
 }
 
@@ -48,12 +49,12 @@ export const allSubscriber = async (req, res) => {
     try{
         const data = await NewsLetter.find({}, { 'email': 1 })
         if(data){
-            return res.status(200).json({ 'status': true, 'message': 'FETCH', 'result': data })
+            return res.status(200).json(encodedata({ 'status': true, 'message': 'FETCH', 'result': data }))
         }else{
-            return res.status(500).json({ 'status': false, 'message': 'Error on server' })   
+            return res.status(500).json(encodedata({ 'status': false, 'message': 'Error on server' })   )
         }
     }catch(e){
-        return res.status(500).json({ 'status': false, 'message': 'Error on server' }) 
+        return res.status(500).json(encodedata({ 'status': false, 'message': 'Error on server' }) )
     }
     // NewsLetter.find({}, { 'email': 1 }).exec((err, data) => {
     //     if (err) {
@@ -90,8 +91,8 @@ export const sendNews = async (req, res) => {
                 })
             }
         }
-        return res.status(200).json({ 'status': true, 'message': "Sent newsletter mails successfully. Refreshing data..." });
+        return res.status(200).json(encodedata({ 'status': true, 'message': "Sent newsletter mails successfully. Refreshing data..." }))
     } catch (err) {
-        return res.status(500).json({ 'status': false, 'message': 'Error on server' })
+        return res.status(500).json(encodedata({ 'status': false, 'message': 'Error on server' }))
     }
 }

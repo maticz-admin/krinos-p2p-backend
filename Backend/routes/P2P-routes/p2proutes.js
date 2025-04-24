@@ -32,19 +32,19 @@ router.route("/update-order-status").post(decodedata, apiKeyCtrl.authorization, 
 router.route("/get-currency-data").get(p2pcontroller.getcurrencydata);
 router.route("/assetupdate").post(apiKeyCtrl.authorization, p2pcontroller.Adminassetupdate);
 
-router.route("/update-user-status").post(decodedata, p2pcontroller.updateuseronlinestatus);
+router.route("/update-user-status").post(p2pcontroller.updateuseronlinestatus);
 
-router.route("/get-cms").get(p2pcontroller.Getcms); //
+router.route("/get-cms").get(reqQueryDecodedata, p2pcontroller.Getcms); //
 router.route("/get-faq").get(p2pcontroller.Getfaq); //
 router.route("/get-sitesettings").get(p2pcontroller.getsitesettings); //
 router.route("/get-tradehistory").get(reqQueryDecodedata, p2pcontroller.gettradehistory); //
 
 router.route("/get-your-request").get(reqQueryDecodedata, p2pcontroller.getspenderhistory);//
-router.route("/get-user-balance").get(apiKeyCtrl.authorization, p2pcontroller.gettotaluserbalance);
-router.route("/get-trade-speed").get(p2pcontroller.gettradespeed);//
+router.route("/get-user-balance").get(reqQueryDecodedata, apiKeyCtrl.authorization, p2pcontroller.gettotaluserbalance);
+router.route("/get-trade-speed").get(reqQueryDecodedata, p2pcontroller.gettradespeed);//
 router.route("/update-profile-pic").post(apiKeyCtrl.authorization, p2pcontroller.updateuserprofilepicUpload, p2pcontroller.updateuserprofilepic);
 router.route("/cancel-offer").post(apiKeyCtrl.authorization, p2pcontroller?.canceloffer);
-router.route("/get-paymenttypes").get(p2pcontroller.getpaymentmethod);//
+router.route("/get-paymenttypes").get( p2pcontroller.getpaymentmethod);//
 router.route("/create-addresss").post(p2pcontroller.createcryptoaddress);
 router.route("/get-message-notification").get(apiKeyCtrl.authorizationEncrypt, orderctrl.getmessagenotification); //
 router.route("/markus_readone").post(apiKeyCtrl.authorization, orderctrl.markasreadeone);
@@ -56,6 +56,10 @@ router.route("/check-deposit").post(apiKeyCtrl.authorization, p2pcontroller.Chec
 
 
 router.route("/get-userp2pcreate-orders").get(reqQueryDecodedata, usercontroller.Getuserp2pcreateorder);
-router.route("/get-userp2pviewoffer").get(reqQueryDecodedata, usercontroller.Getuserp2pviewoffer)
+router.route("/get-userp2pviewoffer").get(reqQueryDecodedata, usercontroller.Getuserp2pviewoffer);
+
+router.route("/add-session-id").post(decodedata, apiKeyCtrl.authorization, p2pcontroller.AddSessionIdkyc);
+
+router.route("/check-didit").post(decodedata, apiKeyCtrl.authorization, p2pcontroller.checkdidit);
 
 export default router;                                                                                                                                                                                                                                                                                                                                            

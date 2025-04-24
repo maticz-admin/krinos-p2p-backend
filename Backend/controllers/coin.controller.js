@@ -17,6 +17,8 @@ import * as tronCtrl from './coin/TronGateway';
 import * as etcCtrl from './coin/etc.controller';
 import * as coinPayment from './coin/coinpaymentGateway';
 
+import * as bitgoPayment from "./bitgo.controller";
+
 import {validatecryptoaddress} from '../config/coinvalidation';
 import {createAddress} from './P2PCONTROLLER/token.controller';
 
@@ -79,7 +81,7 @@ export const coinWithdraw = async ({
            var destTag = "";
             return await coinPayment.createWithdrawal({
                 currencySymbol: coin,
-                amount: amount,
+                amount: amount,  
                 address: toAddress,
                 destTag: destTag
             })
@@ -169,6 +171,8 @@ export const localWithdraw = async ({
 */
 export const generateCryptoAddr = async ({ currencyList = [], option = {} }) => {
     try {
+        console.log("Generate crypto addr");
+        
         if (!Array.isArray(currencyList)) {
             return []
         }
@@ -213,7 +217,7 @@ export const generateCryptoAddr = async ({ currencyList = [], option = {} }) => 
                     assetList.push(assetObj)
                 }
                 else if (currency.depositType == 'coin_payment') {
-                    let emailId = 'AUREX' + option.emailId; // user registered address
+                    let emailId = 'KRINOS' + option.emailId; // user registered address
                     let ipnUrl = config?.IPN_URL;  // config ipn url
                     var coinpayment_details = await coinPayment.createAddress(currency.coinpaymentsymbol, emailId, ipnUrl)
 
@@ -227,6 +231,19 @@ export const generateCryptoAddr = async ({ currencyList = [], option = {} }) => 
                     assetObj['destTag'] = coinpayment_details.destTag
                     assetList.push(assetObj)
 
+                }
+                else if (currency.depositType == 'bitgo') {
+                    let label = 'KRINOS' + option.emailId; // user registered address
+                    let phrase = 'KRINOS' + option.emailId;  // config ipn url
+                    var bitgo_details = await bitgoPayment.CreateAddress(currency.bitgosymbol, label , phrase)
+                    let assetObj = {
+                        "_id": currency._id,
+                        "coin": currency.coin,
+                    }
+                    assetObj['address'] = bitgo_details.address
+                    assetObj['bitgo_id'] = bitgo_details.walletid,
+                    assetObj["bitgo_webhookid"] = bitgo_details?.webhookid
+                    assetList.push(assetObj)
                 }
             }
         }
@@ -245,64 +262,77 @@ export const generateTokenAddr = async ({ currencyList = [], walletData }) => {
         if (!Array.isArray(currencyList)) {
             return []
         }
-
         // if (isEmpty(walletData)) {
         //     return []
         // }
-
         let assetList = []
         for (let currency of currencyList) {
             // && walletData.assets && walletData.assets.length > 0
             if (currency && currency.type == 'token') {
-                if (currency.tokenType == 'erc20') {
-                    // let ETH = walletData.assets.find(el => el.coin == 'ETH');
-                    let ETH = await createAddress();
-                    if (ETH) {
-                        let assetObj = {
-                            "_id": currency._id,
-                            "coin": currency.coin,
-                            'address': ETH.address,
-                            'privateKey': encryptString(ETH.privateKey)
-                        }
-                        assetList.push(assetObj)
-                    }
-                } else 
-                if (currency.tokenType == 'bep20') {
+                // if (currency.tokenType == 'erc20') {
+                //     // let ETH = walletData.assets.find(el => el.coin == 'ETH');
+                //     let ETH = await createAddress();
+                //     if (ETH) {
+                //         let assetObj = {
+                //             "_id": currency._id,
+                //             "coin": currency.coin,
+                //             'address': ETH.address,
+                //             'privateKey': encryptString(ETH.privateKey)
+                //         }
+                //         assetList.push(assetObj)
+                //     }
+                // } else 
+                // if (currency.tokenType == 'bep20') {
+                //     let assetObj = {
+                //         "_id": currency._id,
+                //         "coin": currency.coin,
+                //         "privateKey": '',
+                //         "address": '',
+                //         "destTag": ''
+                //     }
+                //     let ntwAddDoc = await ntwAddress('BNB')
+                //     if (ntwAddDoc.status) {
+                //         assetObj['address'] = ntwAddDoc.address
+                //         assetObj['privateKey'] = ntwAddDoc && ntwAddDoc.privateKey ? encryptString(ntwAddDoc.privateKey) : ""
+                //     }
+                //     assetList.push(assetObj)
+                // }else if (currency.tokenType == 'trc20') {
+                //     let assetObj = {
+                //         "_id": currency._id,
+                //         "coin": currency.coin,
+                //         "privateKey": '',
+                //         "address": '',
+                //         "destTag": ''
+                //     }
+                //     let ntwAddDoc = await ntwAddress('TRX')
+                //     if (ntwAddDoc.status) {
+                //         assetObj['address'] = ntwAddDoc.address
+                //         assetObj['privateKey'] = ntwAddDoc && ntwAddDoc.privateKey ? encryptString(ntwAddDoc.privateKey) : ""
+                //     }
+                //     assetList.push(assetObj)
+                // }else {
+                //     let assetObj = {
+                //         "_id": currency._id,
+                //         "coin": currency.coin,
+                //         "privateKey": '',
+                //         "address": '',
+                //         "destTag": ''
+                //     }
+                //     assetList.push(assetObj)
+                // }
+                if (currency.depositType == 'bitgo') {
+                    let label = 'KRINOS' + option.emailId; // user registered address
+                    let phrase = config?.IPN_URL;  // config ipn url
+                    var bitgo_details = await bitgoPayment.CreateAddress(currency.bitgosymbol, label , phrase)
+
                     let assetObj = {
                         "_id": currency._id,
                         "coin": currency.coin,
-                        "privateKey": '',
-                        "address": '',
-                        "destTag": ''
+                        // "privateKey": coinpayment_details.privateKey
                     }
-                    let ntwAddDoc = await ntwAddress('BNB')
-                    if (ntwAddDoc.status) {
-                        assetObj['address'] = ntwAddDoc.address
-                        assetObj['privateKey'] = ntwAddDoc && ntwAddDoc.privateKey ? encryptString(ntwAddDoc.privateKey) : ""
-                    }
-                    assetList.push(assetObj)
-                }else if (currency.tokenType == 'trc20') {
-                    let assetObj = {
-                        "_id": currency._id,
-                        "coin": currency.coin,
-                        "privateKey": '',
-                        "address": '',
-                        "destTag": ''
-                    }
-                    let ntwAddDoc = await ntwAddress('TRX')
-                    if (ntwAddDoc.status) {
-                        assetObj['address'] = ntwAddDoc.address
-                        assetObj['privateKey'] = ntwAddDoc && ntwAddDoc.privateKey ? encryptString(ntwAddDoc.privateKey) : ""
-                    }
-                    assetList.push(assetObj)
-                }else {
-                    let assetObj = {
-                        "_id": currency._id,
-                        "coin": currency.coin,
-                        "privateKey": '',
-                        "address": '',
-                        "destTag": ''
-                    }
+                    assetObj['address'] = bitgo_details.address
+                    assetObj['bitgo_id'] = bitgo_details.walletid,
+                    assetObj["bitgo_webhookid"] = bitgo_details?.webhookid
                     assetList.push(assetObj)
                 }
             }
@@ -322,7 +352,6 @@ export const generateFiatAddr = async ({ currencyList = [] }) => {
         if (!Array.isArray(currencyList)) {
             return []
         }
-
         let assetList = []
         for (let currency of currencyList) {
             if (currency && currency.type == 'fiat') {

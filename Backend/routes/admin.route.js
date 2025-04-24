@@ -58,7 +58,7 @@ router.route('/login').post(decodedata, adminValid.loginValidate, adminCtrl.admi
 router.route('/subAdmin').get(passportAuth, adminCtrl.getAdmin);
 router.route('/sub-admin').post(passportAuth, adminValid.SubAdminValid, adminCtrl.creatAdmin);
 router.route('/edit-admin').post(passportAuth, adminValid.updateAdminValid, adminCtrl.editAdmin);
-router.route('/login-history').get(passportAuth, adminCtrl.LoginhistoryPag);
+router.route('/login-history').get(decodedata, passportAuth, adminCtrl.LoginhistoryPag);
 router.route('/change-password').put(decodedata, passportAuth, adminValid.passwordValid, adminCtrl.changePassword);
 router.route('/get-profile').get(passportAuth, adminCtrl.getProfile);
 router.route('/send-mail').post(decodedata, passportAuth, adminCtrl.generateOTP, adminCtrl.sendMail);
@@ -128,7 +128,7 @@ router.route('/changeUsrType/:userId').put(passportAuth, userKycCtrl.changeUserT
 router.route('/kycList').post(decodedata, userKycCtrl.getKycList)
 
 // Wallet
-router.route('/depositList').get(passportAuth, walletCtrl.getDepositList)
+router.route('/depositList').get(decodedata, passportAuth, walletCtrl.getDepositList)
 router.route('/withdrawList').get(reqQueryDecodedata, passportAuth, walletCtrl.getWithdrawList)
 router.route('/fundList').get(passportAuth, walletCtrl.fundList)
 router.route('/coinWithdraw/approve/:transactionId').get(passportAuth, walletCtrl.coinWithdrawApprove)
@@ -205,7 +205,7 @@ router.route('/supportCategory')
 
 router.route('/ticketList').get(reqQueryDecodedata, passportAuth, supportCtrl.getTicketList)
 router.route('/ticketMessage')
-  .get(passportAuth, supportCtrl.getTicketMessage)
+  .get(decodedata, passportAuth, supportCtrl.getTicketMessage)
   .put(decodedata, passportAuth, SupprotValid.MessgaeValid, supportCtrl.replyMessage);
 
 // News Letter
@@ -218,4 +218,5 @@ router.route('/getPairDropdown').get(passportAuth, commonCtrl.getPairDropdown)
 
 // router.route('/adminapi/Offer').get(passportAuth,p2pAdmincontroller.Offerdetails)
 
+router.route("/spotTradeHistory").get(decodedata, passportAuth , reportCtrl.spotTradeHistory);
 export default router;

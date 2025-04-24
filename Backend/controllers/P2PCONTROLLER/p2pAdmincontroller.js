@@ -167,6 +167,7 @@ export const paginationQuery = (query) => {
 
 export const getofferhistory = async(req , res) => {
     try{
+        console.log('req.query----req.query---', req.query)
         let pagination = paginationQuery(req.query);
         let filter = await filterSearchQuery(req.query, ['firstName', 'email']);
         filter.$expr = {$eq: ['$userId', '$$createrid']};
@@ -228,7 +229,7 @@ export const getofferhistory = async(req , res) => {
                 ]).sort({ createdAt: -1 }).skip(parseInt(pagination.skip)).limit(parseInt(pagination.limit));
                 }
 
-                return res.json(encodedata({
+                return res.status(200).json(encodedata({
                     type: "success",
                     data: result,
                     count: count
@@ -238,7 +239,7 @@ export const getofferhistory = async(req , res) => {
        
     
     catch(e){
-        return res.json(encodedata({
+        return res.status(500).json(encodedata({
             type : "failed",
             message : "Error found"
         }))
@@ -337,7 +338,7 @@ export const gettradehistory = async(req , res) => {
                     "preserveNullAndEmptyArrays": true
                 } }
             ]).skip(parseInt(pagination.skip)).limit(parseInt(pagination.limit));
-            return res.json(encodedata({
+            return res.status(200).json(encodedata({
                 type: "success",
                 data: result,
                 count: count
@@ -345,7 +346,7 @@ export const gettradehistory = async(req , res) => {
         }
     }
     catch(e){
-        return res.json(encodedata({
+        return res.status(500).json(encodedata({
             type : "failed",
             message : "Error found"
         }))

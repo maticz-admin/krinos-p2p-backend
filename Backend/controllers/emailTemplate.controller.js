@@ -261,14 +261,14 @@ export const mailTemplate = async (identifier, toEmail, content, langCode = '') 
                 /** 
                  * ##message##
                 */
-                const formattedDateTime = new Date(content.date).toLocaleString('en-US', {
+                const formattedDateTime =  new Intl.DateTimeFormat('en-US', {
                     year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: 'numeric',
+                    month: 'short',
+                    day: '2-digit',
+                    hour: '2-digit',
                     minute: '2-digit',
                     hour12: true
-                });
+                }).format(new Date(content.date))
                 
                 mailContent['template'] = mailContent['template']
                     .replace("##DATE##", formattedDateTime)

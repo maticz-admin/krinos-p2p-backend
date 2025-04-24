@@ -16,6 +16,7 @@ import {
 
 // import package
 import csv from 'csv-express';
+import { encodedata } from '../lib/cryptoJS';
 
 export const spotorderHistory = async (req, res) => {
     try {
@@ -189,6 +190,7 @@ export const spotorderHistory = async (req, res) => {
 
 export const spotTradeHistory = async (req, res) => {
     try {
+        console.log('req.query-------', req.query)
         let Exports = req.query.exports
         let pagination = paginationQuery(req.query);
         let filter = filterSearchQuery(req.query, ['firstCurrency', 'secondCurrency', 'buyorsell']);
@@ -273,7 +275,8 @@ export const spotTradeHistory = async (req, res) => {
                 // data,
                 exportData
             }
-            return res.status(200).json({ 'success': true, "messages": "success", result })
+            console.log('result-------', result)
+            return res.status(200).json(encodedata({ 'success': true, "messages": "success", result }))
         } else {
             let data = await SpotTrade.aggregate([
                 { "$match": filter },
@@ -304,10 +307,11 @@ export const spotTradeHistory = async (req, res) => {
                 data,
                 exportData: []
             }
-            return res.status(200).json({ 'success': true, "messages": "success", result })
+            return res.status(200).json(encodedata({ 'success': true, "messages": "success", result }))
         }
     } catch (err) {
-        return res.status(500).json({ "success": false, 'errors': { 'messages': "Error on server" } })
+        console.log('err------', err)
+        return res.status(500).json(encodedata({ "success": false, 'errors': { 'messages': "Error on server" } }))
     }
 }
 

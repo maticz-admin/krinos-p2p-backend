@@ -153,7 +153,7 @@ export const adminLogin = async (req, res) => {
         let isLoginHistory = !isEmpty(req.body.loginHistory)
         let checkUser = await Admin.findOne({ "email": reqBody.email });
         if (!checkUser) {
-            return res.status(404).json({ "success": false, 'errors': { 'email': "Email not found" } })
+            return res.status(404).json(encodedata({ "success": false, 'errors': { 'email': "Email not found" } }))
         }
         let { passwordStatus } = await comparePassword(reqBody.password, checkUser.password);
         if (!passwordStatus) {
@@ -279,7 +279,7 @@ export const LoginhistoryPag = async (req, res) => {
                 count,
                 data
             }
-            return res.status(200).json({ 'success': true, 'message': 'FETCH_SUCCESS', result })
+            return res.status(200).json(encodedata({ 'success': true, 'message': 'FETCH_SUCCESS', result }))
         }
         if (queryData == 'false') {
             let downloadData = await LoginHistory.find({}).select(
@@ -301,12 +301,12 @@ export const LoginhistoryPag = async (req, res) => {
             let result = {
                 downloadData
             }
-            return res.status(200).json({ 'success': true, 'message': 'FETCH_SUCCESS', result })
+            return res.status(200).json(encodedata({ 'success': true, 'message': 'FETCH_SUCCESS', result }))
         }
     }
 
     catch (err) {
-        return res.status(500).json({ 'success': true, 'message': 'SOMETHING_WRONG' })
+        return res.status(500).json(encodedata({ 'success': true, 'message': 'SOMETHING_WRONG' }))
     }
 }
 

@@ -142,14 +142,14 @@ export const getFaqCategory = async (req, res) => {
 */
 export const addFaq = async (req, res) => {
     try {
-        console.log('req.body------', req.body)
+        
         let reqBody = req.body;
         let errors = {}
         if (reqBody.categoryId == '') {
             errors['categoryId'] = 'Category field is required'
         }
         if (reqBody.question == '') {
-            errors['question'] = 'question field is required'
+            errors['question'] = 'Question field is required'
         }
         if (reqBody.answer == '') {
             errors['answer'] = 'Answer field is required'

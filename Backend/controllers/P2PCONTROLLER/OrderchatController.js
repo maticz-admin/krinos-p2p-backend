@@ -64,6 +64,7 @@ export const sendmessage = async(roomid , message , file) => {
         return result;
     }
     catch(e){
+        console.log("error on send messaage" , e);
         return {};
     }
 }
@@ -158,10 +159,10 @@ export const markasreadeall = async(req , res) => {
 export const getunreadmessagenotification = async(req , res) => {
     try{
         let NoticeData = await MessageNotification.find({ userId: req?.user?.id , isRead : false}).sort({ createdAt: -1 });
-        return res.json(encodedata({type : "success" , data : NoticeData}));
+        return res.json({type : "success" , data : NoticeData});
     }
     catch(e){
-        return res.json(encodedata({type : "error" , data : []}));
+        return res.json({type : "error" , data : []});
     }
 }
 

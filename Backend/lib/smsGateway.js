@@ -146,7 +146,7 @@ export const verifyOtp = async (checkDoc, otp, type) => {
             return { smsStatus: true };
         } else {
             console.log("OTP is invalid or expired");
-            return { smsStatus: false, message: "OTP is invalid or expired" };
+            return { smsStatus: false, message: "OTP is invalid or has expired." };
         }
 
     } catch (err) {

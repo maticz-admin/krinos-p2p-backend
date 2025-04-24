@@ -287,10 +287,17 @@ console.log("withdraw",  req?.body , req?.user);
         let AdminWalletId = config?.BITGO_ADMIN_WALLET[coin?.toLowerCase()]?.walletid;
         let currencyData = await Currency.findOne({ 'bitgosymbol': coin })
         if (!currencyData) {
+            console.log("not currency data");
+            
             return res.status(400).json(encodedata({ 'success': false, 'messages': "Invalid currency" }))
         }
         if(parseFloat(amount) < parseFloat(currencyData?.minimumWithdraw)){
-            return res.status(400).json(encodedata({ 'success': false, 'messages': "" }))
+            console.log("withdraw limit");
+            return res.status(400).json(encodedata({ 'success': false, 'messages': `Minimum withdraw amount is ${currencyData?.minimumWithdraw}` }))
+        }
+        if(currencyData?.withdrawStatus != "On"){
+            console.log("ndeposit status");
+            return res.status(400).json(encodedata({ 'success': false, 'messages': `Withdraw blocked by admin` }))
         }
         let findAsset = {
             '_id': currencyData._id,
@@ -322,7 +329,7 @@ console.log("withdraw",  req?.body , req?.user);
             let adminbalance = await GetBitgoBalance(AdminWalletId , coin);
             console.log("admin balance" , adminbalance);
             
-            let gasestimate = await EstimateGasForCoin(coin);
+            // let gasestimate = await EstimateGasForCoin(coin);
             if((adminbalance/10**decimal) > parseFloat(amount) + parseFloat(fee)){
                 let transactions = new Transaction();
                 transactions["userId"] = usrWallet?.userId;
@@ -358,6 +365,7 @@ console.log("withdraw",  req?.body , req?.user);
                 console.log("transactiontransactiontransaction", transaction)
                 if (transaction?.state == 'signed') {
                     transactions["status"] = 'completed';
+                    transactions["txid"] = transaction?.txid
                 }
                 let trxData = await transactions.save();
                 return res.status(200).json(encodedata({ 'success': true, 'messages': "Withdraw successfully" }))
@@ -466,7 +474,7 @@ export async function internalTransfer(walletid , symbol , amount , recipientAdd
         const transfer = await wallet.send({
             amount: amount,  // Amount in satoshis (e.g., 100000 = 0.00000001 BTC)
             address: recipientAddress, // Destination Wallet ID within BitGo
-            walletPassphrase: "KRINOSmhi@yopmail.com", // Needed if using a password-protected wallet
+            walletPassphrase: wallet.label(), // Needed if using a password-protected wallet
             type: "internal" // Internal transfer (avoids blockchain fees)
         });
 

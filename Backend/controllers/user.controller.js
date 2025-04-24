@@ -462,7 +462,7 @@ export const userLogin = async (req, res) => {
                 });
 
                 if (!checkotp) {
-                    return res.status(400).json(encodedata({ 'success': false, 'errors': { 'twoFACode': "INVALID_CODE" }, 'message': "OTP is invalid or expired" }))
+                    return res.status(400).json(encodedata({ 'success': false, 'errors': { 'twoFACode': "INVALID_CODE" }, 'message': "OTP is invalid or has expired." }))
                 }
             }
         } else if (reqBody.formType == 'mobile') {
@@ -1659,7 +1659,7 @@ export const changeNewPhone = async (req, res) => {
                 return res.status(400).json(encodedata({ "success": false, 'errors': { 'newPhoneNo': "Phone number already exists" } }))
             }
             if (checkUser._id.toString() == req.user.id) {
-                return res.status(400).json(encodedata({ "success": false, 'errors': { 'newPhoneNo': "Matched your previous mobile number" } }))
+                return res.status(400).json(encodedata({ "success": false, 'errors': { 'newPhoneNo': "Matches your previously used mobile number." } }))
             }
         }
 

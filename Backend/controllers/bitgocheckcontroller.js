@@ -30,7 +30,8 @@ export const CreateWallet = async(symbol) => {
           label: 'BitGo Webhook Test ENV',
         })
         // // const address = await wallet.createAddress();
-         console.log("created address" ,addwebhok ,  "wallets" , wallet , wallet.id() , wallet);
+        const walletInstance = await bitgo.coin("tbtc").wallets().get({ id: wallet.id() });
+         console.log("created address" ,addwebhok ,  "wallets" , wallet , wallet.id() ,"instanceeeeee" ,  walletInstance?._wallet?.label);
         // Finalsendtransaction()
         //Createtransactlist()
     }

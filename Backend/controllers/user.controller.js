@@ -84,6 +84,8 @@ let profileUpload = multer({
 ])
 
 export const uploadProfile = (req, res, next) => {
+    console.log("upload profioe" , req?.body);
+    
     profileUpload(req, res, function (err) {
         if (!isEmpty(req.validationError)) {
             return res.status(400).json({ "success": false, 'errors': { [req.validationError.fieldname]: req.validationError.messages } })
@@ -782,9 +784,9 @@ export const editUserProfile = async (req, res) => {
         let updateUserData = await userData.save();
         let result = userProfileDetail(updateUserData)
 
-        return res.status(200).json({ "success": false, 'message': "PROFILE_EDIT_SUCCESS", 'result': result })
+        return res.status(200).json(encodedata({ "success": true, 'message': "PROFILE_EDIT_SUCCESS", 'result': result }))
     } catch (err) {
-        return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
+        return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
     }
 }
 
@@ -1378,13 +1380,15 @@ export const defaultUserSetting = async (userData) => {
 export const getUserSetting = async (req, res) => {
     try {
         const data = await UserSetting.findOne({ "userId": req.user.id }, { "_id": 0, "createdAt": 0, "updatedAt": 0, })
+        console.log("user setting data" , data);
+        
         if (data) {
-            return res.status(200).json(encodedata({ 'success': true, 'message': "FETCH_SUCCESS", result: data }))
+            return res.status(200).json({ 'success': true, 'message': "FETCH_SUCCESS", result: data })
         } else {
-            return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
+            return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
         }
     } catch (e) {
-        return res.status(500).json(encodedata({ "success": false, 'message': "SOMETHING_WRONG" }))
+        return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
     }
     // UserSetting.findOne({ "userId": req.user.id }, { "_id": 0, "createdAt": 0, "updatedAt": 0, }, (err, data) => {
     //     if (err) {
@@ -1402,12 +1406,12 @@ export const getUserSetting = async (req, res) => {
  */
 export const editUserSetting = async (req, res) => {
     let reqBody = req.body;
-    // console.log('reqBodyreqBody----', reqBody, req.user);
+    console.log('reqBodyreqBody----', reqBody, req.user);
     try {
         const UpdateUserSetting = await UserSetting.findOneAndUpdate(
             { "userId": req.user.id },
             {
-                // "languageId": reqBody.languageId,
+                "languageId": reqBody.languageId,
                 "theme": reqBody.theme,
                 "currencySymbol": reqBody.currencySymbol,
                 // "timeZone": reqBody.timeZone,

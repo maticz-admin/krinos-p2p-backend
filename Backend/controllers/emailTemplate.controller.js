@@ -86,23 +86,32 @@ export const mailTemplate = async (identifier, toEmail, content, langCode = '') 
 
         let logo = config.SERVER_URL + "Logo-small.png";
         let mailContent = {};
-        mailContent['subject'] = emailTemplateData.subject;
-        mailContent['template'] = emailTemplateData.content
-            .replace('##SITE_URL##', config.FRONT_URL)
-            .replace('##EMAIL_LOGO##', config.SERVER_URL + '/settings/' + siteSettingsData.emailLogo)
-            .replace(/##SUPPORT_MAIL##/g, siteSettingsData.supportMail)
-            .replace('##TWITER_LINK##', siteSettingsData.twitterUrl)
-            .replace('##LINKEDIN_LINK##', siteSettingsData.linkedinLink)
-            .replace('##FB_LINK##', siteSettingsData.facebookLink)
-            .replace(/##SITE_NAME##/g, siteSettingsData.siteName)
-            .replace('##CONTACT_NO##', siteSettingsData.contactNo)
-            .replace('##ADDRESS##', siteSettingsData.address)
-            .replace('##ADDRESS1##', siteSettingsData.address1)
-            .replace('##ADDRESS2##', siteSettingsData.address2)
+        // mailContent['subject'] = emailTemplateData.subject;
+        // mailContent['template'] = emailTemplateData.content
+        //     .replace('##SITE_URL##', config.FRONT_URL)
+        //     .replace('##EMAIL_LOGO##', config.SERVER_URL + '/settings/' + siteSettingsData.emailLogo)
+        //     .replace(/##SUPPORT_MAIL##/g, siteSettingsData.supportMail)
+        //     .replace('##TWITER_LINK##', siteSettingsData.twitterUrl)
+        //     .replace('##LINKEDIN_LINK##', siteSettingsData.linkedinLink)
+        //     .replace('##FB_LINK##', siteSettingsData.facebookLink)
+        //     .replace(/##SITE_NAME##/g, siteSettingsData.siteName)
+        //     .replace('##CONTACT_NO##', siteSettingsData.contactNo)
+        //     .replace('##ADDRESS##', siteSettingsData.address)
+        //     .replace('##ADDRESS1##', siteSettingsData.address1)
+        //     .replace('##ADDRESS2##', siteSettingsData.address2)
 
-            .replace('##TWITER_LOGO##', config.SERVER_URL + '/emailimages/twiter.png')
-            .replace('##FB_LOGO##', config.SERVER_URL + '/emailimages/facbook.png')
-            .replace('##LINKED_IN_LOGO##', config.SERVER_URL + '/emailimages/telegaram.png');
+        //     .replace('##TWITER_LOGO##', config.SERVER_URL + '/emailimages/twiter.png')
+        //     .replace('##FB_LOGO##', config.SERVER_URL + '/emailimages/facbook.png')
+        //     .replace('##LINKED_IN_LOGO##', config.SERVER_URL + '/emailimages/telegaram.png');
+
+
+        mailContent['subject'] = emailTemplateData.subject;
+        mailContent['template'] = emailTemplateData.content;
+        // mailContent[""] = config.BACK_URL + "original/emailtemplate/facebook.png";
+        mailContent['template'] = mailContent['template'].replace("##TWITTER##", config.SERVER_URL + "original/emailtemplate/twitter.png")
+        mailContent['template'] = mailContent['template'].replace("##FACEBOOK##", config.SERVER_URL + "original/emailtemplate/facebook.png")
+        mailContent['template'] = mailContent['template'].replace("##LOGO##", config.SERVER_URL + "original/emailtemplate/logo.png")
+        mailContent['template'] = mailContent['template'].replace("##HEADERIMG##", config.SERVER_URL + "original/emailtemplate/header_img.png")
 
         switch (identifier) {
 
@@ -114,15 +123,17 @@ export const mailTemplate = async (identifier, toEmail, content, langCode = '') 
                  * ##DATE## --> date
                 */
                 mailContent['template'] = mailContent['template']
-                    .replace("##templateInfo_name##", content.email)
-                    .replace("##templateInfo_url##", content.confirmMailUrl)
-                    .replace("##templateInfo_appName##", config.SITE_NAME)
-                    .replace("##templateInfo_logo##", logo)
-                    .replace("##DATE##", content.date);
+                    .replace("##NAME##", content.email)
+                    .replace("##ACTIVATIONLINK##", content.confirmMailUrl)
+                    // .replace("##templateInfo_name##", content.email)
+                    // .replace("##templateInfo_url##", content.confirmMailUrl)
+                    // .replace("##templateInfo_appName##", config.SITE_NAME)
+                    // .replace("##templateInfo_logo##", logo)
+                    // .replace("##DATE##", content.date);
 
                 break;
 
-            case "User_forgot":
+            case "User_forgot" :
                 /** 
                  * ##templateInfo_name## --> name
                  * ##templateInfo_url## --> confirmMailUrl
@@ -210,11 +221,11 @@ export const mailTemplate = async (identifier, toEmail, content, langCode = '') 
                  * ##CODE## --> code
                 */
                 mailContent['template'] = mailContent['template']
-                    .replace("##templateInfo_name##", "Valid User")
-                    .replace("##BROWSER##", content.broswername)
-                    .replace("##IP##", content.ipaddress)
-                    .replace("##COUNTRY##", content.countryName)
-                    .replace("##DATE##", content.date)
+                    .replace("##NAME##", "Valid User")
+                    // .replace("##BROWSER##", content.broswername)
+                    .replace("##IPADDRESS##", content.ipaddress)
+                    // .replace("##COUNTRY##", content.countryName)
+                    // .replace("##DATE##", content.date)
 
                 break;
 
@@ -280,7 +291,7 @@ export const mailTemplate = async (identifier, toEmail, content, langCode = '') 
                  * ##message##
                 */
                 mailContent['template'] = mailContent['template']
-                    .replace("##DATE##", content.date)
+                    .replace("##NAME##", "Valued User")
                     .replace("##OTP##", content.OTP);
                 break;
             case "CHANGE_2FA":

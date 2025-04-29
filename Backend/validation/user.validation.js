@@ -151,6 +151,8 @@ export const confirmMailValidate = (req, res, next) => {
  * BODY : firstName,lastName,blockNo,address,country,state,city,postalCode
 */
 export const editProfileValidate = (req, res, next) => {
+    console.log("edit profile validate " , req?.body);
+    
     let
         errors = {},
         reqBody = req.body;

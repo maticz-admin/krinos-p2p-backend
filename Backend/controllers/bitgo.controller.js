@@ -29,7 +29,7 @@ const ACCESS_TOKEN = "v2xa5b497884f92046dc93b59f9395fb404cb292bcc2c77612d76a3203
 // const ENTERPRICE_ID = "67c9458ecaef5bed16fc5d5ea8331431"
 
 const ENTERPRICE_ID = "67bf20b0cb4ae0362b9d9321ec3fcd83"
-const WEBHOOK_URL = "https://qc3kj71m-2054.inc1.devtunnels.ms/bitgo-webhook";
+const WEBHOOK_URL = "https://krinosp2p-backend.maticz.in/bitgo-webhook";
 
 const bitgo = new BitGo({
     accessToken: ACCESS_TOKEN,
@@ -39,7 +39,6 @@ const bitgo = new BitGo({
 export const CreateAddress = async(symbol , label , phrase) => {
     try{
         console.log("inside create address" , symbol , label);
-        
         const { wallet } = await bitgo.coin(symbol).wallets().generateWallet({
             label: label, //'murugavelrajmaticz@gmail.com',
             passphrase: phrase, //'murugavelwallet',
@@ -177,13 +176,13 @@ export const depositwebhook = async (req, res) => {
         // let AdminWalletId = config?.BITGO_ADMIN_WALLET[reqBody?.coin?.toLowerCase()]?.walletid;
 
 
-        if (reqBody?.state == 'confirmed' && reqBody?.transferType == "receive" ) {  //&& reqBody?.value > 0//reqBody?.state == 'unconfirmed' && 
+        if (reqBody?.state == 'confirmed' && reqBody?.transferType == "receive" && reqBody?.value > 0) {  //&& reqBody?.value > 0//reqBody?.state == 'unconfirmed' && 
             let currencyData = await Currency.findOne({ 'bitgosymbol': reqBody?.coin })
-            let trxnData = await Transaction.findOne({ 'currencyId': currencyData._id, 'txid': reqBody.txn_id });
+            let trxnData = await Transaction.findOne({ 'currencyId': currencyData._id, 'transfer_id': reqBody?.transfer });
             console.log("trxnDatatrxnDatatrxnData" , trxnData);
-            if(false){
-                return res.status(400).json({ 'success': false, 'messages': "Transaction already exist" })
-            }
+            // if(false){
+            //     return res.status(400).json({ 'success': false, 'messages': "Transaction already exist" })
+            // }
             console.log("currencyData",currencyData)
             if (!currencyData) {
                return res.status(400).json({ 'success': false, 'messages': "Invalid currency" })
@@ -196,9 +195,12 @@ export const depositwebhook = async (req, res) => {
             let userAssetData = await Wallet.findOne({ assets: { $elemMatch: findAsset }}).populate({ path: "_id" })
             let userWalletData = usrWallet.assets.id(currencyData._id);
             if (!userWalletData) {
+                console.log("not user wallet data");
+                
                return res.status(400).json({ 'success': false, 'messages': "Invalid assets" })
             }
             if (trxnData) {
+                console.log("trans exist");
                return res.status(400).json({ 'success': false, 'messages': "Already payment exists" })
             }
             let transactions = new Transaction();
@@ -279,8 +281,7 @@ export const WithdrawAmount = async(req , res) => {
     try{
 //         let transfer = await SendAmount("67fde42f273253b0e76c90b9def57de9", "tbtc", 1000, "tb1pqykx30ajt9twvud6s76cuhm4cr5asjly2zskpmjka4vt07r8fh7qwxuesy");
 // return
-console.log("withdraw",  req?.body , req?.user);
-
+        console.log("withdraw",  req?.body , req?.user);
         let {coin , amount , receiveraddress , fee , twoFACode , minimumWithdraw} = req?.body;
         let AdminAddress = config?.BITGO_ADMIN_WALLET[coin?.toLowerCase()]?.address //"tb1pqykx30ajt9twvud6s76cuhm4cr5asjly2zskpmjka4vt07r8fh7qwxuesy"
         let decimal = config?.BITGO_ADMIN_WALLET[coin?.toLowerCase()]?.decimal
@@ -288,7 +289,6 @@ console.log("withdraw",  req?.body , req?.user);
         let currencyData = await Currency.findOne({ 'bitgosymbol': coin })
         if (!currencyData) {
             console.log("not currency data");
-            
             return res.status(400).json(encodedata({ 'success': false, 'messages': "Invalid currency" }))
         }
         if(parseFloat(amount) < parseFloat(currencyData?.minimumWithdraw)){

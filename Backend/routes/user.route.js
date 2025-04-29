@@ -67,7 +67,7 @@ router.route('/bankdetail')
     .patch(apiKeyCtrl.authorization, userValid.deleteBankValidate, userCtrl.setPrimaryBank)
     .get(apiKeyCtrl.authorization, userCtrl.getBankDetail);
 router.route('/userSetting')
-    .get(decodedata, apiKeyCtrl.authorization, userCtrl.getUserSetting)//
+    .get(apiKeyCtrl.authorization, userCtrl.getUserSetting)//
     .put(decodedata, apiKeyCtrl.authorization, userValid.editSettingValid, userCtrl.editUserSetting);
 router.route('/editNotif').put(apiKeyCtrl.authorization, userValid.editNotifValid, userCtrl.editNotif)
 router.route('/forgotPassword').post(decodedata, userValid.checkForgotPwdValidate, userCtrl.checkForgotPassword);

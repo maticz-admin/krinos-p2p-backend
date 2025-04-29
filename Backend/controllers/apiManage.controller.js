@@ -327,7 +327,6 @@ export const apikey = async (apikey, next, req, res) => {
                         res.status(401).json({ 'statusCode': 401, 'message': "Hash is required" });
                     }
                 }
-
             } else {
                 res.status(400).json({ 'statusCode': 400, 'success': false, 'message': "You reached the limit" });
             }
@@ -484,7 +483,7 @@ export const verifyTokenWithEncode = async (req, res, next) => {
             email: userDoc.userId.email,
             google2Fa: userDoc.userId.google2Fa
         }
-        req.user = data
+        req.user = data;
         return next();
     } catch (err) {
         return res.status(401).send("Invalid Token");

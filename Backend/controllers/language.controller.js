@@ -126,7 +126,7 @@ export const getLanguage = async (req, res) => {
     try{
         const data = await Language.find({ 'status': 'active' }, { '_id': 1, 'code': 1, 'name': 1, 'isPrimary': 1, 'status': 1 })
         if(data){
-            return res.status(200).json(encodedata({ 'success': true, 'message': 'Fetch successfully', 'result': data }))
+            return res.status(200).json({ 'success': true, 'message': 'Fetch successfully', 'result': data })
         }else{
             return res.status(500).json({ 'success': false, 'message': 'Something went wrong' })
         }

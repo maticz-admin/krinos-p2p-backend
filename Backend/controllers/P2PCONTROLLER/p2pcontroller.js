@@ -894,7 +894,7 @@ export const gettotaluserbalance = async (req, res) => {
         var totalbalance = 0;
         var userasset = result?.assets;
         for (var i = 0; i < userasset?.length; i++) {
-            var value = await axios.get(`https://min-api.cryptocompare.com/data/price?fsym=${userasset[i]?.coin}&tsyms=${"btc"}`);
+            var value = await axios.get(`https://min-api.cryptocompare.com/data/price?fsym=${userasset[i]?.coin}&tsyms=${"usdt"}`);
             var marketvalue = value?.data["BTC"];
             var coinprice = marketvalue * userasset[i]?.p2pBal;
             var newprice = coinprice ? coinprice : 0
@@ -967,6 +967,7 @@ const profileStorage = multer.diskStorage({
         cb(null, 'file-' + Date.now() + path.extname(file.originalname));
     }
 });
+
 let profilepicUpload = multer({
     storage: profileStorage,
     fileFilter: imageFilter,

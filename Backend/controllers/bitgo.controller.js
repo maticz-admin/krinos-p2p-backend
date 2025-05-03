@@ -22,18 +22,20 @@ const EVM_RPC = {
     pol : "https://dimensional-attentive-frog.matic.quiknode.pro/e172038277e7698137daaad81e1771cb9e36401e"
 }
 
-const ACCESS_TOKEN = "v2xa5b497884f92046dc93b59f9395fb404cb292bcc2c77612d76a3203b3ae81db0" //"v2xf3063bbd890a0851ac72d800858cfb40cf0e1c51e3d51953e577f94206c78da2" //network ip
+const ACCESS_TOKEN = "v2x403ce484732773d2c170c3c359369c1dce5028958f2af572a97fd0031532851d"
+//"v2xa5b497884f92046dc93b59f9395fb404cb292bcc2c77612d76a3203b3ae81db0" //"v2xf3063bbd890a0851ac72d800858cfb40cf0e1c51e3d51953e577f94206c78da2" //network ip
 // "v2xe7986f8c95d9471b2ea822db534548f2a3a6d8b195322c0dd76a61935e0820d1" // systemip
 //"v2x4f64554b8e88600a5a12ef8d37193cd6739f3b6db4dbd2a5982d8fe276f6c89c"
 //"v2x6e5c38b17ddcf2f1cdb545245cfa77378988bfa46755f389697b4b2c0754d501"//without ip
 // const ENTERPRICE_ID = "67c9458ecaef5bed16fc5d5ea8331431"
 
 const ENTERPRICE_ID = "67bf20b0cb4ae0362b9d9321ec3fcd83"
-const WEBHOOK_URL = "https://krinosp2p-backend.maticz.in/bitgo-webhook";
+const WEBHOOK_URL = "https://backp2p-stage.krinos.app/bitgo-webhook";
 
 const bitgo = new BitGo({
     accessToken: ACCESS_TOKEN,
     env: 'prod',   //'test',
+    
 });
 
 export const CreateAddress = async(symbol , label , phrase) => {
@@ -42,7 +44,8 @@ export const CreateAddress = async(symbol , label , phrase) => {
         const { wallet } = await bitgo.coin(symbol).wallets().generateWallet({
             label: label, //'murugavelrajmaticz@gmail.com',
             passphrase: phrase, //'murugavelwallet',
-            enterprise: ENTERPRICE_ID
+            enterprise: ENTERPRICE_ID,
+            walletVersion: 5
         });
         console.log("create wallet" , wallet);
         
@@ -52,6 +55,7 @@ export const CreateAddress = async(symbol , label , phrase) => {
             url: WEBHOOK_URL,
             label: 'For Transaction',
         })
+        
         console.log("addwebhok",addwebhok)
         return {
             webhookid : addwebhok?.id,
@@ -366,6 +370,20 @@ export const WithdrawAmount = async(req , res) => {
                 if (transaction?.state == 'signed') {
                     transactions["status"] = 'completed';
                     transactions["txid"] = transaction?.txid
+
+                    let content = {
+                        'email': userAssetData._id.email,
+                        'date': new Date(),
+                        'amount': parseFloat(amount).toFixed(8),
+                        'transactionId': transaction?.txid,
+                        'currency': coin,
+                    };
+                    mailTemplateLang({
+                        'userId': userAssetData._id._id,
+                        'identifier': 'Withdraw_notification',
+                        'toEmail': userAssetData._id.email,
+                        content
+                    })
                 }
                 let trxData = await transactions.save();
                 return res.status(200).json(encodedata({ 'success': true, 'messages': "Withdraw successfully" }))
@@ -496,7 +514,6 @@ export async function internalTransfersendMany(walletid , symbol , amount , reci
         // amount = '100000000000000000'
         // recipientAddress = "0x387e71773a6217b5209cb63e8e5b91b4816588a9"
         console.log("internal transfer" , walletid , symbol , amount , recipientAddress);
-        
         const wallet = await bitgo.coin(symbol).wallets().get({ id: walletid });
         console.log(`Wallet Found: ${wallet.label()} (${wallet.id()})`);
         // Internal Transfer

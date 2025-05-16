@@ -164,7 +164,8 @@ export const addFaq = async (req, res) => {
         let newDoc = new Faq({
             'categoryId': reqBody.categoryId,
             'question': reqBody.question,
-            'answer': reqBody.answer
+            'answer': reqBody.answer,
+            "language" : reqBody?.language
         })
         await newDoc.save();
         // console.log('newDoc----', newDoc )
@@ -194,7 +195,8 @@ export const updateFaq = async (req, res) => {
                 "categoryId": reqBody.categoryId,
                 "question": reqBody.question,
                 "answer": reqBody.answer,
-                "status": reqBody.status
+                "status": reqBody.status,
+                "language" : reqBody?.language
             }
         })
 

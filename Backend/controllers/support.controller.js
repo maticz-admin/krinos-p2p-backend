@@ -272,6 +272,8 @@ export const createNewTicket = async (req, res) => {
             'userId': req.user.id,
             'title': 'Support Ticket',
             'description': 'Your Ticket Raised Successfully',
+            'sptitle': 'Support Ticket',
+            'spdescription': 'Your Ticket Raised Successfully',
         }
         newNotification(doc)
         return res.status(200).json(encodedata({ 'success': true, "message": "Ticket raised successfully" }))

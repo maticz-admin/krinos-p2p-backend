@@ -1,6 +1,8 @@
 // import package
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
+
+
 // import modal
 import Admin from '../models/Admin';
 import LoginHistory from '../models/LoginHistory';
@@ -21,6 +23,7 @@ import { mailTemplateLang } from './emailTemplate.controller';
 
 //2fa
 import node2fa from 'node-2fa';
+const QRCode = require('qrcode');
 
 // const ObjectId = mongoose.Types.ObjectId;
 
@@ -444,24 +447,68 @@ export const changePassword = async (req, res) => {
 /**
  * creat 2FA Code
 */
-export const generateTwoFa = (userData) => {
+export const generateTwoFa = async(userData) => {
     let result = {}
     if (userData && userData.google2Fa.secret != "") {
 
-        result = {
-            secret: userData.google2Fa.secret,
-            imageUrl: config.NODE_TWOFA.QR_IMAGE + userData.google2Fa.uri,
-            uri: userData.google2Fa.uri,
-            twoFaStatus: "enabled"
-        }
+        // result = {
+        //     secret: userData.google2Fa.secret,
+        //     imageUrl: config.NODE_TWOFA.QR_IMAGE + userData.google2Fa.uri,
+        //     uri: userData.google2Fa.uri,
+        //     twoFaStatus: "enabled"
+        // }
+
+        const newSecret = node2fa.generateSecret({
+                    name: config.NODE_TWOFA.NAME,
+                    account: userData.email
+                });
+                const decodedURI = decodeURIComponent(newSecret.uri);
+        
+                console.log("Decoded URI:", decodedURI);
+                if (!decodedURI.startsWith('otpauth://totp/')) {
+                    throw new Error("Invalid URI format.");
+                }
+        
+                const GenORcode = await QRCode.toDataURL(decodedURI);
+        
+                if (GenORcode) {
+                    result = {
+                        secret: userData.google2Fa.secret,
+                        imageUrl: GenORcode,
+                        uri: userData.google2Fa.uri,
+                        twoFaStatus: "enabled"
+                    };
+                    console.log("Result:", result);
+                }
 
     } else {
-        let newSecret = node2fa.generateSecret({ 'name': config.NODE_TWOFA.NAME, 'account': userData.email })
-        result = {
-            secret: newSecret.secret,
-            imageUrl: newSecret.qr,
-            uri: newSecret.uri,
-            twoFaStatus: "disabled"
+        // let newSecret = node2fa.generateSecret({ 'name': config.NODE_TWOFA.NAME, 'account': userData.email })
+        // result = {
+        //     secret: newSecret.secret,
+        //     imageUrl: newSecret.qr,
+        //     uri: newSecret.uri,
+        //     twoFaStatus: "disabled"
+        // }
+
+        const newSecret = node2fa.generateSecret({
+                    name: config.NODE_TWOFA.NAME,
+                    account: userData.email
+                });
+        const decodedURI = decodeURIComponent(newSecret.uri);
+        if (!decodedURI.startsWith('otpauth://totp/')) {
+            throw new Error("Invalid URI format.");
+        }
+
+        const GenORcode = await QRCode.toDataURL(decodedURI);
+
+        if (GenORcode) {
+            result = {
+                secret: newSecret.secret,
+                imageUrl: GenORcode,
+                uri: newSecret.uri,
+                twoFaStatus: "disabled"
+            };
+            console.log("Result:", result);
         }
     }
     return result;
@@ -476,7 +523,7 @@ export const get2faCode = async (req, res) => {
     try{
     const userData = await Admin.findOne({ "_id": req.user.id })
     if(userData){
-        let result = generateTwoFa(userData)
+        let result = await generateTwoFa(userData)
         return res.status(200).json({ 'success': true, 'result': result })
     }else{
         return res.status(500).json({ "success": false, 'message': "SOMETHING_WRONG" })
@@ -523,7 +570,7 @@ export const UpdateTwoFA = async (req, res) => {
                 { "new": true }
             )
 
-            let result = generateTwoFa(updateData)
+            let result = await generateTwoFa(updateData)
 
             return res.status(200).json({ 'success': true, 'message': "2FA Enable Sucessfully", result })
         }
@@ -561,7 +608,7 @@ export const diabled2faCode = async (req, res) => {
             userData.google2Fa.secret = '';
             userData.google2Fa.uri = '';
             let updateData = await userData.save();
-            let result = generateTwoFa(updateData)
+            let result = await generateTwoFa(updateData)
             return res.status(200).json({ 'success': true, 'message': "2FA Disable Sucessfully", result })
         }
         return res.status(400).json({ 'success': false, 'errors': { 'code': "Invalid Code" } })

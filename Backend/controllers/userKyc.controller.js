@@ -201,7 +201,9 @@ export const updateIdProof = async (req, res) => {
         let doc = {
             userId: req.user.id,
             title: 'KYC',
-            description: 'Your KYC ID proof has been submitted'
+            description: 'Your KYC ID proof has been submitted',
+            sptitle: '',
+            spdescription: ''
         }
         newNotification(doc)
 
@@ -265,7 +267,9 @@ export const updateAddressProof = async (req, res) => {
         let doc = {
             userId: req.user.id,
             title: 'KYC',
-            description: 'Your KYC Address proof has been submitted'
+            description: 'Your KYC Address proof has been submitted',
+            sptitle: '',
+            spdescription: ''
         }
         newNotification(doc)
         return res.status(200).json({ 'success': true, 'message': "ADDRESS_DOC_UPLOAD_SUCCESS", 'result': userKycData, usrDoc })
@@ -508,6 +512,8 @@ export const approveUserKyc = async (req, res) => {
                 userId: reqBody.userId,
                 title: 'KYC',
                 description: 'Your KYC ID proof has been approved',
+                sptitle: '',
+                spdescription: '',
             }
             newNotification(doc)
             let content = {
@@ -525,6 +531,8 @@ export const approveUserKyc = async (req, res) => {
                 userId: reqBody.userId,
                 title: 'KYC',
                 description: 'Your KYC Address proof has been approved',
+                sptitle: 'KYC',
+                spdescription: 'Your KYC Address proof has been approved',
             }
             newNotification(doc)
             let content = {

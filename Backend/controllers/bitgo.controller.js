@@ -17,7 +17,7 @@ const bitcore = require('bitcore-lib');
 
 const tron_rpc_url = 'https://greatest-newest-emerald.tron-mainnet.quiknode.pro/ac81d8377a69068d91f54299e01b5b8851c1e43b'
 const EVM_RPC = {
-    bnb : "https://practical-spring-frog.bsc.quiknode.pro/dabbf8657aa56f634cb64e11baadf47cec7be616/",
+    bnb : "https://practical-spring-frfailed to fetch initial client constants from BitGoog.bsc.quiknode.pro/dabbf8657aa56f634cb64e11baadf47cec7be616/",
     eth : "https://still-cool-hill.quiknode.pro/9bc3fbdf9f4d222c9e1843b1ab5f2de64fc31352",
     pol : "https://dimensional-attentive-frog.matic.quiknode.pro/e172038277e7698137daaad81e1771cb9e36401e"
 }
@@ -129,8 +129,6 @@ export const GetBitgoBalance = async(walletid , symbol) => {
         console.log("bitgo balance" , walletid , symbol);
         
         const wallet = await bitgo.coin(symbol).wallets().get({ id: walletid });
-        
-        
         let bal = await wallet.balance();
         console.log("balance " ,  bal  , wallet?._wallet?.balanceString);
         return parseFloat(wallet?._wallet?.balanceString);

@@ -23,6 +23,10 @@ const faqSchema = new Schema({
 		enum: ['active', 'Inactive'],
 		default: 'active'
 	},
+	language : {
+		type : String,
+		default : "en"
+	}
 }, {
 	timestamps: true
 });

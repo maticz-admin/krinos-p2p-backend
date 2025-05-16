@@ -39,22 +39,7 @@ app.set('trust proxy', true)
 
 
 
-app.post("/webhook", (req, res) => {
-  try {
-    const { session_id, status, vendor_data } = req?.body;
-    console.log(
-      "webdskflkasdjflkjsdalfjasdlk",
-      session_id,
-      status,
-      vendor_data,
-      req?.body
-    );
-    UpdateKycStatus(session_id, status);
-  } catch (error) {
-    console.error("Error in /webhook handler:", error);
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-});
+
 
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -100,6 +85,25 @@ app.use(passport.initialize());
 require("./config/passport").adminAuth(passport);
 
 app.post("/bitgo-webhook", depositwebhook);
+app.post("/webhook", (req, res) => {
+  try {
+    console.log(req?.body);
+    // const {  status, vendor_data } = req?.body;
+    const status = req?.body?.status ? req?.body?.status : ""
+    const session_id = req?.body?.sessionid ? req?.body?.sessionid : req?.body?.session_id
+    console.log(
+      "webdskflkasdjflkjsdalfjasdlk",
+      session_id,
+      status,
+      // vendor_data,
+      req?.body
+    );
+    UpdateKycStatus(session_id, status);
+  } catch (error) {
+    console.error("Error in /webhook handler:", error);
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+});
 
 app.use(express.static(__dirname + '/public'));
 

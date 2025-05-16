@@ -41,6 +41,8 @@ export const CreateP2Porder = async (req, res) => {
                 // 'description': 'You received one trade request',
                 'title': 'Offer_Created',
                 'description': 'You have successfully created offer',
+                'sptitle': '',
+                'spdescription': 'Has creado la oferta con éxito',
             }
             await newNotification(doc)
 
@@ -344,6 +346,8 @@ export const adduserreview = async (req, res) => {
             'userId': checkUser._id,
             'title': 'Review',
             'description': 'You received one review',
+            'sptitle': '',
+            'spdescription': 'Recibiste una reseña',
         }
         await newNotification(doc)
 
@@ -401,6 +405,8 @@ export const createroom = async (req, res) => {
                     'userId': checkUser._id,
                     'title': 'Trade_Request',
                     'description': 'You received one trade request',
+                    'sptitle': '',
+                    'spdescription': 'Recibió una solicitud de intercambio',
                 }
                 await newNotification(doc);
                 var getuser = await User.findOne({ userId: req?.body?.creater });
@@ -596,6 +602,8 @@ export const orderstatus = async (req, res) => {
                 'userId': checkUser._id,
                 'title': 'Trade_Request',
                 'description': 'User have paid your order',
+                'sptitle': 'Trade_Request',
+                'spdescription': 'El usuario ha pagado su pedido',
             }
             await newNotification(doc)
         }
@@ -605,6 +613,8 @@ export const orderstatus = async (req, res) => {
                 'userId': checkUser._id,
                 'title': 'Trade_Request',
                 'description': 'Owner confirm your trade',
+                'sptitle': '',
+                'spdescription': 'Propietario confirma tu comercio',
             }
             await newNotification(doc)
         }
@@ -730,7 +740,7 @@ export const updateuseronlinestatus = async (req, res) => {
 export const Getcms = async (req, res) => {
     try {
         console.log('req?.query?.identifier---', req?.query?.identifier)
-        var result = await Cms.findOne({ identifier: req?.query?.identifier, status: "active" });
+        var result = await Cms.findOne({ identifier: req?.query?.identifier, status: "active" , language : req?.query?.lang});
         console.log('result-----', result)
         return res.json(encodedata({
             type: "success",
@@ -894,7 +904,7 @@ export const gettotaluserbalance = async (req, res) => {
         var totalbalance = 0;
         var userasset = result?.assets;
         for (var i = 0; i < userasset?.length; i++) {
-            var value = await axios.get(`https://min-api.cryptocompare.com/data/price?fsym=${userasset[i]?.coin}&tsyms=${"usdt"}`);
+            var value = await axios.get(`https://min-api.cryptocompare.com/data/price?fsym=${userasset[i]?.coin}&tsyms=${"btc"}`);
             var marketvalue = value?.data["BTC"];
             var coinprice = marketvalue * userasset[i]?.p2pBal;
             var newprice = coinprice ? coinprice : 0

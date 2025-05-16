@@ -610,6 +610,8 @@ export const userLogin = async (req, res) => {
             'userId': checkUser._id,
             'title': 'User Login',
             'description': 'Login Successfully',
+            'sptitle': '',
+            'spdescription': 'Iniciar sesión exitosamente',
         }
         newNotification(doc)
         // mailTemplate('Login_notification', reqBody.langCode, checkUser.email, content)
@@ -1093,6 +1095,8 @@ export const changePassword = async (req, res) => {
             'userId': req.user.id,
             'title': 'Change password ',
             'description': 'Your password has been updated',
+            'sptitle': '',
+            'spdescription': 'Su contraseña ha sido actualizada',
         }
         newNotification(doc)
         return res.status(200).json(encodedata({ 'success': true, 'message': "PASSWORD_CHANGE_SUCCESS" }));
@@ -1153,7 +1157,7 @@ export const update2faCode = async (req, res) => {
                 },
                 { "new": true }
             )
-            let result = generateTwoFa(updateData)
+            let result = await generateTwoFa(updateData)
             if (chackStatus?.twoFA == true) {
                 let content = {
                     'date': new Date(),
@@ -1172,6 +1176,8 @@ export const update2faCode = async (req, res) => {
                 'userId': req.user.id,
                 'title': '2FA',
                 'description': 'Your 2FA has been enabled',
+                'sptitle': '',
+                'spdescription': 'Su 2FA ha sido habilitado',
             }
             newNotification(doc)
 
@@ -1207,7 +1213,7 @@ export const diabled2faCode = async (req, res) => {
             userData.google2Fa.secret = '';
             userData.google2Fa.uri = '';
             let updateData = await userData.save();
-            let result = generateTwoFa(updateData)
+            let result = await generateTwoFa(updateData)
 
             if (chackStatus.twoFA == true) {
                 let content = {
@@ -1225,6 +1231,8 @@ export const diabled2faCode = async (req, res) => {
                 'userId': req.user.id,
                 'title': '2FA',
                 'description': ' Your 2FA has been disabled',
+                'sptitle': '',
+                'spdescription': 'Su 2FA ha sido deshabilitado',
             }
             newNotification(doc)
             return res.status(200).json({ 'success': true, 'message': "TWO_FA_DISABLE_SUCCESS", result })

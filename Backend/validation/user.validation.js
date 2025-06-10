@@ -511,9 +511,9 @@ export const newPhoneValidate = (req, res, next) => {
     }
 
     if (isEmpty(reqBody.newPhoneNo)) {
-        errors.newPhoneNo = "Phone number field is required";
+        errors.newPhoneNo = "PHONE_FIELD_REQUIRED";
     } else if (!(mobileRegex.test(reqBody.newPhoneNo))) {
-        errors.newPhoneNo = "Phone number is invalid";
+        errors.newPhoneNo = "PHONE_INVALID";
     }
 
     if (!isEmpty(errors)) {

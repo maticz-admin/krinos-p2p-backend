@@ -276,7 +276,7 @@ export const createNewTicket = async (req, res) => {
             'spdescription': 'Your Ticket Raised Successfully',
         }
         newNotification(doc)
-        return res.status(200).json(encodedata({ 'success': true, "message": "Ticket raised successfully" }))
+        return res.status(200).json(encodedata({ 'success': true, "message": "TICKET_RAISED_SUCCESSFULLY" }))
     } catch (err) {
         console.log('errrrrr', err)
         return res.status(500).json(encodedata({ 'success': false, "message": "Error on server" }))
@@ -418,7 +418,7 @@ export const closeTicket = async (req, res) => {
             return res.status(400).json(encodedata({ 'success': false, 'message': "NO_DATA" }));
         }
 
-        return res.status(200).json(encodedata({ 'success': true, 'message': "Ticket closed successfully", 'result': ticketData }));
+        return res.status(200).json(encodedata({ 'success': true, 'message': "TICKET_CLOSED_SUCCESSFULLY", 'result': ticketData }));
     } catch (err) {
         console.log('err-----', err)
         return res.status(500).json(encodedata({ 'success': false, 'message': "SOMETHING_WRONG" }));

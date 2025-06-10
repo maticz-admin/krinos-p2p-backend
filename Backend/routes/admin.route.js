@@ -80,6 +80,14 @@ router.route('/currency')
   .put( passportAuth, currencyCtrl.uploadCurrency, currencyValid.editValid, currencyCtrl.updateCurrency);
 router.route('/getCurrency').get(passportAuth, currencyCtrl.getCurrency);
 
+//preferred currency
+
+router.route('/preferred-currency')
+  .get(reqQueryDecodedata, passportAuth, currencyCtrl.prefferedcurrencyList)
+  .post( passportAuth, currencyCtrl.uploadCurrency, currencyValid.addPreferredValid, currencyCtrl.addPreferredCurrency)
+  .put( passportAuth, currencyCtrl.uploadCurrency, currencyValid.editPreferreValid, currencyCtrl.updatePreferredCurrency);
+router.route('/get-preferredCurrency').get(passportAuth, currencyCtrl.getPreferredCurrency);
+
 
 // Language
 router.route('/language')

@@ -5,6 +5,8 @@ import path from "path";
 // import model
 import { Currency } from "../models";
 
+import PreferredCurrency from "../models/PrefferedCurrency";
+
 // import config
 import config from "../config";
 
@@ -496,4 +498,263 @@ export const getLanguage = async (req, res) => {
         .json({ success: true, message: "Fetch successfully", result: data });
     }
   );
+};
+
+
+
+
+/**
+ * Get All Currency List
+ * URL : /adminapi/currency
+ * METHOD : GET
+ */
+export const prefferedcurrencyList = async (req, res) => {
+  try {
+    let pagination = paginationQuery(req.query);
+    let filter = filterSearchQuery(req.query, [
+      "coin",
+      "showSymbol",
+      "status"
+    ]);
+    let Export = req.query.export;
+    const header = ["Coin", "Show Symbol", "Status"];
+    let count = await PreferredCurrency.countDocuments(filter);
+    if (Export == "csv" || Export == "xls") {
+      let exportData = await PreferredCurrency.find(filter, {
+        _id: 1,
+        coin: 1,
+        showSymbol: 1,
+        status: 1,
+        image : 1
+      }).sort({ createdAt: -1 });
+
+      let csvData = [header];
+
+      if (exportData && exportData.length > 0) {
+        for (let item of exportData) {
+          let arr = [];
+          arr.push(item.name, item.type, item.coin, item.status);
+          csvData.push(arr);
+        }
+      }
+      return res.csv(csvData);
+    } else if (Export == "pdf") {
+      let data = await PreferredCurrency.find(filter, {
+        _id: 1,
+        coin: 1,
+        showSymbol: 1,
+        status: 1,
+        image : 1
+        
+      }).sort({ createdAt: -1 });
+      // .skip(pagination.skip).limit(pagination.limit);
+
+      let result = {
+        count,
+        pdfData: data,
+        imageUrl: `${config.SERVER_URL}${config.IMAGE.CURRENCY_URL_PATH}`,
+      };
+
+      return res
+        .status(200)
+        .json(encodedata({ success: true, message: "FETCH_SUCCESS", result }));
+    } else {
+      let data = await PreferredCurrency.find(filter, {
+        _id: 1,
+        coin: 1,
+        showSymbol: 1,
+        status: 1,
+        image : 1
+      })
+        .sort({ createdAt: -1 })
+        .skip(pagination.skip)
+        .limit(pagination.limit);
+      let result = {
+        count,
+        data,
+        imageUrl: `${config.SERVER_URL}${config.IMAGE.CURRENCY_URL_PATH}`,
+      };
+
+      return res
+        .status(200)
+        .json(encodedata({ success: true, message: "FETCH_SUCCESS", result }));
+    }
+  } catch (err) {
+    return res.status(500).json(encodedata({ success: true, message: "SOMETHING_WRONG" }));
+  }
+};
+
+/**
+ * Add Currency
+ * URL : /adminapi/currency
+ * METHOD : POST
+ * BODY : name, symbol, coin, image, contractAddress, minABI, contractDecimal, decimal, tokenType, bankName, accountNo, holderName, bankcode, country, withdrawFee, minimumWithdraw, depositType, fundLimit, fundFee, fundInterval
+ */
+export const addPreferredCurrency = async (req, res) => {
+  try {
+    let reqBody = req.body,
+      reqFile = req.files;
+    let checkCurrency = await PreferredCurrency.findOne({ coin: reqBody.symbol });
+    if (checkCurrency) {
+      return res
+        .status(400)
+        .json(encodedata({ success: false, errors: { coin: "Coin already exists" } }));
+    }
+    const newDoc = new PreferredCurrency({
+        coin: reqBody?.coin,
+        showSymbol: reqBody?.symbol,
+        status: "active",
+        image : reqFile.image[0].filename,
+    });
+    
+
+    let newData = await newDoc.save();
+    // addPriceCNV(newData);
+    // newAssetAllUsr(newData);
+    return res
+      .status(200)
+      .json(encodedata({ success: true, message: "Coin added successfully" }))
+  } catch (err) {
+    console.log('errrrrrrrrrrrrr-------------', err)
+    return res
+      .status(500)
+      .json(encodedata({ success: false, message: "Something went wrong" }))
+  }
+};
+
+/**
+ * Update Currency
+ * URL : /adminapi/currency
+ * METHOD : PUT
+ * BODY : currencyId, name, coin, symbol, image, contractAddress, minABI, decimal, contractDecimal, tokenType, bankName, accountNo, holderName, bankcode, country, withdrawFee, minimumWithdraw, depositType, fundLimit, fundFee, fundInterval
+ */
+export const updatePreferredCurrency = async (req, res) => {
+  try {
+    let reqBody = req.body,
+      reqFile = req.files;
+      // console.log('reqBody-----reqFile',reqBody, reqFile)
+    let checkCurrency = await PreferredCurrency.findOne({
+      coin: reqBody.coin,
+      _id: { $ne: reqBody.currencyId },
+    });
+    if (checkCurrency) {
+      return res
+        .status(400)
+        .json({ success: false, errors: { coin: "Coin already exists" } });
+    }
+
+    let currencyDoc = await PreferredCurrency
+    .findOne({ _id: reqBody.currencyId });
+
+    currencyDoc.coin = reqBody.coin;
+    currencyDoc.showSymbol = reqBody.symbol;
+    currencyDoc.image =
+      reqFile.image && reqFile.image[0]
+        ? reqFile.image[0].filename
+        : currencyDoc.image;
+    currencyDoc.status = reqBody.status;
+    await currencyDoc.save();
+    return res
+      .status(200)
+      .json({ success: true, message: "Coin updated successfully" });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Something went wrong" });
+  }
+};
+
+
+export const getPreferredCurrency = async (req, res) => {
+  try {
+    const data = await PreferredCurrency.aggregate(
+      [
+        { $match: { status: "active" } },
+        {
+          $project: {
+            _id: 1,
+            coin: 1,
+            showSymbol: 1,
+            status: 1,
+            // image : 1
+            // coinpaymentsymbol: 1,
+            // bitgosymbol:1,
+            image: {
+              $cond: [
+                { $eq: ["$image", ""] },
+                "",
+                {
+                  $concat: [
+                    config.SERVER_URL,
+                    config.IMAGE.CURRENCY_URL_PATH,
+                    "$image",
+                  ],
+                },
+              ],
+            },
+          },
+        },
+      ])
+    if (data) {
+      return res
+        .status(200)
+        .json(encodedata({ success: true, message: "FETCH_SUCCESS", result: data }));
+    } else {
+      return res
+        .status(500)
+        .json(encodedata({ success: false, message: "SOMETHING_WRONG" }));
+    }
+  } catch (e) {
+    return res
+      .status(500)
+      .json(encodedata({ success: false, message: "SOMETHING_WRONG" }));
+  }
+  // Currency.aggregate(
+  //   [
+  //     { $match: { status: "active" } },
+  //     {
+  //       $project: {
+  //         name: 1,
+  //         coin: 1,
+  //         symbol: 1,
+  //         type: 1,
+  //         withdrawFee: 1,
+  //         minimumWithdraw: 1,
+  //         bankDetails: 1,
+  //         decimal: 1,
+  //         depositStatus: 1,
+  //         withdrawStatus: 1,
+  //         depositminlimit: 1,
+  //         commisionfee : 1,
+  //         coinpaymentsymbol : 1,
+  //         image: {
+  //           $cond: [
+  //             { $eq: ["$image", ""] },
+  //             "",
+  //             {
+  //               $concat: [
+  //                 config.SERVER_URL,
+  //                 config.IMAGE.CURRENCY_URL_PATH,
+  //                 "$image",
+  //               ],
+  //             },
+  //           ],
+  //         },
+  //         fundFee: 1,
+  //         api : 1,
+  //         key : 1
+  //       },
+  //     },
+  //   ],
+  //   (err, data) => {
+  //     if (err) {
+  //       return res
+  //         .status(500)
+  //         .json({ success: false, message: "SOMETHING_WRONG" });
+  //     }
+  //     return res
+  //       .status(200)
+  //       .json({ success: true, message: "FETCH_SUCCESS", result: data });
+  //   }
+  // );
 };

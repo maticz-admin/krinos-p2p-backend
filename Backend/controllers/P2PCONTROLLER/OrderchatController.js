@@ -113,7 +113,6 @@ export const Newmessagenotification = async(datas)=>{
 
 const FetchUnReadmessage = async (id) => {
     try {
-
         let NoticeData = await MessageNotification.find({ userId: id}).sort({ createdAt: -1 }); //select({ 'description': 1, 'createdAt': 1 })
         if (!isEmpty(NoticeData)) {
             return NoticeData

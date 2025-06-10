@@ -143,10 +143,12 @@ export const Filterp2porderhooks = async (req, res) => {
 
 
 const buildFindData = (body) => {
+    console.log("bodtddadfasfdafa" , body);
+    
     const finddata = { offerstatus: "created" };
 
     if (body?.coin) finddata.coin = body.coin;
-    if (body?.prefferedcurrency) finddata.preferedcurrency = body.prefferedcurrency;
+    if (body?.preferedcurrency) finddata.preferedcurrency = body.preferedcurrency;
     if (body?.ordertype) finddata.ordertype = body.ordertype === "Sell" ? "Buy" : "Sell";
     if (body?.amount) {
         finddata.min = { "$lte": parseFloat(body.amount) };
@@ -739,7 +741,7 @@ export const updateuseronlinestatus = async (req, res) => {
 
 export const Getcms = async (req, res) => {
     try {
-        console.log('req?.query?.identifier---', req?.query?.identifier)
+        console.log('req?.query?.identifier---', req?.query)
         var result = await Cms.findOne({ identifier: req?.query?.identifier, status: "active" , language : req?.query?.lang});
         console.log('result-----', result)
         return res.json(encodedata({
@@ -757,7 +759,7 @@ export const Getcms = async (req, res) => {
 
 export const Getfaq = async (req, res) => {
     try {
-        var result = await Faq.find({ status: "active" });
+        var result = await Faq.find({ status: "active" ,language : req?.query?.lang});
         return res.json(encodedata({
             type: "success",
             data: result
@@ -808,6 +810,7 @@ export const gettradehistory = async (req, res) => {
         // console.log('req?.query?.userId--req?.query?.userId----', req?.query)
 
         let pagination = paginationQuery(req.query);
+        let search = new RegExp(req?.query?.search?.toUpperCase() , "i");
 
         let count = await Tradehistory.find({
             $or: [
@@ -819,6 +822,7 @@ export const gettradehistory = async (req, res) => {
         var result = await Tradehistory.aggregate([
             {
                 $match: {
+                    orderid : search,
                     $or: [
                         { creater: req?.query?.userId },
                         { spender: req?.query?.userId }
@@ -865,8 +869,9 @@ export const gettradehistory = async (req, res) => {
 export const getspenderhistory = async (req, res) => {
     try {
         let pagination = paginationQuery(req.query);
-        let count = await Orderchat.aggregate([{ $match: { spender: req?.query?.userId } }]);
-        let result = await Orderchat.aggregate([{ $match: { spender: req?.query?.userId } },
+        let search = new RegExp(req?.query?.search , "i")
+        let count = await Orderchat.aggregate([{ $match: { spender: req?.query?.userId ,orderid : search} }]);
+        let result = await Orderchat.aggregate([{ $match: { spender: req?.query?.userId  , orderid : search} },
         {
             $lookup: {
                 from: "p2pcreateOrder",

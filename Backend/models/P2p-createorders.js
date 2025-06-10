@@ -93,7 +93,7 @@ const createorderschema = new mongoose.Schema({
     },
     offerstatus : {
         type : String,
-        default : "created"
+        default : "created" 
     }
 },
 {

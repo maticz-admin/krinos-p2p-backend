@@ -22,7 +22,12 @@ const EVM_RPC = {
     pol : "https://dimensional-attentive-frog.matic.quiknode.pro/e172038277e7698137daaad81e1771cb9e36401e"
 }
 
-const ACCESS_TOKEN = "v2x403ce484732773d2c170c3c359369c1dce5028958f2af572a97fd0031532851d"
+const ACCESS_TOKEN = "v2x4e9a4fd19072730e6d4c9366787af6e5b2bc52f8184230f82e8df0f071504d99"
+// "v2xd04e2adb24484a10d13244d4b43da442797752234855f6616f3aff31d073eb06"
+
+
+
+// "v2x403ce484732773d2c170c3c359369c1dce5028958f2af572a97fd0031532851d"
 //"v2xa5b497884f92046dc93b59f9395fb404cb292bcc2c77612d76a3203b3ae81db0" //"v2xf3063bbd890a0851ac72d800858cfb40cf0e1c51e3d51953e577f94206c78da2" //network ip
 // "v2xe7986f8c95d9471b2ea822db534548f2a3a6d8b195322c0dd76a61935e0820d1" // systemip
 //"v2x4f64554b8e88600a5a12ef8d37193cd6739f3b6db4dbd2a5982d8fe276f6c89c"
@@ -35,7 +40,6 @@ const WEBHOOK_URL = "https://backp2p-stage.krinos.app/bitgo-webhook";
 const bitgo = new BitGo({
     accessToken: ACCESS_TOKEN,
     env: 'prod',   //'test',
-    
 });
 
 export const CreateAddress = async(symbol , label , phrase) => {
@@ -65,6 +69,11 @@ export const CreateAddress = async(symbol , label , phrase) => {
     }
     catch(e){
         console.log("error on create wallet" , e);
+        return {
+            webhookid : "",
+            walletid : "",
+            address  : ""
+        }
     }
 }
 
@@ -191,14 +200,14 @@ export const depositwebhook = async (req, res) => {
             }
             let findAsset = {
                 '_id': currencyData?._id,
-                'address': reqBody?.receiver
+                // 'address': reqBody?.receiver
+                "bitgo_id" : reqBody?.wallet
             }
             let usrWallet = await Wallet.findOne({ assets: { $elemMatch: findAsset }})
             let userAssetData = await Wallet.findOne({ assets: { $elemMatch: findAsset }}).populate({ path: "_id" })
             let userWalletData = usrWallet.assets.id(currencyData._id);
             if (!userWalletData) {
                 console.log("not user wallet data");
-                
                return res.status(400).json({ 'success': false, 'messages': "Invalid assets" })
             }
             if (trxnData) {
@@ -272,7 +281,8 @@ export const depositwebhook = async (req, res) => {
             return res.status(200).json({ 'success': true, 'messages': "Updated successfully" })
         }
        // return res.status(400).json({ 'success': true, 'messages': "Payment status pending" })
-    } catch (err) {
+    } 
+    catch (err) {
         console.log("Error on send amount", err);
         return res.status(500).json({ 'success': false, 'messages': "Error on server" })
     }
@@ -364,7 +374,7 @@ export const WithdrawAmount = async(req , res) => {
 
                 let finalamount = parseFloat(amount)*10**decimal
                 const transaction = await internalTransfer(AdminWalletId , coin , finalamount?.toString() , receiveraddress)
-                console.log("transactiontransactiontransaction", transaction)
+                console.log("transactiontransactiontransaction", transaction , finalamount)
                 if (transaction?.state == 'signed') {
                     transactions["status"] = 'completed';
                     transactions["txid"] = transaction?.txid
@@ -491,7 +501,7 @@ export async function internalTransfer(walletid , symbol , amount , recipientAdd
             amount: amount,  // Amount in satoshis (e.g., 100000 = 0.00000001 BTC)
             address: recipientAddress, // Destination Wallet ID within BitGo
             walletPassphrase: wallet.label(), // Needed if using a password-protected wallet
-            type: "internal" // Internal transfer (avoids blockchain fees)
+            type: "transfer" // Internal transfer (avoids blockchain fees)
         });
 
         console.log("Transfer Successful:", transfer);

@@ -160,6 +160,8 @@ router.route('/key/manage/:keyId?')
 // Common
 router.route('/getLanguage').get(languageCtrl.getLanguage);//
 router.route('/getCurrency').get(currencyCtrl.getCurrency);//
+
+router.route('/get-preferredCurrency').get(currencyCtrl.getPreferredCurrency);
 router.route('/getSocialMedia').get(commonCtrl.getSocialMedia);//
 router.route('/getMarketTrend').get(commonCtrl.getMarketTrend)
 router.route('/getCmsData').get(commonCtrl.getCmsData)

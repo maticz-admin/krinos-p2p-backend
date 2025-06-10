@@ -151,7 +151,7 @@ export const updateHideZeroStatus = async (req, res) => {
             { hideZeroStatus: reqBody.hideZeroStatus }, 
             { new: true }
         );
-        return res.status(200).json({ 'success': true, message: "zero balance assets hidden successfully" });
+        return res.status(200).json({ 'success': true, message: "ZERO_BALANCE_HIDDEN" });
     } catch (err) {
         console.log('rrrrrrrrrrrrrrrrrrrrr------------', err);
         return res.status(500).json({ 'success': false });
@@ -1244,12 +1244,13 @@ export const getDepositList = async (req, res) => {
                     arr.push(
                         item.createdAt.toLocaleString(),
                         item.userId,
-                        item.paymentType == 'coin_deposit' ? '-' : elt.toAddress,
+                        item.paymentType == 'coin_deposit' ? '-' : item.toAddress,
                         item.coin,
                         paymentType(item.paymentType),
                         item.amount,
                         item.status,
                     )
+                    console.log('arr-------', arr)
                     csvData.push(arr)
                 }
             }
@@ -1277,7 +1278,7 @@ export const getDepositList = async (req, res) => {
                 pdfData: data,
                 count: count
             }
-            return res.status(200).json({ "success": true, result })
+            return res.status(200).json(encodedata({ "success": true, result }))
         } else {
             let count = await Transaction.countDocuments(filter)
 
@@ -1300,10 +1301,11 @@ export const getDepositList = async (req, res) => {
                 count: count
             }
 
-            return res.status(200).json({ "success": true, result })
+            return res.status(200).json(encodedata({ "success": true, result }))
         }
     } catch (err) {
-        return res.status(500).json({ "success": false, 'message': 'Error on server' })
+        console.log('errerrerr------', err)
+        return res.status(500).json(encodedata({ "success": false, 'message': 'Error on server' }))
     }
 }
 

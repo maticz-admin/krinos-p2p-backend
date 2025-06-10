@@ -6,7 +6,7 @@ export const newsValid = (req, res, next) => {
         errors.email = 'Email field is required'
     }
     if (isEmpty(reqBody.message)) {
-        errors.message = 'content field is required'
+        errors.message = 'Content field is required'
     }
     if (!isEmpty(errors)) {
         return res.status(400).json({ "errors": errors })

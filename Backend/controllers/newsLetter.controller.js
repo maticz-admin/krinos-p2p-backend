@@ -23,9 +23,9 @@ export const newSubscribe = async (req, res) => {
         let reqBody = req.body;
         let checkDoc = await NewsLetter.findOne({ 'email': reqBody.email })
         if (checkDoc) {
-            return res.status(400).json(encodedata({ 'status': false, 'message':  'Email already Subscribed'  }))
+            return res.status(400).json(encodedata({ 'status': false, 'message':  'EMAIL_ALREADY_SUBSCRIBED'  }))
         }else if(reqBody.email==""||reqBody.email==null ||reqBody.email==undefined){
-            return res.status(400).json(encodedata({ 'status': false, 'message':  'Email must not be empty'}))
+            return res.status(400).json(encodedata({ 'status': false, 'message':  'EMAIL_MUST_NOT_BE_EMPTY'}))
         }
         let newDoc = new NewsLetter({
             'email': reqBody.email
@@ -33,7 +33,7 @@ export const newSubscribe = async (req, res) => {
 
         await newDoc.save();
 
-        return res.status(200).json(encodedata({ 'status': true, 'message': 'Newsletter Subscribe Successfully' }))
+        return res.status(200).json(encodedata({ 'status': true, 'message': 'NEWSLETTER_SUBSCRIBED' }))
     } catch (err) {
         return res.status(500).json(encodedata({ 'status': false, 'message': 'Error on server' }))
     }

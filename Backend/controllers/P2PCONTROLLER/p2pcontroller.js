@@ -41,6 +41,8 @@ export const CreateP2Porder = async (req, res) => {
                 // 'description': 'You received one trade request',
                 'title': 'Offer_Created',
                 'description': 'You have successfully created offer',
+                'sptitle': '',
+                'spdescription': 'Has creado la oferta con éxito',
             }
             await newNotification(doc)
 
@@ -141,10 +143,12 @@ export const Filterp2porderhooks = async (req, res) => {
 
 
 const buildFindData = (body) => {
+    console.log("bodtddadfasfdafa" , body);
+    
     const finddata = { offerstatus: "created" };
 
     if (body?.coin) finddata.coin = body.coin;
-    if (body?.prefferedcurrency) finddata.preferedcurrency = body.prefferedcurrency;
+    if (body?.preferedcurrency) finddata.preferedcurrency = body.preferedcurrency;
     if (body?.ordertype) finddata.ordertype = body.ordertype === "Sell" ? "Buy" : "Sell";
     if (body?.amount) {
         finddata.min = { "$lte": parseFloat(body.amount) };
@@ -344,6 +348,8 @@ export const adduserreview = async (req, res) => {
             'userId': checkUser._id,
             'title': 'Review',
             'description': 'You received one review',
+            'sptitle': '',
+            'spdescription': 'Recibiste una reseña',
         }
         await newNotification(doc)
 
@@ -401,6 +407,8 @@ export const createroom = async (req, res) => {
                     'userId': checkUser._id,
                     'title': 'Trade_Request',
                     'description': 'You received one trade request',
+                    'sptitle': '',
+                    'spdescription': 'Recibió una solicitud de intercambio',
                 }
                 await newNotification(doc);
                 var getuser = await User.findOne({ userId: req?.body?.creater });
@@ -596,6 +604,8 @@ export const orderstatus = async (req, res) => {
                 'userId': checkUser._id,
                 'title': 'Trade_Request',
                 'description': 'User have paid your order',
+                'sptitle': 'Trade_Request',
+                'spdescription': 'El usuario ha pagado su pedido',
             }
             await newNotification(doc)
         }
@@ -605,6 +615,8 @@ export const orderstatus = async (req, res) => {
                 'userId': checkUser._id,
                 'title': 'Trade_Request',
                 'description': 'Owner confirm your trade',
+                'sptitle': '',
+                'spdescription': 'Propietario confirma tu comercio',
             }
             await newNotification(doc)
         }
@@ -729,8 +741,8 @@ export const updateuseronlinestatus = async (req, res) => {
 
 export const Getcms = async (req, res) => {
     try {
-        console.log('req?.query?.identifier---', req?.query?.identifier)
-        var result = await Cms.findOne({ identifier: req?.query?.identifier, status: "active" });
+        console.log('req?.query?.identifier---', req?.query)
+        var result = await Cms.findOne({ identifier: req?.query?.identifier, status: "active" , language : req?.query?.lang});
         console.log('result-----', result)
         return res.json(encodedata({
             type: "success",
@@ -747,7 +759,7 @@ export const Getcms = async (req, res) => {
 
 export const Getfaq = async (req, res) => {
     try {
-        var result = await Faq.find({ status: "active" });
+        var result = await Faq.find({ status: "active" ,language : req?.query?.lang});
         return res.json(encodedata({
             type: "success",
             data: result
@@ -798,6 +810,7 @@ export const gettradehistory = async (req, res) => {
         // console.log('req?.query?.userId--req?.query?.userId----', req?.query)
 
         let pagination = paginationQuery(req.query);
+        let search = new RegExp(req?.query?.search?.toUpperCase() , "i");
 
         let count = await Tradehistory.find({
             $or: [
@@ -809,6 +822,7 @@ export const gettradehistory = async (req, res) => {
         var result = await Tradehistory.aggregate([
             {
                 $match: {
+                    orderid : search,
                     $or: [
                         { creater: req?.query?.userId },
                         { spender: req?.query?.userId }
@@ -855,8 +869,9 @@ export const gettradehistory = async (req, res) => {
 export const getspenderhistory = async (req, res) => {
     try {
         let pagination = paginationQuery(req.query);
-        let count = await Orderchat.aggregate([{ $match: { spender: req?.query?.userId } }]);
-        let result = await Orderchat.aggregate([{ $match: { spender: req?.query?.userId } },
+        let search = new RegExp(req?.query?.search , "i")
+        let count = await Orderchat.aggregate([{ $match: { spender: req?.query?.userId ,orderid : search} }]);
+        let result = await Orderchat.aggregate([{ $match: { spender: req?.query?.userId  , orderid : search} },
         {
             $lookup: {
                 from: "p2pcreateOrder",
@@ -967,6 +982,7 @@ const profileStorage = multer.diskStorage({
         cb(null, 'file-' + Date.now() + path.extname(file.originalname));
     }
 });
+
 let profilepicUpload = multer({
     storage: profileStorage,
     fileFilter: imageFilter,

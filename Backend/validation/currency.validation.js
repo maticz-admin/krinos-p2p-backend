@@ -27,7 +27,7 @@ export const addValid = (req, res, next) => {
     }
     if(reqBody?.depositType == "coin_payment"){
         if (isEmpty(reqBody.coinpaymentsymbol)) {
-            errors.coinpaymentsymbol = "Coinpayment Symbol field is required";
+            errors.coinpaymentsymbol = "Coinpayment symbol field is required";
         }
     }
 
@@ -38,13 +38,13 @@ export const addValid = (req, res, next) => {
     }
 
     if (isEmpty(reqFile.image)) {
-        errors.image = "REQUIRED";
+        errors.image = "Required";
     }
 
     if (isEmpty(reqBody.commisionfee)) {
         errors.commisionfee = "Commisionfee field is required";
     } else if (reqBody.commisionfee <= 0) {
-        errors.commisionfee = "Please Enter Valid Commisionfee";
+        errors.commisionfee = "Please enter valid commision fee";
     } else if (!isEmpty(reqBody.commisionfee) && isNaN(reqBody.commisionfee)) {
         errors.commisionfee = "ALLOW_NUMERIC";
     } else if (parseInt(reqBody.commisionfee) < 0) {
@@ -53,9 +53,9 @@ export const addValid = (req, res, next) => {
 
 
     if (isEmpty(reqBody.buyercommisionfee)) {
-        errors.buyercommisionfee = "Buyercommisionfee field is required";
+        errors.buyercommisionfee = "Buyer commisionfee field is required";
     } else if (reqBody.buyercommisionfee <= 0) {
-        errors.buyercommisionfee = "Please Enter Valid Commisionfee";
+        errors.buyercommisionfee = "Please enter valid commision fee";
     } else if (!isEmpty(reqBody.buyercommisionfee) && isNaN(reqBody.buyercommisionfee)) {
         errors.buyercommisionfee = "ALLOW_NUMERIC";
     } else if (parseInt(reqBody.buyercommisionfee) < 0) {
@@ -65,7 +65,7 @@ export const addValid = (req, res, next) => {
     if (isEmpty(reqBody.withdrawFee)) {
         errors.withdrawFee = "Withdrawfee field is required";
     } else if (reqBody.withdrawFee <= 0) {
-        errors.withdrawFee = "Please Enter Valid WithdrawFee";
+        errors.withdrawFee = "Please enter valid withdraw fee";
     } else if (!isEmpty(reqBody.withdrawFee) && isNaN(reqBody.withdrawFee)) {
         errors.withdrawFee = "ALLOW_NUMERIC";
     } else if (parseInt(reqBody.withdrawFee) < 0) {
@@ -76,7 +76,7 @@ export const addValid = (req, res, next) => {
     if (isEmpty(reqBody.minimumWithdraw)) {
         errors.minimumWithdraw = "Minimum withdraw field is required";
     } else if (reqBody.minimumWithdraw <= 0) {
-        errors.minimumWithdraw = "Please Enter Valid MinimumWithdraw";
+        errors.minimumWithdraw = "Please enter valid minimum withdraw";
     } else if (!isEmpty(reqBody.minimumWithdraw) && isNaN(reqBody.minimumWithdraw)) {
         errors.minimumWithdraw = "ALLOW_NUMERIC";
     } else if (parseInt(reqBody.minimumWithdraw) < 0) {
@@ -84,25 +84,25 @@ export const addValid = (req, res, next) => {
     }
 
     if (isEmpty(reqBody.depositStatus)) {
-        errors.depositStatus = "REQUIRED";
+        errors.depositStatus = "Required";
     } else if (!['On', 'Off'].includes(reqBody.depositStatus)) {
         errors.depositStatus = "INVALID_TYPE";
     }
 
     if (isEmpty(reqBody.withdrawStatus)) {
-        errors.withdrawStatus = "REQUIRED";
+        errors.withdrawStatus = "Required";
     } else if (!['On', 'Off'].includes(reqBody.withdrawStatus)) {
         errors.withdrawStatus = "INVALID_TYPE";
     }
 
     if (isEmpty(reqBody.type)) {
-        errors.type = "REQUIRED";
+        errors.type = "Required";
     } else if (!['crypto', 'token', 'fiat','preferedcurrency'].includes(reqBody.type)) {
         errors.type = "INVALID_TYPE";
     }
 
     if (isEmpty(reqBody.depositType)) {
-        errors.depositType = "REQUIRED";
+        errors.depositType = "Required";
     } else if (!['local', 'coin_payment', 'binance', 'bitgo'].includes(reqBody.depositType)) {
         errors.depositType = "INVALID_TYPE";
     }
@@ -126,14 +126,14 @@ export const addValid = (req, res, next) => {
     }
     if (reqBody.type == 'token') {
         if (isEmpty(reqBody.contractAddress)) {
-            errors.contractAddress = "REQUIRED";
+            errors.contractAddress = "Required";
         }
         if (isEmpty(reqBody.minABI)) {
             errors.minABI = "Min ABI field is required";
         }
         
         if (isEmpty(reqBody.tokenType)) {
-            errors.tokenType = "REQUIRED";
+            errors.tokenType = "Required";
         } else if (!['erc20', 'trc20', 'bep20'].includes(reqBody.tokenType)) {
             errors.tokenType = "INVALID_TYPE";
         }
@@ -341,6 +341,85 @@ export const editValid = (req, res, next) => {
         if (isEmpty(reqBody.country)) {
             errors.country = "Country field is required";
         }
+    }
+
+    if (!isEmpty(errors)) {
+        return res.status(400).json(encodedata({ "errors": errors }))
+    }
+
+    return next();
+}
+
+
+/** 
+* Add Currency
+* URL : /adminapi/currency
+* METHOD : POST
+* BODY : name, symbol, coin, image, contractAddress, minABI, contractDecimal, decimal, tokenType, bankName, accountNo, holderName, bankcode, country, withdrawFee, minimumWithdraw, depositType, fundLimit, fundFee, fundInterval
+*/
+export const addPreferredValid = (req, res, next) => {
+    let errors = {}, reqBody = req.body, reqFile = req.files;
+    console.log('errors-----', errors, reqBody, reqFile)
+    // return false;
+    const regex = new RegExp(/[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/);
+    
+    if (isEmpty(reqBody.coin)) {
+        errors.coin = "Coin field is required";
+    }
+    if (isEmpty(reqBody.symbol)) {
+        errors.symbol = "Symbol field is required";
+    }
+    
+
+    if (isEmpty(reqFile.image)) {
+        errors.image = "Required";
+    }
+
+    
+    console.log('errors------', errors)
+    if (!isEmpty(errors)) {
+        return res.status(400).json(encodedata({ "errors": errors }))
+    }
+
+    return next();
+}
+
+/** 
+* Update Currency
+* URL : /adminapi/currency
+* METHOD : PUT
+* BODY : currencyId, name, symbol, coin, image, contractAddress, minABI, contractDecimal, decimal, tokenType, bankName, accountNo, holderName, bankcode, country, withdrawFee, minimumWithdraw, depositType, status, fundLimit, fundFee, fundInterval
+*/
+export const editPreferreValid = (req, res, next) => {
+    let errors = {}, reqBody = req.body, reqFile = req.files;
+    const regex = new RegExp(/[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/);
+
+    if (isEmpty(reqBody.currencyId)) {
+        errors.currencyId = "CurrencyId field is required";
+    } else if (!(mongoose.Types.ObjectId.isValid(reqBody.currencyId))) {
+        errors.currencyId = "CurrencyId is invalid";
+    }
+
+
+    if (isEmpty(reqBody.coin)) {
+        errors.coin = "Coin field is required";
+    }
+
+    if (isEmpty(reqBody.symbol)) {
+        errors.symbol = "Symbol field is required";
+    }
+
+    
+
+
+   
+
+    
+
+    if (isEmpty(reqBody.status)) {
+        errors.status = "Invalid";
+    } else if (!['active', 'Inactive'].includes(reqBody.status)) {
+        errors.status = "Invalid";
     }
 
     if (!isEmpty(errors)) {

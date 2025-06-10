@@ -79,13 +79,14 @@ export const Getuserp2pviewoffer = async (req, res) => {
         // return false
         let pagination = paginationQuery(req.query);
         let userId = req?.query?.userId;
+        let search = new RegExp(req?.query?.search , "i")
         
         // Use .countDocuments() instead of .count()
-        let count = await Orderchat.find({ ordercreator: userId }).countDocuments(); 
+        let count = await Orderchat.find({ ordercreator: userId , orderid : search}).countDocuments(); 
 
         let result = [];
 
-        result = await Orderchat.aggregate([{ $match: { ordercreator: userId } }])
+        result = await Orderchat.aggregate([{ $match: { ordercreator: userId  , orderid : search} }])
             .sort({ createdAt: -1 })
             .skip(parseInt(pagination.skip))
             .limit(parseInt(pagination.limit));

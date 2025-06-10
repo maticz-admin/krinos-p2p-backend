@@ -2526,6 +2526,7 @@ export const disputeTrade = async (req, res) => {
 
                 let newNotification = new Notification({
                     description: description,
+                    spdescription : "Su operación fue disputada",
                     userId: Sender_userId,
                     uri: "p2pchat",
                     ObjectId: orderbookdata._id,

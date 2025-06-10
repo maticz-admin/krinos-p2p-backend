@@ -57,7 +57,8 @@ export const sendmessage = async(roomid , message , file) => {
             roomid : roomid,
             title : "Received Message",
             description : `You have one messsage from ${anotheruserdata?.firstName + " " + anotheruserdata?.lastName} !`,
-            
+            sptitle : "Received Message",
+            spdescription : `Tienes un mensaje de ${anotheruserdata?.firstName + " " + anotheruserdata?.lastName} !`,
         }
         await Newmessagenotification(notify);
         var result = await Orderchat.findOneAndUpdate(finddata , updatedata , {new : true});
@@ -112,7 +113,6 @@ export const Newmessagenotification = async(datas)=>{
 
 const FetchUnReadmessage = async (id) => {
     try {
-
         let NoticeData = await MessageNotification.find({ userId: id}).sort({ createdAt: -1 }); //select({ 'description': 1, 'createdAt': 1 })
         if (!isEmpty(NoticeData)) {
             return NoticeData

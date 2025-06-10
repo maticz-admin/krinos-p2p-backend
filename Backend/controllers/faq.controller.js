@@ -142,14 +142,14 @@ export const getFaqCategory = async (req, res) => {
 */
 export const addFaq = async (req, res) => {
     try {
-        console.log('req.body------', req.body)
+        
         let reqBody = req.body;
         let errors = {}
         if (reqBody.categoryId == '') {
             errors['categoryId'] = 'Category field is required'
         }
         if (reqBody.question == '') {
-            errors['question'] = 'question field is required'
+            errors['question'] = 'Question field is required'
         }
         if (reqBody.answer == '') {
             errors['answer'] = 'Answer field is required'
@@ -164,7 +164,8 @@ export const addFaq = async (req, res) => {
         let newDoc = new Faq({
             'categoryId': reqBody.categoryId,
             'question': reqBody.question,
-            'answer': reqBody.answer
+            'answer': reqBody.answer,
+            "language" : reqBody?.language
         })
         await newDoc.save();
         // console.log('newDoc----', newDoc )
@@ -194,7 +195,8 @@ export const updateFaq = async (req, res) => {
                 "categoryId": reqBody.categoryId,
                 "question": reqBody.question,
                 "answer": reqBody.answer,
-                "status": reqBody.status
+                "status": reqBody.status,
+                "language" : reqBody?.language
             }
         })
 

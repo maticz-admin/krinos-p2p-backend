@@ -20,6 +20,14 @@ const messagenotificationschema = new Schema({
         type: String,
         default: 0
     },
+    sptitle : {
+        type : String,
+        default : ""
+    },
+    spdescription : {
+        type : String,
+        default : ""
+    },
     isRead: {
         type: Boolean,
         default: false

@@ -99,6 +99,7 @@ export const updateCms = async (req, res) => {
         checkCmsData.image = image;
         checkCmsData.title = reqBody.title;
         checkCmsData.content = reqBody.content;
+        checkCmsData.language = reqBody?.language
         await checkCmsData.save();
         return res.status(200).json({ 'status': true, 'message': 'Cms updated successfully' });
     } catch (err) {

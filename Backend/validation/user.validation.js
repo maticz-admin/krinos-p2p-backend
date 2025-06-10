@@ -151,6 +151,8 @@ export const confirmMailValidate = (req, res, next) => {
  * BODY : firstName,lastName,blockNo,address,country,state,city,postalCode
 */
 export const editProfileValidate = (req, res, next) => {
+    console.log("edit profile validate " , req?.body);
+    
     let
         errors = {},
         reqBody = req.body;
@@ -509,9 +511,9 @@ export const newPhoneValidate = (req, res, next) => {
     }
 
     if (isEmpty(reqBody.newPhoneNo)) {
-        errors.newPhoneNo = "Phone number field is required";
+        errors.newPhoneNo = "PHONE_FIELD_REQUIRED";
     } else if (!(mobileRegex.test(reqBody.newPhoneNo))) {
-        errors.newPhoneNo = "Phone number is invalid";
+        errors.newPhoneNo = "PHONE_INVALID";
     }
 
     if (!isEmpty(errors)) {

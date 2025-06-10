@@ -1280,6 +1280,6 @@ export const usrDeposit = async () => {
 //   }
 
 // Initial Function Call
-getSpotPair();
-spotOrderBookWS();
-spotTickerPriceWS();
+// getSpotPair();
+// spotOrderBookWS();
+// spotTickerPriceWS();

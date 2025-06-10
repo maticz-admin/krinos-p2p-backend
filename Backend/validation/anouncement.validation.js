@@ -17,7 +17,7 @@ export const anouncementAdd = (req, res, next) => {
         errors.endDate = "endDate field is required";
     }
     if (isEmpty(reqBody.content)) {
-        errors.content = "content field is required";
+        errors.content = "Content field is required";
     }else if(reqBody.content.length>=150) {
         errors.content = "Only Allow 150 charactors";
 

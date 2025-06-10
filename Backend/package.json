@@ -19,7 +19,7 @@
     "binance-api-node": "^0.10.6",
     "bitcoin-address-validation": "^2.1.1",
     "bitcore-lib": "^10.8.10",
-    "bitgo": "^42.0.0",
+    "bitgo": "^46.0.1",
     "body-parser": "^1.19.0",
     "bybit": "^1.0.5",
     "cloudinary": "^1.26.3",

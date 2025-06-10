@@ -16,8 +16,16 @@ import { encodedata } from '../lib/cryptoJS';
 */
 export const newNotification = async (doc) => {
     try {
+        // let endoc = doc;
+        // let spdoc = doc;
+        // endoc.language = "en";
+        // spdoc.language = "sp";
         let newDoc = new Notification(doc)
+        // let newDocen = new Notification(endoc);
+        // let newDocsp = new Notification(spdoc);
         await newDoc.save();
+        await newDocen.save();
+        await newDocsp.save();
         let data = await FetchUnReadNotice(newDoc.userId)
         socketEmitOne('notice', data, newDoc.userId)
         return true
@@ -64,7 +72,7 @@ export const getNotification = async (req, res) => {
 
 const FetchUnReadNotice = async (id) => {
     try {
-        let NoticeData = await Notification.find({ userId: id, isRead: false }).select({ 'description': 1, 'createdAt': 1 }).sort({ createdAt: -1 })
+        let NoticeData = await Notification.find({ userId: id, isRead: false }).select({ 'description': 1,'spdescription': 1, 'createdAt': 1 }).sort({ createdAt: -1 })
         if (!isEmpty(NoticeData)) {
             return NoticeData
         } else {

@@ -23,7 +23,7 @@ export const addTemplateValidate = (req, res, next) => {
     }
 
     if (isEmpty(reqBody.content)) {
-        errors.content = "content field is required";
+        errors.content = "Content field is required";
     }
 
     if (isEmpty(reqBody.langCode)) {
@@ -60,7 +60,7 @@ export const editTemplateValidate = (req, res, next) => {
     }
 
     if ((isEmpty(reqBody.content)) || (reqBody.content == '<p><br />\n&nbsp;</p>\n')) {
-        errors.content = "content field is required";
+        errors.content = "Content field is required";
     }
 
     // if (isEmpty(reqBody.langCode)) {

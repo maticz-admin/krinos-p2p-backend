@@ -67,7 +67,7 @@ router.route('/bankdetail')
     .patch(apiKeyCtrl.authorization, userValid.deleteBankValidate, userCtrl.setPrimaryBank)
     .get(apiKeyCtrl.authorization, userCtrl.getBankDetail);
 router.route('/userSetting')
-    .get(decodedata, apiKeyCtrl.authorization, userCtrl.getUserSetting)//
+    .get(apiKeyCtrl.authorization, userCtrl.getUserSetting)//
     .put(decodedata, apiKeyCtrl.authorization, userValid.editSettingValid, userCtrl.editUserSetting);
 router.route('/editNotif').put(apiKeyCtrl.authorization, userValid.editNotifValid, userCtrl.editNotif)
 router.route('/forgotPassword').post(decodedata, userValid.checkForgotPwdValidate, userCtrl.checkForgotPassword);
@@ -160,6 +160,8 @@ router.route('/key/manage/:keyId?')
 // Common
 router.route('/getLanguage').get(languageCtrl.getLanguage);//
 router.route('/getCurrency').get(currencyCtrl.getCurrency);//
+
+router.route('/get-preferredCurrency').get(currencyCtrl.getPreferredCurrency);
 router.route('/getSocialMedia').get(commonCtrl.getSocialMedia);//
 router.route('/getMarketTrend').get(commonCtrl.getMarketTrend)
 router.route('/getCmsData').get(commonCtrl.getCmsData)

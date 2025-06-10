@@ -51,7 +51,6 @@ export const hget = async (key, uniqueId) => {
 //         resolve(null);
 //     }
 // })
-
 // client.set("foo", "bar")
 
 // client.get("foo", function(err, reply) {

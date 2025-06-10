@@ -151,17 +151,17 @@ export const editSupportCategory = async (req, res) => {
  * METHOD : GET
 */
 export const getSupportCategory = async (req, res) => {
-    try{
-    let filter = filterSearchQuery(req.query, ['categoryName'])
-    const categoryData = await SupportCategory.find(filter, { 'categoryName': 1, 'status': 1 })
-    if(categoryData){
-        return res.status(200).json(encodedata({ "success": true, 'result': { 'data': categoryData } }))
-    }else{
+    try {
+        let filter = filterSearchQuery(req.query, ['categoryName'])
+        const categoryData = await SupportCategory.find(filter, { 'categoryName': 1, 'status': 1 })
+        if (categoryData) {
+            return res.status(200).json(encodedata({ "success": true, 'result': { 'data': categoryData } }))
+        } else {
+            return res.status(500).json(encodedata({ "success": false, 'errors': { 'messages': "Error on server" } }))
+        }
+    } catch (e) {
         return res.status(500).json(encodedata({ "success": false, 'errors': { 'messages': "Error on server" } }))
     }
-}catch(e){
-    return res.status(500).json(encodedata({ "success": false, 'errors': { 'messages': "Error on server" } }))
-}
     // SupportCategory.find(filter, { 'categoryName': 1, 'status': 1 }, (err, categoryData) => {
     //     if (err) {
     //         return res.status(500).json({ "success": false, 'errors': { 'messages': "Error on server" } })
@@ -176,16 +176,16 @@ export const getSupportCategory = async (req, res) => {
  * METHOD : GET
 */
 export const getSptCat = async (req, res) => {
-    try{
-    const categoryData = await SupportCategory.find({ "status": "active" }, { 'categoryName': 1 })
-    if(categoryData){
-        return res.status(200).json({ "success": true, 'result': categoryData })
-    }else{
+    try {
+        const categoryData = await SupportCategory.find({ "status": "active" }, { 'categoryName': 1 })
+        if (categoryData) {
+            return res.status(200).json({ "success": true, 'result': categoryData })
+        } else {
+            return res.status(500).json({ "success": false, 'errors': { 'messages': "Error on server" } })
+        }
+    } catch (e) {
         return res.status(500).json({ "success": false, 'errors': { 'messages': "Error on server" } })
     }
-}catch(e){
-    return res.status(500).json({ "success": false, 'errors': { 'messages': "Error on server" } })
-}
     // SupportCategory.find({ "status": "active" }, { 'categoryName': 1 }, (err, categoryData) => {
     //     if (err) {
     //         return res.status(500).json({ "success": false, 'errors': { 'messages': "Error on server" } })
@@ -201,18 +201,18 @@ export const getSptCat = async (req, res) => {
  * PARAMS : categoryId
 */
 export const getSingleSupportCategory = async (req, res) => {
-    try{
-    const Supportcat = await SupportCategory.findOne({ '_id': req.params.categoryId }, { 'categoryName': 1 })
-    if(Supportcat){
+    try {
+        const Supportcat = await SupportCategory.findOne({ '_id': req.params.categoryId }, { 'categoryName': 1 })
+        if (Supportcat) {
 
             return res.status(200).json({ "success": true, 'result': Supportcat })
+        }
+        else {
+            return res.status(500).json({ "success": false, 'errors': { 'messages': "Error on server" } })
+        }
+    } catch (err) {
+        return res.status(500).json({ "success": false, 'errors': { 'messages': "Error on server" } })
     }
-    else{
-        return res.status(500).json({ "success": false, 'errors': { 'messages': "Error on server" } }) 
-    }
-}catch(err){
-    return res.status(500).json({ "success": false, 'errors': { 'messages': "Error on server" } })
-}
 }
 
 /** 
@@ -236,7 +236,7 @@ export const createNewTicket = async (req, res) => {
             'ursUiqueId': ckeckUser.userId,
             'adminId': adminDetail._id,
             'categoryId': reqBody.categoryId,
-            'roomid' : reqBody?.roomid,
+            'roomid': reqBody?.roomid,
             'reply': [{
                 'senderId': req.user.id,
                 'receiverId': adminDetail._id,
@@ -272,9 +272,11 @@ export const createNewTicket = async (req, res) => {
             'userId': req.user.id,
             'title': 'Support Ticket',
             'description': 'Your Ticket Raised Successfully',
+            'sptitle': 'Support Ticket',
+            'spdescription': 'Your Ticket Raised Successfully',
         }
         newNotification(doc)
-        return res.status(200).json(encodedata({ 'success': true, "message": "Ticket raised successfully" }))
+        return res.status(200).json(encodedata({ 'success': true, "message": "TICKET_RAISED_SUCCESSFULLY" }))
     } catch (err) {
         console.log('errrrrr', err)
         return res.status(500).json(encodedata({ 'success': false, "message": "Error on server" }))
@@ -300,7 +302,7 @@ export const userTicketList = async (req, res) => {
                 "_id": 1,
                 "name": 1
             })
-            console.log('userDatauserDatauserData----',adminData, userData)
+            console.log('userDatauserDatauserData----', adminData, userData)
 
             if (adminData) {
                 let tickerData = await SupportTicket.aggregate([
@@ -335,7 +337,7 @@ export const userTicketList = async (req, res) => {
                         'sender': userData,
                         'receiver': adminData
                     }
-                console.log('resultresult-----',  tickerData, userData, adminData)
+                    console.log('resultresult-----', tickerData, userData, adminData)
 
                     return res.status(200).json(encodedata({ 'success': true, result }))
                 }
@@ -358,33 +360,33 @@ export const userTicketList = async (req, res) => {
 export const usrReplyMsg = async (req, res) => {
     let reqBody = req.body;
     let reqFile = req.files;
-    try{
-   const ticketData = await SupportTicket.findOneAndUpdate(
-        {
-            "_id": reqBody.ticketId,
-            "userId": req.user.id,
-            "adminId": reqBody.receiverId,
-        },
-        {
-            "$push": {
-                "reply": {
-                    'senderId': req.user.id,
-                    'receiverId': reqBody.receiverId,
-                    "message": reqBody.message,
-                    'attachment': reqFile && reqFile.attachment ? reqFile.attachment[0].filename : "",
+    try {
+        const ticketData = await SupportTicket.findOneAndUpdate(
+            {
+                "_id": reqBody.ticketId,
+                "userId": req.user.id,
+                "adminId": reqBody.receiverId,
+            },
+            {
+                "$push": {
+                    "reply": {
+                        'senderId': req.user.id,
+                        'receiverId': reqBody.receiverId,
+                        "message": reqBody.message,
+                        'attachment': reqFile && reqFile.attachment ? reqFile.attachment[0].filename : "",
+                    }
                 }
-            }
-        },
-        { "new": true })
-            if (ticketData) {
-                return res.status(200).json({ 'success': true, "message": 'Successfully reply the message', 'result': ticketData.reply.reverse() })
-            } else {
-                return res.status(400).json({ 'success': false, "message": "No records" })
-            }
-        }catch(err){
-            return res.status(500).json({ 'success': false, "message": "Something went wrong" })
+            },
+            { "new": true })
+        if (ticketData) {
+            return res.status(200).json({ 'success': true, "message": 'Successfully reply the message', 'result': ticketData.reply.reverse() })
+        } else {
+            return res.status(400).json({ 'success': false, "message": "No records" })
         }
-          
+    } catch (err) {
+        return res.status(500).json({ 'success': false, "message": "Something went wrong" })
+    }
+
 }
 
 /** 
@@ -393,10 +395,10 @@ export const usrReplyMsg = async (req, res) => {
  * METHOD : PATCH
  * BODY: ticketId
 */
-export const closeTicket = async (req, res)=> {
+export const closeTicket = async (req, res) => {
     try {
-        const {ticketId} = req.body;
-        const {id} = req.user;
+        const { ticketId } = req.body;
+        const { id } = req.user;
         const ticketData = await TicketSupport.findOneAndUpdate(
             {
                 "_id": ticketId,
@@ -411,12 +413,12 @@ export const closeTicket = async (req, res)=> {
                 "new": true
             }
         );
-            // console.log('ticketData----', ticketData)
+        // console.log('ticketData----', ticketData)
         if (!ticketData) {
             return res.status(400).json(encodedata({ 'success': false, 'message': "NO_DATA" }));
         }
 
-        return res.status(200).json(encodedata({ 'success': true, 'message': "Ticket closed successfully", 'result': ticketData }));
+        return res.status(200).json(encodedata({ 'success': true, 'message': "TICKET_CLOSED_SUCCESSFULLY", 'result': ticketData }));
     } catch (err) {
         console.log('err-----', err)
         return res.status(500).json(encodedata({ 'success': false, 'message': "SOMETHING_WRONG" }));
@@ -433,8 +435,10 @@ export const closeTicket = async (req, res)=> {
 */
 export const getTicketMessage = async (req, res) => {
     let reqQuery = req.query;
-    try{
-        const ticketData = await  TicketSupport.aggregate([
+    try {
+
+
+        const ticketData = await TicketSupport.aggregate([
             {
                 "$match": {
                     "tickerId": reqQuery.ticketId,
@@ -470,17 +474,17 @@ export const getTicketMessage = async (req, res) => {
                     "status": 1
                 }
             }
-    
-        ])
 
-        if(ticketData && ticketData.length > 0){
-            return res.status(200).json({ 'success': true, 'result': ticketData[0] })
-        }else{
-            return res.status(400).json({ 'success': false, "message": "NO_DATA" }) 
+        ]);
+
+        if (ticketData && ticketData.length > 0) {
+            return res.status(200).json(encodedata({ 'success': true, 'result': ticketData[0] }))
+        } else {
+            return res.status(400).json(encodedata({ 'success': false, "message": "NO_DATA" }))
         }
-}catch(e){
-    return res.status(500).json({ 'success': false, "message": "Error on server" })
-}
+    } catch (e) {
+        return res.status(500).json(encodedata({ 'success': false, "message": "Error on server" }))
+    }
 }
 
 /** 
@@ -490,14 +494,15 @@ export const getTicketMessage = async (req, res) => {
  * BODY : ticketId, receiverId, message
 */
 export const replyMessage = async (req, res) => {
-    const { ticketId, receiverId, message } = req.body;
+    const { tickerId, receiverId, message } = req.body;
     const adminId = req.user.id;
-    console.log('reqBody---', ticketId, message, adminId, receiverId);
+    console.log('reqBody---', tickerId
+        , message, adminId, receiverId);
 
     try {
         const ticketData = await SupportTicket.findOneAndUpdate(
             {
-                ticketId,
+                tickerId,
                 userId: receiverId,
                 adminId
             },
@@ -512,18 +517,18 @@ export const replyMessage = async (req, res) => {
             },
             { new: true }
         );
-            console.log('ticketData-----', ticketData)
+        console.log('ticketData-----', ticketData)
         if (!ticketData) {
-            return res.status(400).json({ success: false, message: "No record found" });
+            return res.status(400).json(encodedata({ success: false, message: "No record found" }));
         }
 
         const userData = await User.findOne({ _id: receiverId });
         if (!userData) {
-            return res.status(404).json({ success: false, message: "No user data found" });
+            return res.status(404).json(encodedata({ success: false, message: "No user data found" }));
         }
 
         const content = {
-            ticketId,
+            tickerId,
             message,
             date: new Date().toUTCString()
         };
@@ -557,9 +562,25 @@ export const replyMessage = async (req, res) => {
 */
 export const getTicketList = async (req, res) => {
     try {
+        console.log('getTicketList----------', req.query)
         let pagination = paginationQuery(req.query);
         let Export = req.query.export
         const header = ["Ticket ID", "Category Name", "status", "Date"]
+
+        let matchQuery = {};
+        const search = req.query.search?.trim();
+
+        if (search) {
+            matchQuery = {
+                $or: [
+                    { tickerId: { $regex: search, $options: "i" } },
+                    { status: { $regex: search, $options: "i" } },
+                    { email: { $regex: search, $options: "i" } },
+                    { userId: { $regex: search, $options: "i" } },
+                    // If you're searching by user name or category name, you'll need to match after $lookup + $unwind
+                ]
+            };
+        }
 
 
         let count = await TicketSupport.aggregate([
@@ -600,8 +621,8 @@ export const getTicketList = async (req, res) => {
                     "adminId": 1,
                     'status': 1,
                     'createdAt': 1,
-                    'roomid' : 1,
-                    "email" : 1
+                    'roomid': 1,
+                    "email": 1
                 }
             }
         ])
@@ -647,8 +668,8 @@ export const getTicketList = async (req, res) => {
                         'ursUiqueId': 1,
                         'createdAt': 1,
                         'reply': 1,
-                        'roomid' : 1,
-                        "email" : 1
+                        'roomid': 1,
+                        "email": 1
                     }
                 },
                 // { "$skip": pagination.skip },
@@ -714,8 +735,8 @@ export const getTicketList = async (req, res) => {
                         'ursUiqueId': 1,
                         'createdAt': 1,
                         'reply': 1,
-                        'roomid' : 1,
-                        "email" : "$userInfo.email"
+                        'roomid': 1,
+                        "email": "$userInfo.email"
                     }
                 },
                 // { "$skip": pagination.skip },
@@ -728,13 +749,8 @@ export const getTicketList = async (req, res) => {
             return res.status(200).json(encodedata({ "success": true, 'result': respData }))
         } else {
             let data = await TicketSupport.aggregate([
-                {
-                    "$sort": {
-                        "createdAt": -1
-                    }
-                },
-
-
+                { "$sort": { "createdAt": -1 } },
+            
                 {
                     "$lookup": {
                         "from": 'supportcategory',
@@ -744,7 +760,7 @@ export const getTicketList = async (req, res) => {
                     }
                 },
                 { "$unwind": "$categoryInfo" },
-
+            
                 {
                     "$lookup": {
                         "from": 'user',
@@ -754,8 +770,19 @@ export const getTicketList = async (req, res) => {
                     }
                 },
                 { "$unwind": "$userInfo" },
-
-
+            
+                ...(search ? [{
+                    $match: {
+                        $or: [
+                            { tickerId: { $regex: search, $options: "i" } },
+                            { status: { $regex: search, $options: "i" } },
+                            { "userInfo.email": { $regex: search, $options: "i" } },
+                            { "userInfo.firstName": { $regex: search, $options: "i" } },
+                            { "categoryInfo.categoryName": { $regex: search, $options: "i" } },
+                        ]
+                    }
+                }] : []),
+            
                 {
                     "$project": {
                         '_id': 1,
@@ -768,13 +795,15 @@ export const getTicketList = async (req, res) => {
                         'status': 1,
                         'createdAt': 1,
                         'reply': 1,
-                        'roomid' : 1,
-                        "email" : "$userInfo.email"
+                        'roomid': 1,
+                        "email": "$userInfo.email"
                     }
                 },
                 { "$skip": pagination.skip },
                 { "$limit": pagination.limit },
-            ])
+            ]);
+            
+
             let respData = {
                 count: count.length,
                 data
@@ -784,6 +813,7 @@ export const getTicketList = async (req, res) => {
 
 
     } catch (err) {
+        console.log('errrrrrrrrrrrrrrrrrrrrrr-------', err)
         return res.status(500).json(encodedata({ "success": false, 'errors': { 'messages': 'Error on server' } }))
     }
 }
@@ -794,7 +824,7 @@ export const getTicketList = async (req, res) => {
  * METHOD : POST
 */
 export const ticketList = async (req, res) => {
-    try{
+    try {
         const data = await TicketSupport.aggregate([
             { '$match': { '_id': ObjectId(req.params.ticketId) } },
             {
@@ -807,7 +837,7 @@ export const ticketList = async (req, res) => {
                 }
             },
             { "$unwind": "$categoryInfo" },
-    
+
             {
                 "$lookup": {
                     "from": 'user',
@@ -817,7 +847,7 @@ export const ticketList = async (req, res) => {
                 }
             },
             { "$unwind": "$userInfo" },
-    
+
             {
                 "$lookup": {
                     "from": 'admins',
@@ -827,7 +857,7 @@ export const ticketList = async (req, res) => {
                 }
             },
             { "$unwind": "$adminInfo" },
-    
+
             {
                 "$project": {
                     '_id': 1,
@@ -843,10 +873,10 @@ export const ticketList = async (req, res) => {
         ])
         if (data.length <= 0) {
             return res.status(400).json({ 'success': false, 'errors': { "messages": "No chart" } })
-        }else{
-        return res.status(200).json({ 'success': true, 'result': data[0] })
+        } else {
+            return res.status(200).json({ 'success': true, 'result': data[0] })
         }
-}catch(e){
-    return res.status(500).json({ 'success': false, 'errors': { "messages": "Error on server" } })
-}
+    } catch (e) {
+        return res.status(500).json({ 'success': false, 'errors': { "messages": "Error on server" } })
+    }
 }

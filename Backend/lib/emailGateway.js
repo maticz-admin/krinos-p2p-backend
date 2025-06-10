@@ -37,22 +37,22 @@ import { log } from 'async';
 
   // else if (Type.mailType == 'nodeMailer') {
   //     const { subject, template } = content;
-  export const sendEmail = async (to, content) => {
-    try{
-      const { subject, template } = content;
-       let transporter = nodemailer.createTransport(smtpConfig.nodemailer);
-      let info = await transporter.sendMail({
-           from: smtpConfig.fromMail,
-           to,
-           subject,
-           html: template
-       });
-       console.log("info",info);
-    }
-    catch(E){
-      console.log("Error in send Mail",E);
-    }
-   }
+export const sendEmail = async (to, content) => {
+  try {
+    const { subject, template } = content;
+    let transporter = nodemailer.createTransport(smtpConfig.nodemailer);
+    let info = await transporter.sendMail({
+      from: smtpConfig.fromMail,
+      to,
+      subject,
+      html: template
+    });
+    console.log("info", info);
+  }
+  catch (E) {
+    console.log("Error in send Mail", E);
+  }
+}
 
 //export const sendEmail = async (to, content) => {
 //    const { subject, template } = content;

@@ -302,7 +302,7 @@ export const changePwdValidate = (req, res, next) => {
         errors.password = "PASSWORD_REQUIRED";
     } 
     else if (!(passwordRegex.test(reqBody.password))) {
-        errors.password = "invalid password";
+        errors.password = "Invalid password";
     }
 
     if (isEmpty(reqBody.confirmPassword)) {
@@ -310,7 +310,7 @@ export const changePwdValidate = (req, res, next) => {
     } else if (!isEmpty(reqBody.password) && !isEmpty(reqBody.confirmPassword) && reqBody.password != reqBody.confirmPassword) {
         errors.confirmPassword = "CONFIRM_PASSWORD_MISMATCH";
     } else if (!(passwordRegex.test(reqBody.confirmPassword))) {
-        errors.confirmPassword = "invalid password";
+        errors.confirmPassword = "Invalid password";
     }
 
     if (!isEmpty(errors)) {

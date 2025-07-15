@@ -39,6 +39,7 @@ import { log } from 'async';
   //     const { subject, template } = content;
 export const sendEmail = async (to, content) => {
   try {
+    console.log('mailContentmailContent',content?.template)
     const { subject, template } = content;
     let transporter = nodemailer.createTransport(smtpConfig.nodemailer);
     let info = await transporter.sendMail({

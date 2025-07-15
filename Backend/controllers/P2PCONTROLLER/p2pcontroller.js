@@ -304,6 +304,20 @@ export const canceltrade = async (req, res) => {
         const result = await Orderchat.findByIdAndUpdate({ _id: req?.body?.id },
             { $set: { chatstatus: "Inactive", orderendtime: text } }, { new: true });
         updatelastseen(req?.body?.userid);
+        console.log('resultresult',result)
+        if(result){
+            let orderdetail = await p2pcreateOrder.findOne({ orderid: result?.orderid });
+            let creater = orderdetail?.ordertype == "Sell" ? result?.spender : result?.ordercreator;
+            var checkUser = await User.findOne({ userId: creater })
+            let doc = {
+                'userId': checkUser._id,
+                'title': 'Offer_Cancelled',
+                'description': 'Your offer cancelled',
+                'sptitle': '',
+                'spdescription': 'Tu oferta cancelada',
+            }
+            await newNotification(doc)
+        }
         socketEmit("CANCEL_TRADE", [], req?.body?.roomid)
         return res.json({
             type: "success",
@@ -311,6 +325,7 @@ export const canceltrade = async (req, res) => {
         })
     }
     catch (e) {
+        console.log('canceltrade_error',e)
         return res.json({
             type: "failed",
             message: "Error found"

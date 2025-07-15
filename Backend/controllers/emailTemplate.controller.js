@@ -348,6 +348,7 @@ export const mailTemplate = async (identifier, toEmail, content, langCode = '') 
                .replace("##RESPONSE##", content.message);
                break;             
         }
+        console.log('hiiiiii');
         sendEmail(toEmail, mailContent)
         return true
         // return res.status(200).json({ "success": true, 'messages': "Mail sent successfully" })

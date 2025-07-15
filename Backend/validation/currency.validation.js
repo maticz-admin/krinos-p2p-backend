@@ -33,7 +33,7 @@ export const addValid = (req, res, next) => {
 
     if(reqBody?.depositType == "bitgo"){
         if (isEmpty(reqBody.bitgosymbol)) {
-            errors.bitgosymbol = "Bitgo Symbol field is required";
+            errors.bitgosymbol = "Bitgo symbol field is required";
         }
     }
 
@@ -42,10 +42,12 @@ export const addValid = (req, res, next) => {
     }
 
     if (isEmpty(reqBody.commisionfee)) {
-        errors.commisionfee = "Commisionfee field is required";
-    } else if (reqBody.commisionfee <= 0) {
-        errors.commisionfee = "Please enter valid commision fee";
-    } else if (!isEmpty(reqBody.commisionfee) && isNaN(reqBody.commisionfee)) {
+        errors.commisionfee = "Seller commisionfee field is required";
+    } 
+    // else if (reqBody.commisionfee <= 0) {
+    //     errors.commisionfee = "Please enter valid seller commisionfee";
+    // } 
+    else if (!isEmpty(reqBody.commisionfee) && isNaN(reqBody.commisionfee)) {
         errors.commisionfee = "ALLOW_NUMERIC";
     } else if (parseInt(reqBody.commisionfee) < 0) {
         errors.commisionfee = "Invalid value";
@@ -54,9 +56,11 @@ export const addValid = (req, res, next) => {
 
     if (isEmpty(reqBody.buyercommisionfee)) {
         errors.buyercommisionfee = "Buyer commisionfee field is required";
-    } else if (reqBody.buyercommisionfee <= 0) {
-        errors.buyercommisionfee = "Please enter valid commision fee";
-    } else if (!isEmpty(reqBody.buyercommisionfee) && isNaN(reqBody.buyercommisionfee)) {
+    } 
+    // else if (reqBody.buyercommisionfee <= 0) {
+    //     errors.buyercommisionfee = "Please enter valid buyer commisionfee";
+    // } 
+    else if (!isEmpty(reqBody.buyercommisionfee) && isNaN(reqBody.buyercommisionfee)) {
         errors.buyercommisionfee = "ALLOW_NUMERIC";
     } else if (parseInt(reqBody.buyercommisionfee) < 0) {
         errors.buyercommisionfee = "Invalid value";
@@ -64,9 +68,11 @@ export const addValid = (req, res, next) => {
 
     if (isEmpty(reqBody.withdrawFee)) {
         errors.withdrawFee = "Withdrawfee field is required";
-    } else if (reqBody.withdrawFee <= 0) {
-        errors.withdrawFee = "Please enter valid withdraw fee";
-    } else if (!isEmpty(reqBody.withdrawFee) && isNaN(reqBody.withdrawFee)) {
+    } 
+    // else if (reqBody.withdrawFee <= 0) {
+    //     errors.withdrawFee = "Please enter valid withdraw fee";
+    // } 
+    else if (!isEmpty(reqBody.withdrawFee) && isNaN(reqBody.withdrawFee)) {
         errors.withdrawFee = "ALLOW_NUMERIC";
     } else if (parseInt(reqBody.withdrawFee) < 0) {
         errors.withdrawFee = "Invalid value";
@@ -161,7 +167,7 @@ export const addValid = (req, res, next) => {
     }
     console.log('errors------', errors)
     if (!isEmpty(errors)) {
-        return res.status(400).json(encodedata({ "errors": errors }))
+        return res.status(400).json({ "errors": errors })
     }
 
     return next();
@@ -188,7 +194,7 @@ export const editValid = (req, res, next) => {
     }
     if(reqBody?.depositType == "coin_payment"){
         if (isEmpty(reqBody.coinpaymentsymbol)) {
-            errors.coinpaymentsymbol = "Coinpayment Symbol field is required";
+            errors.coinpaymentsymbol = "Coinpayment symbol field is required";
         }
     }
     
@@ -203,9 +209,11 @@ export const editValid = (req, res, next) => {
 
     if (isEmpty(reqBody.withdrawFee)) {
         errors.withdrawFee = "Withdrawfee field is required";
-    }  else if (reqBody.withdrawFee <= 0) {
-        errors.withdrawFee = "Please Enter Valid WithdrawFee";
-    } else if (!isEmpty(reqBody.withdrawFee) && isNaN(reqBody.withdrawFee)) {
+    }  
+    // else if (reqBody.withdrawFee <= 0) {
+    //     errors.withdrawFee = "Please enter valid withdrawFee";
+    // } 
+    else if (!isEmpty(reqBody.withdrawFee) && isNaN(reqBody.withdrawFee)) {
         errors.withdrawFee = "ALLOW_NUMERIC";
     } else if (parseInt(reqBody.withdrawFee) < 0) {
         errors.withdrawFee = "Invalid value";
@@ -215,7 +223,7 @@ export const editValid = (req, res, next) => {
     if (isEmpty(reqBody.minimumWithdraw)) {
         errors.minimumWithdraw = "Minimum withdraw field is required";
     }  else if (reqBody.minimumWithdraw <= 0) {
-        errors.minimumWithdraw = "Please Enter Valid MinimumWithdraw";
+        errors.minimumWithdraw = "Please enter valid minimumwithdraw";
     }  else if (!isEmpty(reqBody.minimumWithdraw) && isNaN(reqBody.minimumWithdraw)) {
         errors.minimumWithdraw = "ALLOW_NUMERIC";
     } else if (parseInt(reqBody.minimumWithdraw) < 0) {
@@ -247,13 +255,27 @@ export const editValid = (req, res, next) => {
     }
 
     if (isEmpty(reqBody.commisionfee)) {
-        errors.commisionfee = "Commisionfee field is required";
-    } else if (reqBody.commisionfee <= 0) {
-        errors.commisionfee = "Please Enter Valid Commisionfee";
-    } else if (!isEmpty(reqBody.commisionfee) && isNaN(reqBody.commisionfee)) {
+        errors.commisionfee = "Seller commisionfee field is required";
+    } 
+    // else if (reqBody.commisionfee <= 0) {
+    //     errors.commisionfee = "Please enter valid seller commisionfee";
+    // } 
+    else if (!isEmpty(reqBody.commisionfee) && isNaN(reqBody.commisionfee)) {
         errors.commisionfee = "ALLOW_NUMERIC";
     } else if (parseInt(reqBody.commisionfee) < 0) {
         errors.commisionfee = "Invalid value";
+    }
+
+    if (isEmpty(reqBody.buyercommisionfee)) {
+        errors.buyercommisionfee = "Buyer commisionfee field is required";
+    } 
+    // else if (reqBody.buyercommisionfee <= 0) {
+    //     errors.buyercommisionfee = "Please enter valid buyer commision fee";
+    // } 
+    else if (!isEmpty(reqBody.buyercommisionfee) && isNaN(reqBody.buyercommisionfee)) {
+        errors.buyercommisionfee = "ALLOW_NUMERIC";
+    } else if (parseInt(reqBody.buyercommisionfee) < 0) {
+        errors.buyercommisionfee = "Invalid value";
     }
 
     if (isEmpty(reqBody.decimal) || reqBody.decimal == 0) {
@@ -310,7 +332,7 @@ export const editValid = (req, res, next) => {
         }
 
         if (isEmpty(reqBody.contractDecimal)) {
-            errors.contractDecimal = "Contract Decimal field is required";
+            errors.contractDecimal = "Contract decimal field is required";
         } else if (isNaN(reqBody.contractDecimal)) {
             errors.contractDecimal = "ALLOW_NUMERIC";
         }
@@ -344,7 +366,7 @@ export const editValid = (req, res, next) => {
     }
 
     if (!isEmpty(errors)) {
-        return res.status(400).json(encodedata({ "errors": errors }))
+        return res.status(400).json({ "errors": errors })
     }
 
     return next();
@@ -408,13 +430,6 @@ export const editPreferreValid = (req, res, next) => {
     if (isEmpty(reqBody.symbol)) {
         errors.symbol = "Symbol field is required";
     }
-
-    
-
-
-   
-
-    
 
     if (isEmpty(reqBody.status)) {
         errors.status = "Invalid";

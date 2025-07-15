@@ -22,7 +22,7 @@ const EVM_RPC = {
     pol : "https://dimensional-attentive-frog.matic.quiknode.pro/e172038277e7698137daaad81e1771cb9e36401e"
 }
 
-const ACCESS_TOKEN = "v2x4e9a4fd19072730e6d4c9366787af6e5b2bc52f8184230f82e8df0f071504d99"
+const ACCESS_TOKEN = "v2x8f6dcf627772773ea4e4cb505cc2933e4de90861fbeefcfe9f7d751354b593b8"
 // "v2xd04e2adb24484a10d13244d4b43da442797752234855f6616f3aff31d073eb06"
 
 
@@ -218,7 +218,7 @@ export const depositwebhook = async (req, res) => {
             transactions["userId"] = usrWallet?.userId;
             transactions["currencyId"] = currencyData?._id;
             transactions["coin"] = reqBody?.coin;
-            transactions["toAddress"] = reqBody?.receiver;
+            transactions["toAddress"] = userWalletData?.address//reqBody?.receiver;
             transactions["amount"] = reqBody?.value/10**8;
             transactions["actualAmount"] = reqBody?.baseValue/10**parseFloat(decimal);
             transactions["txid"] = reqBody?.hash;
@@ -265,14 +265,14 @@ export const depositwebhook = async (req, res) => {
             
             let gasestimate;
             if(reqBody?.coin == "tbtc"){
-                // gasestimate = await EstimateGaseFeeForBTC(reqBody?.wallet , reqBody?.coin , AdminAddress , 1000);
+                //gasestimate = await EstimateGaseFeeForBTC(reqBody?.wallet , reqBody?.coin , AdminAddress , 1000);
                 gasestimate = await EstimateGasForCoin(reqBody?.coin);
             }
             else{
                 gasestimate = await EstimateGasForCoin(reqBody?.coin);
             }
             let final_amount = parseFloat(reqBody?.value) - parseFloat(gasestimate?.gasfee);
-            const transaction = await internalTransfer(userWalletData?.bitgo_id, reqBody?.coin, reqBody?.valueString, AdminAddress)
+            const transaction = await internalTransfer(userWalletData?.bitgo_id, reqBody?.coin, reqBody?.valueString, AdminAddress , "" , true)
             console.log("transactiontransactiontransaction",transaction)
             if(transaction?.state == 'signed'){
                 transactions["status"] = 'completed';
@@ -291,8 +291,7 @@ export const depositwebhook = async (req, res) => {
 
 export const WithdrawAmount = async(req , res) => {
     try{
-//         let transfer = await SendAmount("67fde42f273253b0e76c90b9def57de9", "tbtc", 1000, "tb1pqykx30ajt9twvud6s76cuhm4cr5asjly2zskpmjka4vt07r8fh7qwxuesy");
-// return
+        
         console.log("withdraw",  req?.body , req?.user);
         let {coin , amount , receiveraddress , fee , twoFACode , minimumWithdraw} = req?.body;
         let AdminAddress = config?.BITGO_ADMIN_WALLET[coin?.toLowerCase()]?.address //"tb1pqykx30ajt9twvud6s76cuhm4cr5asjly2zskpmjka4vt07r8fh7qwxuesy"
@@ -341,7 +340,6 @@ export const WithdrawAmount = async(req , res) => {
             let adminbalance = await GetBitgoBalance(AdminWalletId , coin);
             console.log("admin balance" , adminbalance);
             
-            // let gasestimate = await EstimateGasForCoin(coin);
             if((adminbalance/10**decimal) > parseFloat(amount) + parseFloat(fee)){
                 let transactions = new Transaction();
                 transactions["userId"] = usrWallet?.userId;
@@ -398,19 +396,15 @@ export const WithdrawAmount = async(req , res) => {
             }
             else {
                 console.log("Insufficient fund in admin wallet");
-                return res.status(400).json({ 'success': false, 'messages': "Insufficient fund in admin wallet" })
+                // return res.status(400).json({ 'success': false, 'messages': "Insufficient fund in admin wallet" })
+                return res.status(400).json(encodedata({ 'success': false, 'message': "Insufficient fund in admin wallet" }))
             }
         }
         else{
             console.log("Insufficient ");
             return res.status(400).json({ 'success': false, 'messages': "Insufficient fund" })
         }
-        // if (userWalletData?.p2pBal > amount) {
-        //     let userbalance = await GetBitgoBalance(coin, userWalletData?.bitgo_id);
-        //     if (userbalance > amount) {
-                // let transfer = await SendAmount(userWalletData?.bitgo_id, coin, amount, receiveraddress);
-        //     }
-        // }
+        
     }
     catch(e){
         console.log("error on withdraw amount" , e);
@@ -490,7 +484,7 @@ export const serializeTransaction = async(toAmount , walletaddress) => {
     }
 }
 
-export async function internalTransfer(walletid , symbol , amount , recipientAddress , walletphrase) {
+export async function internalTransfer(walletid , symbol , amount , recipientAddress , walletphrase , internal) {
     try {
         console.log("internal transfer" , walletid , symbol , amount , recipientAddress);
         
@@ -501,7 +495,8 @@ export async function internalTransfer(walletid , symbol , amount , recipientAdd
             amount: amount,  // Amount in satoshis (e.g., 100000 = 0.00000001 BTC)
             address: recipientAddress, // Destination Wallet ID within BitGo
             walletPassphrase: wallet.label(), // Needed if using a password-protected wallet
-            type: "transfer" // Internal transfer (avoids blockchain fees)
+            type: "transfer", // Internal transfer (avoids blockchain fees)
+            isWalletAddress: internal ? true : false
         });
 
         console.log("Transfer Successful:", transfer);

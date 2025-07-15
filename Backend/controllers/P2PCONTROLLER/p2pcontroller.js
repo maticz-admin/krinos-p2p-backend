@@ -303,7 +303,8 @@ export const canceltrade = async (req, res) => {
         var text = Date.now().toString();
         const result = await Orderchat.findByIdAndUpdate({ _id: req?.body?.id },
             { $set: { chatstatus: "Inactive", orderendtime: text } }, { new: true });
-        updatelastseen(req?.body?.userid)
+        updatelastseen(req?.body?.userid);
+        socketEmit("CANCEL_TRADE", [], req?.body?.roomid)
         return res.json({
             type: "success",
             data: result
@@ -373,6 +374,8 @@ export const createroom = async (req, res) => {
             'spender': req?.body?.spender,
             'orderid': req?.body?.orderid
         })
+        console.log("checking" , check);
+        
         var order = await p2pcreateOrder.findOne({ orderid: req?.body?.orderid })
         var time = parseFloat(check?.orderstarttime) + (60000 * parseFloat(order?.offertimelimit))
         if (check) {
@@ -430,7 +433,8 @@ export const createroom = async (req, res) => {
             else {
                 return res.json({
                     type: "success",
-                    data: check
+                    data: check,
+                    old : true
                 });
             }
         }
@@ -909,8 +913,8 @@ export const gettotaluserbalance = async (req, res) => {
         var totalbalance = 0;
         var userasset = result?.assets;
         for (var i = 0; i < userasset?.length; i++) {
-            var value = await axios.get(`https://min-api.cryptocompare.com/data/price?fsym=${userasset[i]?.coin}&tsyms=${"btc"}`);
-            var marketvalue = value?.data["BTC"];
+            var value = await axios.get(`https://min-api.cryptocompare.com/data/price?fsym=${userasset[i]?.coin}&tsyms=${"usd"}`);
+            var marketvalue = value?.data["USD"];
             var coinprice = marketvalue * userasset[i]?.p2pBal;
             var newprice = coinprice ? coinprice : 0
             totalbalance = totalbalance + newprice;

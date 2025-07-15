@@ -83,7 +83,7 @@ app.use(passport.initialize());
 
 
 require("./config/passport").adminAuth(passport);
-
+app.set('trust proxy', true)
 app.post("/bitgo-webhook", depositwebhook);
 app.post("/webhook", (req, res) => {
   try {

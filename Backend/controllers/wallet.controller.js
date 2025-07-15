@@ -151,7 +151,7 @@ export const updateHideZeroStatus = async (req, res) => {
             { hideZeroStatus: reqBody.hideZeroStatus }, 
             { new: true }
         );
-        return res.status(200).json({ 'success': true, message: "ZERO_BALANCE_HIDDEN" });
+        return res.status(200).json({ 'success': true, message: reqBody?.hideZeroStatus ? "ZERO_BALANCE_HIDDEN" : "ZERO_BALANCE_UNHIDDEN"});
     } catch (err) {
         console.log('rrrrrrrrrrrrrrrrrrrrr------------', err);
         return res.status(500).json({ 'success': false });

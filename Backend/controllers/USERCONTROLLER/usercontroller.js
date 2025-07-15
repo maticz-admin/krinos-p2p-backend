@@ -43,6 +43,8 @@ export const Getuserp2pcreateorder = async (req, res) => {
             await Promise.all(result.map(async (item, ind) => {
                 const coin = item.preferedcurrency;
                 const marketValue = await axios.get(`https://min-api.cryptocompare.com/data/price?fsym=${item.coin}&tsyms=${coin}`);
+                console.log("market value" , marketValue);
+                
                 const resMarketValue = marketValue?.data[coin];
                 const convertedValue = (resMarketValue / 100) * parseFloat(item.offermargin);
                 const currencyValue = item.offermargin ? resMarketValue + convertedValue : item?.fixedmarketrate;

@@ -122,7 +122,7 @@ export const createUserKyc = async(userId) => {
 */
 export const getUserKycDetail = async (req, res) => {
     try{
-    const data = await UserKyc.findOne({ "userId": req.user.id },{ "_id": 0, "idProof": 1, "addressProof": 1 })
+    const data = await UserKyc.findOne({ "userId": req.user.id },{ "_id": 0, "idProof": 1, "addressProof": 1 , "status" : 1})
     if(data){
         return res.status(200).json(encodedata({ 'success': true, 'message': "FETCH_SUCCESS", 'result': data }))
     }else{
@@ -454,6 +454,7 @@ export const getAllUserKyc = async (req, res) => {
                         "status": 1
 
                     },
+                    "status" : 1
                 }
             },
             { "$match": filter },

@@ -243,18 +243,18 @@ export const totalCount = async (req, res) => {
     try {
         let userCount = await User.countDocuments({  }) // status: "verified"
         let kycCount = await UserKyc.countDocuments({
-                "$or": [{
-                    "idProof.status": {$in:["pending"]},
-                }, {
-                    "addressProof.status": {$in:["pending"]},
-                },
+                // "$or": [{
+                //     "idProof.status": {$in:["pending"]},
+                // }, {
+                //     "addressProof.status": {$in:["pending"]},
+                // },
                 
-                ]
+                // ]
         })
         let contactCount = await ContactUs.countDocuments({ softDelete: false })
         let supportCount = await SupportTicket.countDocuments({})
-        let transCount = await Transaction.countDocuments({ paymentType: "coin_withdraw", status: "pending"})
-        let depositCount =await Transaction.countDocuments({ paymentType: "fiat_deposit", status: "pending"})
+        let transCount = await Transaction.countDocuments({ paymentType : "coin_withdraw", status: "completed"})//paymentType: "coin_withdraw"
+        let depositCount =await Transaction.countDocuments({paymentType : "coin_deposit" ,  status: "completed"})// paymentType: "fiat_deposit",
         let totalCount = {
             userCount : userCount,
             kycCount : kycCount,

@@ -330,7 +330,7 @@ export const passwordValid = (req, res, next) => {
         } else if (reqBody.confirmPassword.length > 18) {
             errors.confirmPassword = 'minimum 6 and maximum 18'
         } else if (reqBody.newPassword != reqBody.confirmPassword) {
-            errors.confirmPassword = 'incorrect password'
+            errors.confirmPassword = 'New password and confirm password do not match'
         }
 
         if (!isEmpty(errors)) {

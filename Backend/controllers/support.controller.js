@@ -266,14 +266,14 @@ export const createNewTicket = async (req, res) => {
             let content = {
                 'ID': ticketData.tickerId,
             };
-            mailTemplate('new_support_ticket_admin', adminDetail.email, content)
+            // mailTemplate('new_support_ticket_admin', adminDetail.email, content)
         }
         let doc = {
             'userId': req.user.id,
             'title': 'Support Ticket',
             'description': 'Your Ticket Raised Successfully',
             'sptitle': 'Support Ticket',
-            'spdescription': 'Your Ticket Raised Successfully',
+            'spdescription': 'Su ticket fue recaudado exitosamente',
         }
         newNotification(doc)
         return res.status(200).json(encodedata({ 'success': true, "message": "TICKET_RAISED_SUCCESSFULLY" }))
@@ -542,6 +542,8 @@ export const replyMessage = async (req, res) => {
             userId: receiverId,
             title: 'Support Ticket',
             description: `Your Support Ticket Admin Reply: ${message}`,
+            sptitle: 'Boleto de soporte',
+            spdescription: `Respuesta del administrador de su ticket de soporte: ${message}`,
         };
         await newNotification(notificationDoc);
 

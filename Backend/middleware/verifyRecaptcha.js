@@ -4,7 +4,7 @@ import { encodedata } from "../lib/cryptoJS";
 
 export const verifyRecaptcha = async (req, res, next) => {
     const recaptchaResponse = req.body.recaptcha;
-    // console.log('recaptchaResponse---', recaptchaResponse);
+    console.log('recaptchaResponse---', config.RECAPTCHA_SECRET_KEY);
     if (!recaptchaResponse) {
         return res.status(400).json(encodedata({ message: 'reCAPTCHA token is missing' }));
     }
@@ -30,13 +30,13 @@ export const verifyRecaptcha = async (req, res, next) => {
         } else {
 
             console.log('400-------', google_response)
-            return res.status(400).json(encodedata({ message: 'reCAPTCHA verification failed' }));
+            return res.status(400).json(encodedata({ message: 'RECPTCHA_VERIFICATION_FAILED' }));
         }
 
 
     } catch (error) {
         console.log('Error during reCAPTCHA verification:', error);
-        return res.status(500).json(encodedata({ message: 'Error verifying reCAPTCHA', error }));
+        return res.status(500).json(encodedata({ message: 'ERROR_VERIFYING_RECAPTCHA', error }));
     }
 };
 

@@ -58,7 +58,7 @@ export const getNotification = async (req, res) => {
 
     try {
         console.log('req.user.id----', req.user.id)
-        let allNotify = await Notification.find({ userId: req.user.id }).select({ 'description': 1, 'createdAt': 1,'isRead':1}).sort({ createdAt: -1 })
+        let allNotify = await Notification.find({ userId: req.user.id }).select({"spdescription" : 1, 'description': 1, 'createdAt': 1,'isRead':1}).sort({ createdAt: -1 })
         console.log('allNotify------', allNotify)
         if (!isEmpty(allNotify)) {
             return res.status(200).json(encodedata({ 'success': true, result: allNotify }))

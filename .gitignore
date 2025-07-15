@@ -46,6 +46,7 @@ Thumbs.db
 *.mov
 *.wmv
 /Backend/config
+/Backend/public
 *.env
 .env
 

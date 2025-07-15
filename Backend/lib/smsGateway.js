@@ -4,6 +4,7 @@ import twilio from 'twilio';
 // import lib
 import config from '../config';
 import { User } from '../models';
+import Verification from '../models/mobileverification';
 
 export const sentSms = async ({ to, body = '' }) => {
     const client = twilio(
@@ -44,7 +45,7 @@ export const sentOtp = async (to, body) => {
             from: fromNumber,
             to: to,
         });
-        return { smsStatus: true };
+        return { smsStatus: true , message : message};
     } catch (err) {
         // Log the entire error for more details
         console.log('smsStatus-----', err);
@@ -123,14 +124,28 @@ export const sentOtp = async (to, body) => {
 
 
 
-export const verifyOtp = async (checkDoc, otp, type) => {
+export const verifyOtp = async (checkDoc, otp, type,phno , phonceCode) => {
     try {
         console.log('checkDoc.id---', checkDoc.id, checkDoc._id, otp);
 
         // Check for the case when the type is 'registerMobile' and no checkDoc is found
         if (checkDoc == '' || !checkDoc && type === 'registerMobile') {
-            console.log("OTP is valid for registerMobile");
-            return { smsStatus: true };
+            // console.log("OTP is valid for registerMobile");
+            let checkvalid = await Verification.findOne({
+                "phoneCode": phonceCode, 
+                "phoneNo": phno,
+                otp: otp,
+                otptime: { $gte: new Date() }
+            })
+            // return { smsStatus: true };
+            
+            if (checkvalid) {
+                console.log(checkvalid , "OTP is valid");
+                return { smsStatus: true };
+            } else {
+                console.log("OTP is invalid or expired");
+                return { smsStatus: false, message: "OTP is invalid or has expired." };
+            }
         }
 
         // Verify OTP, ensuring it was generated in the last 10 minutes

@@ -535,19 +535,19 @@ export const editPhoneValidate = (req, res, next) => {
     let mobileRegex = /^\d+$/;
 
     if (isEmpty(reqBody.newPhoneCode)) {
-        errors.newPhoneCode = "Phone code field is required";
+        errors.newPhoneCode = "PHONECODE_REQUIRED";
     }
 
     if (isEmpty(reqBody.newPhoneNo)) {
-        errors.newPhoneNo = "Phone number field is required";
+        errors.newPhoneNo = "PHONE_FIELD_REQUIRED";
     } else if (!(mobileRegex.test(reqBody.newPhoneNo))) {
-        errors.newPhoneNo = "Phone number is invalid";
+        errors.newPhoneNo = "PHONE_INVALID";
     }
 
     if (isEmpty(reqBody.otp)) {
-        errors.otp = "OTP Field is Required";
+        errors.otp = "OTP_REQUIRED";
     } else if (reqBody.otp.toString().length != 6) {
-        errors.otp = "Invalid OTP";
+        errors.otp = "INVALID_OTP";
     }
 
     if (!isEmpty(errors)) {

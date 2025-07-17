@@ -62,4 +62,6 @@ router.route("/add-session-id").post(decodedata, apiKeyCtrl.authorization, p2pco
 
 router.route("/check-didit").post(decodedata, apiKeyCtrl.authorization, p2pcontroller.checkdidit);
 
+router.route("/gethomelive").get(p2pcontroller.getHomeLiveDatas)
+
 export default router;                                                                                                                                                                                                                                                                                                                                            

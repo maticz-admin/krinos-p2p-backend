@@ -1234,6 +1234,7 @@ export const usrDeposit = async () => {
                                     'amount': parseFloat(item.amount).toFixed(8),
                                     'transactionId': item.txId,
                                     'currency': item.coin,
+                                    userData: usrData,
                                 };
 
                                 mailTemplateLang({

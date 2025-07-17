@@ -28,7 +28,7 @@ export const verifyRecaptcha = async (req, res, next) => {
         if (google_response.success) {
             return next();
         } else {
-            // return next();
+            return next();
             console.log('400-------', google_response)
             return res.status(400).json(encodedata({ message: 'RECPTCHA_VERIFICATION_FAILED' }));
         }

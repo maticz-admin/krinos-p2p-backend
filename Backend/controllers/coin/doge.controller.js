@@ -108,6 +108,7 @@ export const deposit = async () => {
                                                 'amount': parseFloat(item.amount).toFixed(8),
                                                 'transactionId': item.txid,
                                                 'currency': item.coin,
+                                                userData: usrData,
                                             };
 
                                             mailTemplateLang({

@@ -32,7 +32,7 @@ export const newContact = async(req, res) => {
 
     const SaveContact = await newDoc.save();
     if (SaveContact) {
-        return res.status(200).json(encodedata({ 'success': true, 'message': 'Your Message submitted successfully' }))
+        return res.status(200).json(encodedata({ 'success': true, 'message': 'Your message submitted successfully' }))
     }else{
         return res.status(500).json(encodedata({ 'success': false, 'message': "Error on server" }))
     }
@@ -48,7 +48,7 @@ export const getContact = async (req, res) => {
         let pagination = paginationQuery(req.query);
         let filter = filterSearchQuery(req.query, ['email',]);
         // let count = await Currency.countDocuments(filter);
-        const contactData = await ContactUs.find().sort({ "created_date": -1 });
+        const contactData = await ContactUs.find().sort({ "createdAt": -1 });
         let result = {
             data: contactData
         }
@@ -76,6 +76,7 @@ export const adminMsg = async (req, res) => {
             let content = {
                 'AdminMsg': checkUser.adminMsg,
                 'date': new Date(),
+                userData: checkUser,
             };
 
             mailTemplateLang({
@@ -83,7 +84,7 @@ export const adminMsg = async (req, res) => {
                 'toEmail': checkUser.email,
                 content
             })
-            return res.status(200).json(encodedata({ status: true, message: 'Reply Email send Successfully' }))
+            return res.status(200).json(encodedata({ status: true, message: 'Reply Email send successfully' }))
         } else {
             return res.status(400).json(encodedata({ status: false, message: 'Reply failed' }))
         }

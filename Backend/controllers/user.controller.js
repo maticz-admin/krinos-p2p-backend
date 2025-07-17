@@ -449,7 +449,7 @@ const generateOTP = (length = 6) => {
 
 export const userLogin = async (req, res) => {
     try {
-        console.log("req.body in login", req.body , req?.ip);
+        console.log("req.body in login", req.body , req?.ip, typeof(req?.ip));
         let reqBody = req.body, checkUser;
         reqBody.loginHistory.ipaddress = req?.ip
 
@@ -464,7 +464,7 @@ export const userLogin = async (req, res) => {
             }
 
             //iprestriction
-            if (checkUser?.loginhistory?.length > 0 && !checkUser?.loginhistory?.find((e) => e?.ipaddress == reqBody?.ip) && reqBody?.reftype != "ipotp" && isEmpty(reqBody.twoFACode)) {
+            if (checkUser?.loginhistory?.length > 0 && !checkUser?.loginhistory?.some((e) => e?.ipaddress == req?.ip) && reqBody?.reftype != "ipotp" && isEmpty(reqBody.twoFACode)) {
                 if (!checkUser.authenticate(reqBody.password)) {
                     // loginHistory({ ...reqBody.loginHistory, ...{ "status": 'Failed', "reason": "Password incorrect", "userId": checkUser._id } })
                     return res.status(400).json(encodedata({ 'success': false, 'errors': { 'password': "PASSWORD_INCORRECT" } }));
@@ -627,6 +627,7 @@ export const userLogin = async (req, res) => {
                 'ipaddress': reqBody.loginHistory && reqBody.loginHistory.ipaddress,
                 'countryName': reqBody.loginHistory && reqBody.loginHistory.countryName,
                 'date': new Date(),
+                userData: checkUser,
             };
 
             mailTemplateLang({
@@ -1106,7 +1107,8 @@ export const changePassword = async (req, res) => {
 
             let content = {
                 // 'confirmMailUrl': `${config.FRONT_URL}/Change_Password/${encryptToken}`,
-                'date': new Date()
+                'date': new Date(),
+                userData: userData,
             };
             if (chackStatus.passwordChange == true) {
                 mailTemplateLang({
@@ -1189,7 +1191,8 @@ export const update2faCode = async (req, res) => {
             if (chackStatus?.twoFA == true) {
                 let content = {
                     'date': new Date(),
-                    'status': "enable"
+                    'status': "enable",
+                    userData: userData,
                 };
                 mailTemplateLang({
 
@@ -1246,7 +1249,8 @@ export const diabled2faCode = async (req, res) => {
             if (chackStatus.twoFA == true) {
                 let content = {
                     'date': new Date(),
-                    'status': "disable"
+                    'status': "disable",
+                    userData: userData,
                 };
                 mailTemplateLang({
                     'userId': req.user.id,
@@ -1566,7 +1570,8 @@ export const checkForgotPassword = async (req, res) => {
             let encryptToken = encryptString(userData._id, true)
             let content = {
                 'name': userData.firstName,
-                'confirmMailUrl': `${config.FRONT_URL}/reset-password/${encryptToken}`
+                'confirmMailUrl': `${config.FRONT_URL}/reset-password/${encryptToken}`,
+                userData: userData,
             }
 
             userData.mailToken = encryptToken;
@@ -1990,7 +1995,8 @@ export const editEmail = async (req, res) => {
             )
             let content = {
                 'confirmMailUrl': `${config.FRONT_URL}/verify-old-email/${encryptToken}`,
-                'date': new Date()
+                'date': new Date(),
+                userData: userData,
             };
             mailTemplateLang({
                 'userId': userData._id,
@@ -2032,7 +2038,8 @@ export const sentVerifLink = async (req, res) => {
 
         let content = {
             'confirmMailUrl': `${config.FRONT_URL}/verify-new-email/${encryptToken}`,
-            'date': new Date()
+            'date': new Date(),
+            userData: userData,
         };
 
         mailTemplateLang({

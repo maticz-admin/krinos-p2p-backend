@@ -606,6 +606,7 @@ export const rejectUserKyc = async (req, res) => {
             let content = {
                 'notice': doc.description,
                 'date': new Date(),
+                userData: checkUser,
             };
             mailTemplateLang({
                 'identifier': 'KYC_REJECT',
@@ -624,6 +625,7 @@ export const rejectUserKyc = async (req, res) => {
             let content = {
                 'notice': doc.description,
                 'date': new Date(),
+                userData: checkUser,
             };
             mailTemplateLang({
                 'identifier': 'KYC_REJECT',

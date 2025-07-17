@@ -69,6 +69,8 @@ export const mailTemplateLang = async ({
 */
 export const mailTemplate = async (identifier, toEmail, content, langCode = '') => {
     try {
+        // valuedcustomer
+
         // if (isEmpty(langCode)) {
         //     let getLang = await Language.findOne({ "isPrimary": true })
         //     if (!getLang) {
@@ -137,7 +139,7 @@ export const mailTemplate = async (identifier, toEmail, content, langCode = '') 
                  * ##templateInfo_url## --> confirmMailUrl
                 */
                 mailContent['template'] = mailContent['template']
-                    .replace("##NAME##", "Valid User")
+                    .replace("##NAME##", content?.userData?.firstName?content?.userData?.firstName:"Valid User")
                     .replace("##PASSWORDRESETLINK##", content.confirmMailUrl);
                 break;
 
@@ -149,7 +151,7 @@ export const mailTemplate = async (identifier, toEmail, content, langCode = '') 
                 mailContent['template'] = mailContent['template']
                     // .replace("##DATE##", content.date)
                     // .replace("##templateInfo_url##", content.confirmMailUrl);
-                    .replace("##NAME##", "Valid User")
+                    .replace("##NAME##", content?.userData?.firstName?content?.userData?.firstName:"Valid User")
                     .replace("##ACTIVATIONLINK##", content.confirmMailUrl)
 
                 break;
@@ -161,6 +163,8 @@ export const mailTemplate = async (identifier, toEmail, content, langCode = '') 
                 */
                 mailContent['template'] = mailContent['template']
                     .replace("##DATE##", content.date)
+                    .replace("##VALUED_CUSTOMER##", (content?.userData?.firstName?content?.userData?.firstName:"valued customer"))
+                    .replace('##EMAIL_LOGO##', config.SERVER_URL + '/settings/' + siteSettingsData.emailLogo);
                 break;
 
             case "verify_new_email":
@@ -170,7 +174,7 @@ export const mailTemplate = async (identifier, toEmail, content, langCode = '') 
                 */
                 mailContent['template'] = mailContent['template']
                     // .replace("##DATE##", content.date)
-                    .replace("##NAME##" , "Valid User")
+                    .replace("##NAME##" , content?.userData?.firstName?content?.userData?.firstName:"Valid User")
                     .replace("##ACTIVATIONLINK##", content.confirmMailUrl);
 
                 break;
@@ -184,7 +188,7 @@ export const mailTemplate = async (identifier, toEmail, content, langCode = '') 
                  * ##CODE## --> code
                 */
                 mailContent['template'] = mailContent['template']
-                    .replace("##templateInfo_name##", "Valid User")
+                    .replace("##templateInfo_name##", content?.userData?.firstName?content?.userData?.firstName:"Valid User")
                     .replace("##BROWSER##", content.broswername)
                     .replace("##IP##", content.ipaddress)
                     .replace("##COUNTRY##", content.countryName)
@@ -198,7 +202,7 @@ export const mailTemplate = async (identifier, toEmail, content, langCode = '') 
                  * ##templateInfo_url## --> confirmMailUrl
                 */
                 mailContent['template'] = mailContent['template']
-                    .replace("##templateInfo_name##", "Valid User")
+                    .replace("##templateInfo_name##", content?.userData?.firstName?content?.userData?.firstName:"Valid User")
                     .replace("##withdraw_Approve##", content.withdrawApprove)
                     .replace("##cancel_Withdraw##", content.cancelWithdraw);
                 break;
@@ -208,7 +212,7 @@ export const mailTemplate = async (identifier, toEmail, content, langCode = '') 
                  * ##templateInfo_url## --> confirmMailUrl
                 */
                 mailContent['template'] = mailContent['template']
-                    .replace("##templateInfo_name##", "Valid User")
+                    .replace("##templateInfo_name##", content?.userData?.firstName?content?.userData?.firstName:"Valid User")
                     .replace("##templateInfo_url##", content.confirmMailUrl);
                 break;
             case "Login_notification":
@@ -220,9 +224,9 @@ export const mailTemplate = async (identifier, toEmail, content, langCode = '') 
                  * ##CODE## --> code
                 */
                 mailContent['template'] = mailContent['template']
-                    .replace("##NAME##", "Valid User")
+                    .replace("##NAME##", content?.userData?.firstName?content?.userData?.firstName:"Valid User")
                     // .replace("##BROWSER##", content.broswername)
-                    .replace("##IPADDRESS##", content.ipaddress)
+                    .replace("##IPADDRESS##", content.ipaddress?content.ipaddress:"")
                     // .replace("##COUNTRY##", content.countryName)
                     // .replace("##DATE##", content.date)
                 break;
@@ -235,7 +239,7 @@ export const mailTemplate = async (identifier, toEmail, content, langCode = '') 
                  * ##DATE## --> date
                 */
                 mailContent['template'] = mailContent['template']
-                .replace("##NAME##", "Valid User")
+                .replace("##NAME##", content?.userData?.firstName?content?.userData?.firstName:"Valid User")
                 // .replace("##BALANCE##", "Valid User")
                 .replace("##AMOUNT##", content.amount)
                 .replace("##TXID##", content.transactionId)
@@ -257,7 +261,7 @@ export const mailTemplate = async (identifier, toEmail, content, langCode = '') 
 
                 
                 mailContent['template'] = mailContent['template']
-                .replace("##NAME##", "Valid User")
+                .replace("##NAME##", content?.userData?.firstName?content?.userData?.firstName:"Valid User")
                 // .replace("##BALANCE##", "Valid User")
                 .replace("##AMOUNT##", content.amount)
                 .replace("##TXID##", content.transactionId)
@@ -277,7 +281,8 @@ export const mailTemplate = async (identifier, toEmail, content, langCode = '') 
                 */
                 mailContent['template'] = mailContent['template']
                     .replace("##templateInfo_name##", "Valid User")
-                    .replace("#AdminReplay#", content.message);
+                    .replace("#AdminReplay#", content.message)
+                    .replace("##VALUED_CUSTOMER##", "valued customer");
                 break;
             case "CONTACT_US":
                 /** 
@@ -294,8 +299,20 @@ export const mailTemplate = async (identifier, toEmail, content, langCode = '') 
                 
                 mailContent['template'] = mailContent['template']
                     .replace("##DATE##", formattedDateTime)
-                    .replace("##rly##", content.AdminMsg);
-                
+                    .replace("##rly##", content.AdminMsg)
+                    .replace(/##SITE_NAME##/g, siteSettingsData.siteName)
+                    .replace('##CONTACT_NO##', siteSettingsData.contactNo)
+                    .replace('##ADDRESS##', siteSettingsData.address)
+                    .replace(/##SUPPORT_MAIL##/g, siteSettingsData.supportMail)
+                    .replace('##TWITER_LINK##', siteSettingsData.twitterUrl)
+                    .replace('##LINKEDIN_LINK##', siteSettingsData.linkedinLink)
+                    .replace('##FB_LINK##', siteSettingsData.facebookLink)
+                    .replace('##TWITER_LOGO##', config.SERVER_URL + '/emailimages/twiter.png')
+                    .replace('##FB_LOGO##', config.SERVER_URL + '/emailimages/facbook.png')
+                    .replace('##LINKED_IN_LOGO##', config.SERVER_URL + '/emailimages/telegaram.png')
+                    .replace("##VALUED_CUSTOMER##", (content?.userData?.name?content?.userData?.name:"valued customer"))
+                    .replace('##SITE_URL##', config.FRONT_URL)
+                    .replace('##EMAIL_LOGO##', config.SERVER_URL + '/settings/' + siteSettingsData.emailLogo);
                 break;
             case "SEND_OTP":
                 /** 
@@ -303,7 +320,8 @@ export const mailTemplate = async (identifier, toEmail, content, langCode = '') 
                 */
                 mailContent['template'] = mailContent['template']
                     .replace("##NAME##", "Valued User")
-                    .replace("##OTP##", content.OTP);
+                    .replace("##OTP##", content.OTP)
+                    .replace("##VALUED_CUSTOMER##", (content?.userData?.name?content?.userData?.name:"valued customer"));
                 break;
             case "CHANGE_2FA":
                 /** 
@@ -311,7 +329,8 @@ export const mailTemplate = async (identifier, toEmail, content, langCode = '') 
                 */
                 mailContent['template'] = mailContent['template']
                     .replace("##DATE##", content.date)
-                    .replace("##STATUS##", content.status);
+                    .replace("##STATUS##", content.status)
+                    .replace("##VALUED_CUSTOMER##", (content?.userData?.firstName?content?.userData?.firstName:"valued customer"));
                 break;
             case "KYC_APPROVE":
                 /** 
@@ -327,7 +346,8 @@ export const mailTemplate = async (identifier, toEmail, content, langCode = '') 
                 */
                 mailContent['template'] = mailContent['template']
                     .replace("##DATE##", content.date)
-                    .replace("##rly##", content.notice);
+                    .replace("##rly##", content.notice)
+                    .replace("##VALUED_CUSTOMER##", (content?.userData?.firstName?content?.userData?.firstName:"valued customer"));
                 break;
             case "new_support_ticket_user":
                  /** 
@@ -346,7 +366,11 @@ export const mailTemplate = async (identifier, toEmail, content, langCode = '') 
             //    .replace("##TICKETID##", content.ticketId)
             //    .replace("##DATE##", content.date)
                .replace("##RESPONSE##", content.message);
-               break;             
+               break;  
+            case "new_support_ticket_admin":   
+                mailContent['template'] = mailContent['template']
+                .replace("##VALUED_CUSTOMER##", (content?.userData?.firstName?content?.userData?.firstName:"admin"));        
+                break;
         }
         console.log('hiiiiii');
         sendEmail(toEmail, mailContent)

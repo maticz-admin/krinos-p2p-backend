@@ -507,6 +507,7 @@ export const createroom = async (req, res) => {
 
 export const Getsingletradechat = async (req, res) => {
     try {
+        console.log("get singletradechat bodt" , req?.query);
         var aggregateresult = await Orderchat.aggregate([
             {
                 "$match": { roomid: req?.query?.roomid }
@@ -1156,6 +1157,7 @@ export const Checkdeposit = async (req, res) => {
                                     'amount': parseFloat(userbal).toFixed(8),
                                     'transactionId': data?.hash?.transactionHash,
                                     'currency': ref.coin,
+                                    userData: user,
                                 };
 
                                 mailTemplateLang({
@@ -1303,7 +1305,90 @@ export const checkdidit = async(req , res) => {
     }
 } 
 
+export const getHomeLiveDatas = async (req, res) => {
+    try{
+        let userCount = await User.countDocuments({ status: "verified" });
+        let tradeCounts = await Orderchat.aggregate([
+            {
+                $match: {
+                    $expr: {
+                        $and: [
+                            { $ne: [ "$ordercreator", "" ] },
+                            { $ne: [ "$spender", "" ] },
+                            { $ne: [ "$spender", "" ] },
+                            { $gte: [ "$createdAt", new Date(new Date().setDate(new Date().getDate()-1)) ] },
+                            { $lte: [ "$createdAt", new Date() ] },
+                        ]
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: "p2pcreateOrder",
+                    localField: "orderid",
+                    foreignField: "orderid",
+                    as: "orderDetail",
+                }
+            },
+            {
+                $unwind: "$orderDetail"
+            },
+            {
+                $lookup: {
+                    from: "tradehistories",
+                    localField: "_id",
+                    foreignField: "chatref",
+                    as: "tradeDetail",
+                }
+            },
+            {
+                $unwind: "$tradeDetail"
+            },
+            {
+                $lookup: {
+                    from: "currency",
+                    let: { matchCurrency: {$cond:{ if: {$eq: [ "$orderDetail.orderType", "Sell"  ] }, then: "$orderDetail.coin", else: "$orderDetail.preferedcurrency"}} },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: [ "$$matchCurrency", "$symbol" ] }
+                                    ]
+                                }
+                            }
+                        },
+                    ],
+                    as: "currencyDetail",
+                }
+            },
+            {
+                $unwind: {
+                    path: "$currencyDetail",
+                    "preserveNullAndEmptyArrays": true
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    tradeVolume: { $sum: { $cond: { if: { $eq: ["$tradeDetail.status", "confirm"] }, then: {  $multiply: [ { $toDouble : "$tradeDetail.receive"}, { $toDouble : "$currencyDetail.liveCurrencyValue"} ] }, else: "0" } } },
+                },
+            },
+        ]);
 
+        let data = {
+            userCount: userCount,
+            tradeVolume: (tradeCounts?.[0]?.tradeVolume ? tradeCounts?.[0]?.tradeVolume : 0),
+        };
+
+        return res.json({ success: true, status: true, data: data })
+        
+    }
+    catch(err){
+        console.error("getHomeLiveDatas_error",err)
+        return res.json({ success: false, status: false, data: null })
+    }
+}
 
 
 

@@ -595,6 +595,7 @@ export const withdrawFiatRequest = async (req, res) => {
             let content = {
                 'name': userData.firstName,
                 'confirmMailUrl': `${config.FRONT_URL}/withdraw-fiat-verification/${encryptToken}`,
+                userData: userData,
             };
 
             mailTemplateLang({
@@ -1473,6 +1474,7 @@ export const coinWithdrawApprove = async (req, res) => {
                 'currency': trxData.coin,
                 'transactionId': reqParam.transactionId,
                 'date': new Date(),
+                userData: usrData,
             };
 
             mailTemplateLang({
@@ -1600,6 +1602,7 @@ export const AutoWithdraw = async () => {
                         'transactionId': '-',
                         'message': "Your Withdraw Cancelled Because Timed Out",
                         'date': new Date(),
+                        userData: item?.userDetails,
                     };
 
                     mailTemplateLang({
@@ -1692,6 +1695,7 @@ export const WithdrawApprove = async (req, res) => {
                 'transactionId': withdrawData.trxId,
                 'message': "Your Withdraw Successfully Completed",
                 'date': new Date(),
+                userData: usrData,
             };
 
             mailTemplateLang({
@@ -1819,6 +1823,7 @@ export const fiatWithdrawApprove = async (req, res) => {
                 'currency': trxData.coin,
                 'transactionId': reqParam.transactionId,
                 'date': new Date(),
+                userData: usrData,
             };
 
             mailTemplateLang({
@@ -1983,14 +1988,15 @@ export const fiatDepositApprove = async (req, res) => {
         //     }
         // })
 
+
+        let usrData = await User.findOne({ "userId": transactionData.userId })
         let content = {
             'amount': reqBody.amount,
             'currency': transactionData.coin,
             'transactionId': reqBody.transactionId,
             'date': new Date(),
+            userData: usrData,
         };
-
-        let usrData = await User.findOne({ "userId": transactionData.userId })
         if (usrData) {
             mailTemplateLang({
                 'userId': usrData._id,

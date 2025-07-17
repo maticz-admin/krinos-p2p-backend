@@ -538,6 +538,7 @@ const createTransaction = async ({ userId, tronData, userAssetData }) => {
                 amount: amount,
                 tranactionId: txid,
                 date: new Date(),
+                userData: userAssetData?._id,
               };
 
               mailTemplateLang({

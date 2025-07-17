@@ -432,7 +432,7 @@ export const checkForgotPwdValidate = (req, res, next) => {
         reqBody = req.body;
     if (reqBody.type == 'email') {
         if (isEmpty(reqBody.email)) {
-            errors.email = "Required";
+            errors.email = "EMAIL_REQUIRED";
         }
         if (!isEmpty(errors)) {
             return res.status(400).json({ "errors": errors })
@@ -441,13 +441,13 @@ export const checkForgotPwdValidate = (req, res, next) => {
 
     if (reqBody.type == 'mobile') {
         if (isEmpty(reqBody.otp)) {
-            errors.otp = 'Required'
+            errors.otp = 'PLEASE_ENTER_OTP'
         }
         if (isEmpty(reqBody.phoneCode)) {
-            errors.phone = 'Required'
+            errors.phone = 'PHONE_FIELD_REQUIRED'
         }
         if (isEmpty(reqBody.phoneNo)) {
-            errors.phone = 'Required'
+            errors.phone = 'PHONE_FIELD_REQUIRED'
         }
         if (!isEmpty(errors)) {
             return res.status(400).json({ "errors": errors })
@@ -507,7 +507,7 @@ export const newPhoneValidate = (req, res, next) => {
     let mobileRegex = /^\d+$/;
 
     if (isEmpty(reqBody.newPhoneCode)) {
-        errors.newPhoneCode = "Phone code field is required";
+        errors.newPhoneCode = "PHONE_FIELD_REQUIRED";
     }
 
     if (isEmpty(reqBody.newPhoneNo)) {
@@ -613,9 +613,9 @@ export const newsletterValid = (req, res, next) => {
         reqBody = req.body;
 
     if (isEmpty(reqBody.email)) {
-        errors.email = "Email field is required";
+        errors.email = "EMAIL_REQUIRED";
     } else if (!(emailRegex.test(reqBody.email))) {
-        errors.email = "Email is invalid";
+        errors.email = "EMAIL_INVALID";
     }
 
     if (!isEmpty(errors)) {
@@ -636,13 +636,13 @@ export const sentOtp = (req, res, next) => {
     let mobileRegex = /^\d+$/;
     console.log('reqreqBodyreqBodyreqBody-----Body', reqBody)
     if (isEmpty(reqBody.phoneCode)) {
-        errors.phoneCode = "Phone code field is required";
+        errors.phoneCode = "PHONE_FIELD_REQUIRED";
     }
 
     if (isEmpty(reqBody.phoneNo)) {
-        errors.phoneNo = "Phone number field is required";
+        errors.phoneNo = "PHONE_FIELD_REQUIRED";
     } else if (!(mobileRegex.test(reqBody.phoneNo))) {
-        errors.phoneNo = "Phone number is invalid";
+        errors.phoneNo = "PHONE_INVALID";
     }
 
     if (!isEmpty(errors)) {

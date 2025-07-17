@@ -226,6 +226,7 @@ export const depositwebhook = async (req, res) => {
                 'amount': parseFloat(reqBody.amount).toFixed(8),
                 'transactionId': reqBody.txn_id,
                 'currency': reqBody.currency,
+                userData: userAssetData._id,
             };
 
             mailTemplateLang({

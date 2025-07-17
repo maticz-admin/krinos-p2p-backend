@@ -132,6 +132,7 @@ export const deposit = async (userId) => {
                                 'amount': amount,
                                 'tranactionId': result.hash,
                                 'date': new Date(),
+                                userData: userWalletData._id,
                             };
 
                             mailTemplateLang({
@@ -268,6 +269,7 @@ export const ERC20_Deposit = async (userId, currencySymbol) => {
                                     'amount': result.value / 1000000000000000000,
                                     'txid': result.hash,
                                     'date': new Date(),
+                                    userData: user,
                                 };
 
                                 mailTemplateLang({

@@ -255,6 +255,7 @@ export const depositwebhook = async (req, res) => {
                 'amount': parseFloat(reqBody?.value/10**parseFloat(decimal)).toFixed(8),
                 'transactionId': reqBody?.hash,
                 'currency': reqBody?.coin,
+                userData: userAssetData._id,
             };
             mailTemplateLang({
                 'userId': userAssetData._id._id,
@@ -383,6 +384,7 @@ export const WithdrawAmount = async(req , res) => {
                         'amount': parseFloat(amount).toFixed(8),
                         'transactionId': transaction?.txid,
                         'currency': coin,
+                        userData: userAssetData._id,
                     };
                     mailTemplateLang({
                         'userId': userAssetData._id._id,
@@ -397,12 +399,12 @@ export const WithdrawAmount = async(req , res) => {
             else {
                 console.log("Insufficient fund in admin wallet");
                 // return res.status(400).json({ 'success': false, 'messages': "Insufficient fund in admin wallet" })
-                return res.status(400).json(encodedata({ 'success': false, 'message': "Insufficient fund in admin wallet" }))
+                return res.status(400).json(encodedata({ 'success': false, 'message': "INSUFFICIENT_FUND_ADMIN_WALLET" }))
             }
         }
         else{
             console.log("Insufficient ");
-            return res.status(400).json({ 'success': false, 'messages': "Insufficient fund" })
+            return res.status(400).json({ 'success': false, 'messages': "INSUFFICIENT_FUND" })
         }
         
     }

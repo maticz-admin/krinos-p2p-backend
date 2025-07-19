@@ -33,6 +33,12 @@ export const newSubscribe = async (req, res) => {
 
         await newDoc.save();
 
+        await mailTemplateLang({
+            'identifier': 'newsletter_subscribe',
+            'toEmail': item,
+            content
+        })
+
         return res.status(200).json(encodedata({ 'status': true, 'message': 'NEWSLETTER_SUBSCRIBED' }))
     } catch (err) {
         return res.status(500).json(encodedata({ 'status': false, 'message': 'Error on server' }))

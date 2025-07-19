@@ -762,7 +762,7 @@ export const updateuseronlinestatus = async (req, res) => {
 export const Getcms = async (req, res) => {
     try {
         console.log('req?.query?.identifier---', req?.query)
-        var result = await Cms.findOne({ identifier: req?.query?.identifier, status: "active" , language : req?.query?.lang});
+        var result = await Cms.findOne({ identifier: { $regex: req?.query?.identifier, $options: "i"}, status: "active" , language : req?.query?.lang});
         console.log('result-----', result)
         return res.json(encodedata({
             type: "success",

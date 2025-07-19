@@ -282,7 +282,9 @@ export const mailTemplate = async (identifier, toEmail, content, langCode = '') 
                 mailContent['template'] = mailContent['template']
                     .replace("##templateInfo_name##", "Valid User")
                     .replace("#AdminReplay#", content.message)
-                    .replace("##VALUED_CUSTOMER##", "valued customer");
+                    .replace("##VALUED_CUSTOMER##", "valued customer")
+                    .replace('##SITE_URL##', config.FRONT_URL)
+                    .replace('##EMAIL_LOGO##', config.SERVER_URL + '/settings/' + siteSettingsData.emailLogo);
                 break;
             case "CONTACT_US":
                 /** 

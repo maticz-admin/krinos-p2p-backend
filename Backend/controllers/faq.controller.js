@@ -262,6 +262,31 @@ export const listFaq = async (req, res) => {
             { "$limit": pagination.limit },
         ])
 
+        console.log('queryyyyty',filter,JSON.stringify([
+            {
+                "$lookup": {
+                    "from": 'faqcategory',
+                    "localField": "categoryId",
+                    "foreignField": "_id",
+                    "as": "categoryInfo"
+                }
+            },
+            { "$unwind": "$categoryInfo" },
+            { "$match": filter },
+            {
+                "$project": {
+                    "categoryId": 1,
+                    "categoryName": "$categoryInfo.name",
+                    "question": 1,
+                    "answer": 1,
+                    "status": 1,
+                }
+            },
+            { "$skip": pagination.skip },
+            { "$limit": pagination.limit },
+        ],null,2));
+
+
         let result = {
             count,
             data

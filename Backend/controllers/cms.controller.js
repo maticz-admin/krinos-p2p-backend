@@ -20,7 +20,7 @@ import { encodedata } from '../lib/cryptoJS';
 */
 export const getCmsList = async (req, res) => {
   try{
-      const data = await  Cms.find({}, { '_id': 1, 'identifier': 1, 'title': 1, 'content': 1, 'image': 1, 'status': 1 })
+      const data = await  Cms.find({}, { '_id': 1, 'identifier': 1, 'title': 1, 'content': 1, 'image': 1, 'status': 1, 'language': 1 })
   if(data){
     return res.status(200).json({ 'success': true, 'message': 'Fetch successfully', 'result': data })
   }else{

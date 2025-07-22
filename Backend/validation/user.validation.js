@@ -185,9 +185,9 @@ export const editProfileValidate = (req, res, next) => {
         errors.city = "REQUIRED";
     }
 
-    if (isEmpty(reqBody.postalCode)) {
-        errors.postalCode = "REQUIRED";
-    }
+    // if (isEmpty(reqBody.postalCode)) {
+    //     errors.postalCode = "REQUIRED";
+    // }
 
     if (!isEmpty(errors)) {
         return res.status(400).json({ "errors": errors })

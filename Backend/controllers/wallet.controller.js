@@ -362,8 +362,8 @@ console.log("cryptoDoccryptoDoc",cryptoDoc)
                         'assets._id': tokenData._id
                     }, {
                         "$set": {
-                            "assets.$.address": tokenDoc[0].address,
-                            "assets.$.privateKey": tokenDoc[0].privateKey,
+                            "assets.$.address": tokenDoc?.[0]?.address,
+                            "assets.$.privateKey": tokenDoc?.[0]?.privateKey,
                         }
                     }, {
                         "fields": {
@@ -2108,12 +2108,14 @@ export const newUsrWallet = async (walletData, option = {}) => {
                 ]
             }
 
+            console.log('checkkkkk',currencyList[0].token && currencyList[0].token.length > 0)
+
             if (currencyList[0].token && currencyList[0].token.length > 0) {
                 walletData['assets'] = [
                     ...walletData['assets'],
                     ...await coinCtrl.generateTokenAddr({
                         'currencyList': currencyList[0].token,
-                        'walletData': walletData,
+                        'walletData': {...option, walletData},
 
                     })
                 ]

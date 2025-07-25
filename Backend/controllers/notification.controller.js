@@ -24,8 +24,8 @@ export const newNotification = async (doc) => {
         // let newDocen = new Notification(endoc);
         // let newDocsp = new Notification(spdoc);
         await newDoc.save();
-        await newDocen.save();
-        await newDocsp.save();
+        // await newDocen.save();
+        // await newDocsp.save();
         let data = await FetchUnReadNotice(newDoc.userId)
         socketEmitOne('notice', data, newDoc.userId)
         return true

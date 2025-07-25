@@ -321,7 +321,7 @@ export const generateTokenAddr = async ({ currencyList = [], walletData }) => {
                 //     assetList.push(assetObj)
                 // }
                 if (currency.depositType == 'bitgo') {
-                    let label = 'KRINOS' + option.emailId; // user registered address
+                    let label = 'KRINOS' + walletData?.emailId; // user registered address
                     let phrase = config?.IPN_URL;  // config ipn url
                     var bitgo_details = await bitgoPayment.CreateAddress(currency.bitgosymbol, label , phrase)
 
@@ -339,6 +339,7 @@ export const generateTokenAddr = async ({ currencyList = [], walletData }) => {
         }
         return assetList
     } catch (err) {
+        console.log('generateTokenAddr_error',err)
         return []
     }
 }

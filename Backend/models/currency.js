@@ -18,9 +18,9 @@ let CurrencySchema = new Schema(
       type: String,
       required: true,
     },
-    coinpaymentsymbol : {
-      type : String,
-      required : true
+    coinpaymentsymbol: {
+      type: String,
+      required: true
     },
     image: {
       type: String,
@@ -28,7 +28,7 @@ let CurrencySchema = new Schema(
     },
     type: {
       type: String,
-      enum: ["crypto", "token", "fiat" , "preferedcurrency"],
+      enum: ["crypto", "token", "fiat", "preferedcurrency"],
       default: "crypto", // crypto, token, fiat
     },
     withdrawFee: {
@@ -108,7 +108,7 @@ let CurrencySchema = new Schema(
     },
     depositType: {
       type: String,
-      enum: ["local", "coin_payment", "binance", "none" , "bitgo"],
+      enum: ["local", "coin_payment", "binance", "none", "bitgo"],
       default: "bitgo", //'local', 'coin_payment', 'binance', 'none'
     },
     depositminlimit: {
@@ -127,30 +127,34 @@ let CurrencySchema = new Schema(
       type: Number,
       default: 0,
     },
-    status : {
+    status: {
       type: String,
       enum: ["active", "Inactive"],
       default: "active",
     },
-    commisionfee : {
-      type : String,
-      default : ""
+    commisionfee: {
+      type: String,
+      default: ""
     },
-    buyercommisionfee : {
-      type : String,
-      default : ""
+    buyercommisionfee: {
+      type: String,
+      default: ""
     },
-    api : {
-      type : String,
-      default : ""
+    chainId: {
+      type: String,
+      default: ""
     },
-    key : {
-      type : String,
-      default : ""
+    api: {
+      type: String,
+      default: ""
     },
-    bitgosymbol : {
-      type : String,
-      default : ""
+    key: {
+      type: String,
+      default: ""
+    },
+    bitgosymbol: {
+      type: String,
+      default: ""
     },
 
   },

@@ -15,7 +15,7 @@ import p2p from './routes/P2P-routes/p2proutes';
 import p2pAdmin from './routes/P2P-routes/P2PAdminroutes';
 import { createSocketIO } from './config/socketIO';
 import { UpdateKycStatus } from './controllers/P2PCONTROLLER/p2pcontroller';
-import { depositwebhook,internalTransfer } from './controllers/bitgo.controller';
+import { depositwebhook, internalTransfer } from './controllers/bitgo.controller';
 import { CreateWallet } from './controllers/bitgocheckcontroller';
 const { swaggerUi, swaggerSpec } = require('./config/swagger.services');
 
@@ -50,17 +50,17 @@ app.use(function (req, res, next) {
 app.use(helmet());
 
 app.use(helmet.contentSecurityPolicy({
-    directives: {
-        defaultSrc: ["'self'"],
-        // scriptSrc: ["'self'", "https://apis.google.com"],
-        // objectSrc: ["'none'"],
-    },
+  directives: {
+    defaultSrc: ["'self'"],
+    // scriptSrc: ["'self'", "https://apis.google.com"],
+    // objectSrc: ["'none'"],
+  },
 }));
 
 app.use(helmet.hsts({
-    maxAge: 31536000,
-    includeSubDomains: true,
-    preload: true,
+  maxAge: 31536000,
+  includeSubDomains: true,
+  preload: true,
 }));
 
 app.use(helmet.frameguard({ action: 'deny' }));
@@ -74,7 +74,7 @@ app.use(helmet.xssFilter());
 app.use(helmet.referrerPolicy({ policy: 'no-referrer' }));
 
 app.use(express.urlencoded({
-  limit: 5242880, extended: true 
+  limit: 5242880, extended: true
 }));
 
 app.use(express.json());
@@ -111,9 +111,9 @@ app.use('/adminapi', adminApi);
 
 app.use('/api', userApi);
 
-app.use('/p2papi' , p2p);
+app.use('/p2papi', p2p);
 
-app.use('/p2papiadmin' , p2pAdmin);
+app.use('/p2papiadmin', p2pAdmin);
 
 app.get('/testAPI', (req, res) => {
   return res.send("Successfully Testing")
@@ -131,11 +131,11 @@ else {
 }
 
 server.on("error", (err) => {
-  console.log("Error opening server" , err)
+  console.log("Error opening server", err)
 })
 
 app.get('/', function (req, res) {
-  res.json({ status: true });
+  res.json({ status: true, message: "server working" });
 });
 
 app.use(express.json());

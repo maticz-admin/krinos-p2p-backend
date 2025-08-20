@@ -87,10 +87,10 @@ export const decryptWallet = (req, res, next) => {
         if (api_key !== null && api_key !== undefined && authorization == undefined) {
             return next();
         }
-        else{
-        let token = decryptObject(req.body.token)
-        req.body = token;
-        return next();
+        else {
+            let token = decryptObject(req.body.token)
+            req.body = token;
+            return next();
         }
     } catch (err) {
         return res.status(500).json({ 'status': false, 'message': "SOMETHING_WRONG" });
@@ -124,7 +124,7 @@ export const decryptWallet = (req, res, next) => {
 
 export const getHideZeroStatus = async (req, res) => {
     try {
-        
+
         let hideZeroStatus = await Wallet.findOne({
             '_id': req.user.id
         }, {
@@ -134,7 +134,7 @@ export const getHideZeroStatus = async (req, res) => {
 
         return res.status(200).json(encodedata({ 'success': true, 'hideZeroStatus': hideZeroStatus, }))
     } catch (err) {
-       
+
         return res.status(500).json(encodedata({ 'success': false, message: "Internal server error" }))
 
     }
@@ -144,14 +144,14 @@ export const getHideZeroStatus = async (req, res) => {
 export const updateHideZeroStatus = async (req, res) => {
     try {
         let reqBody = req.body;
-        console.log("reqBody" , reqBody);
-        
+        console.log("reqBody", reqBody);
+
         const updateData = await wallet.findOneAndUpdate(
-            { "_id": new ObjectId(req.user.id) }, 
-            { hideZeroStatus: reqBody.hideZeroStatus }, 
+            { "_id": new ObjectId(req.user.id) },
+            { hideZeroStatus: reqBody.hideZeroStatus },
             { new: true }
         );
-        return res.status(200).json({ 'success': true, message: reqBody?.hideZeroStatus ? "ZERO_BALANCE_HIDDEN" : "ZERO_BALANCE_UNHIDDEN"});
+        return res.status(200).json({ 'success': true, message: reqBody?.hideZeroStatus ? "ZERO_BALANCE_HIDDEN" : "ZERO_BALANCE_UNHIDDEN" });
     } catch (err) {
         console.log('rrrrrrrrrrrrrrrrrrrrr------------', err);
         return res.status(500).json({ 'success': false });
@@ -173,11 +173,11 @@ export const getWallet = async (req, res) => {
             "assets.derivativeBal": 1,
             "assets.p2pBal": 1
         })
-        console.log("walletDatawalletData",walletData)
+        console.log("walletDatawalletData", walletData)
         var userInfo = await User.findOne({
             '_id': req.user.id
         })
-        console.log("userInfo",userInfo)
+        console.log("userInfo", userInfo)
         if (!walletData) {
             return res.status(400).json(encodedata({ 'success': false }))
         }
@@ -189,7 +189,7 @@ export const getWallet = async (req, res) => {
             }
         });
         if (assetList && assetList.length > 0) {
-            console.log("assetListasdas" , assetList);
+            console.log("assetListasdas", assetList);
             let updateAsset = await updateAddress(assetList, req.user.userId, {
                 'walletId': walletData._id,
                 "binSubAcctEmail": req.user.binSubAcctEmail,
@@ -203,7 +203,7 @@ export const getWallet = async (req, res) => {
         return res.status(200).json(encodedata({ 'success': true, 'messages': "successfully", 'result': usrAsset, }))
     }
     catch (err) {
-        console.log("errrrrrrrrrrrrrrrrr",err)
+        console.log("errrrrrrrrrrrrrrrrr", err)
         return res.status(500).json(encodedata({ 'success': false }))
     }
 }
@@ -240,8 +240,8 @@ export const getbalance = async (req, res) => {
 */
 export const updateAddress = async (assetList, userId, option = {}) => {
     try {
-        console.log("update address" );
-        
+        console.log("update address");
+
         let currencyList = await Currency.aggregate([
             { "$match": { "_id": { "$in": assetList } } },
             {
@@ -254,8 +254,8 @@ export const updateAddress = async (assetList, userId, option = {}) => {
                                 "coin": 1,
                                 "depositType": 1,
                                 "tokenType": 1,
-                                "coinpaymentsymbol" : 1,
-                                "bitgosymbol" : 1
+                                "coinpaymentsymbol": 1,
+                                "bitgosymbol": 1
                             }
                         }
                     ],
@@ -267,8 +267,8 @@ export const updateAddress = async (assetList, userId, option = {}) => {
                                 "coin": 1,
                                 "depositType": 1,
                                 "tokenType": 1,
-                                "coinpaymentsymbol" : 1,
-                                "bitgosymbol" : 1
+                                "coinpaymentsymbol": 1,
+                                "bitgosymbol": 1
                             }
                         }
                     ],
@@ -280,15 +280,15 @@ export const updateAddress = async (assetList, userId, option = {}) => {
                                 "coin": 1,
                                 "depositType": 1,
                                 "tokenType": 1,
-                                "coinpaymentsymbol" : 1,
-                                "bitgosymbol" : 1
+                                "coinpaymentsymbol": 1,
+                                "bitgosymbol": 1
                             }
                         }
                     ],
-            }
+                }
             },
         ]);
-        console.log("currencyListcurrencyList",currencyList)
+        console.log("currencyListcurrencyList", currencyList)
         let walletData;
         if (currencyList && currencyList.length > 0) {
             if (currencyList[0].crypto && currencyList[0].crypto.length > 0) {
@@ -298,7 +298,7 @@ export const updateAddress = async (assetList, userId, option = {}) => {
                         'option': { ...option, 'userId': userId }
                     })
 
-console.log("cryptoDoccryptoDoc",cryptoDoc)
+                    console.log("cryptoDoccryptoDoc", cryptoDoc)
                     walletData = await Wallet.findOneAndUpdate({
                         'userId': userId,
                         'assets._id': cryptoData._id
@@ -420,7 +420,7 @@ console.log("cryptoDoccryptoDoc",cryptoDoc)
         return []
 
     } catch (err) {
-        console.log("sjnaskdasjdasdas",err)
+        console.log("sjnaskdasjdasdas", err)
         return []
     }
 }
@@ -673,147 +673,147 @@ export const fiatRequestVerify = async (req, res) => {
 export const withdrawCoinRequest = async (req, res) => {
     try {
         let api_key = req.header("x-api-key");
-        if(api_key!==null && api_key!== undefined && req.user.withdraw !==true){
+        if (api_key !== null && api_key !== undefined && req.user.withdraw !== true) {
             console.log('------------------1');
-             return res.status(400).json(encodedata({ 'status': false, 'message': "You don't have permission to WithdrawCoinRequest" }));      
+            return res.status(400).json(encodedata({ 'status': false, 'message': "You don't have permission to WithdrawCoinRequest" }));
         }
-        else{
-        let reqBody = req.body;
-        reqBody.amount = parseFloat(reqBody.amount);
-        let userData = await User.findOne({ "_id": req.user.id });
+        else {
+            let reqBody = req.body;
+            reqBody.amount = parseFloat(reqBody.amount);
+            let userData = await User.findOne({ "_id": req.user.id });
 
-        if (userData.google2Fa.secret == '') {
-            console.log('------------------2');
+            if (userData.google2Fa.secret == '') {
+                console.log('------------------2');
 
-            return res.status(500).json(encodedata({ "success": false, 'errors': { 'twoFACode': 'TWO_FA_MSG' } }))
+                return res.status(500).json(encodedata({ "success": false, 'errors': { 'twoFACode': 'TWO_FA_MSG' } }))
+            }
+
+            let verifyTwoFaCode = node2fa.verifyToken(userData.google2Fa.secret, reqBody.twoFACode);
+            if (!(verifyTwoFaCode && verifyTwoFaCode.delta == 0)) {
+                console.log('------------------3');
+
+                return res.status(400).json(encodedata({ "success": false, 'errors': { 'twoFACode': "INVALID_CODE" } }))
+            }
+
+            let usrWallet = await Wallet.findOne({
+                '_id': req.user.id
+            }, {
+                '_id': 1,
+                'binSubAcctId': 1,
+                "assets._id": 1,
+                "assets.coin": 1,
+                "assets.address": 1,
+                "assets.destTag": 1,
+                "assets.spotBal": 1,
+                "assets.derivativeBal": 1,
+                "assets.p2pBal": 1,
+            })
+            if (!usrWallet) {
+                console.log('------------------4');
+
+                return res.status(400).json(encodedata({ 'success': false, 'message': 'NO_DATA' }))
+            }
+
+            let usrAsset = usrWallet.assets.id(reqBody.currencyId);
+            if (!usrAsset) {
+                console.log('------------------5');
+
+                return res.status(400).json(encodedata({ 'success': false, 'message': 'NO_DATA' }))
+            }
+
+            if (reqBody.coin != 'XRP' && usrAsset.address == reqBody.receiverAddress) {
+                console.log('------------------6');
+
+                return res.status(400).json(encodedata({ 'success': false, 'errors': { 'receiverAddress': 'RECEIVER_ADDRESS_SHOULD_DIFFER' } }))
+            }
+
+            if (reqBody.coin == 'XRP' && usrAsset.destTag == reqBody.destTag) {
+                console.log('------------------7');
+
+                return res.status(400).json(encodedata({ 'success': false, 'errors': { 'destTag': 'RECEIVER_TAG_SHOULD_DIFFER' } }))
+            }
+
+            let curData = await Currency.findOne({ '_id': reqBody.currencyId })
+            if (!curData) {
+                console.log('------------------8');
+
+                return res.status(400).json(encodedata({ 'success': false, 'message': 'NO_DATA' }))
+            }
+
+            // let finalAmount = reqBody.amount + precentConvetPrice(reqBody.amount, curData.withdrawFee)
+            let finalAmount = reqBody.finalAmount //+ parseFloat(curData.withdrawFee)
+            if (usrAsset.p2pBal < finalAmount) {
+                console.log('------------------9');
+                return res.status(400).json(encodedata({ 'success': false, 'errors': { 'finalAmount': 'INSUFFICIENT_BALANCE' } }))
+            }
+
+            var transactions = new Transaction();
+            transactions["userId"] = req.user.userId;
+            transactions["currencyId"] = reqBody.currencyId;
+            transactions["coin"] = curData.coin;
+            transactions["fromAddress"] = usrAsset.address;
+            transactions["toAddress"] = reqBody.receiverAddress;
+            transactions["destTag"] = isEmpty(reqBody.destTag) ? '' : reqBody.destTag;
+            transactions["amount"] = finalAmount;
+            transactions["actualAmount"] = reqBody.amount;
+            transactions["paymentType"] = 'coin_withdraw';
+            transactions["commissionFee"] = curData.withdrawFee;
+            transactions["txid"] = '';
+            transactions["type"] = curData.depositType;
+            transactions["status"] = 'pending';
+            transactions["coinpaymentsymbol"] = curData?.coinpaymentsymbol
+
+            // usrAsset.spotBal = usrAsset.spotBal - finalAmount;
+            // let updateWallet = await usrWallet.save();
+            // let trxData = await transactions.save();
+
+            let beforeBalance = parseFloat(usrAsset.p2pBal);
+            usrAsset.p2pBal = parseFloat(usrAsset.p2pBal) - parseFloat(finalAmount);
+            let updateWallet = await usrWallet.save();
+            let trxData = await transactions.save();
+
+            // CREATE PASS_BOOK
+            createPassBook({
+                'userId': req.user.id,
+                'coin': curData.coin,
+                'currencyId': reqBody.currencyId,
+                'tableId': trxData._id,
+                'beforeBalance': beforeBalance,
+                'afterBalance': parseFloat(usrAsset.spotBal),
+                'amount': parseFloat(finalAmount),
+                'type': 'coin_withdraw_request',
+                'category': 'debit',
+                "coinpaymentsymbol": curData?.coinpaymentsymbol
+            })
+
+
+            let encryptToken = encryptString(trxData._id, true)
+            let content = {
+                'name': userData.firstName,
+                'withdrawApprove': `${config.FRONT_URL}/withdraw-approve/${encryptToken}`,
+                'cancelWithdraw': `${config.FRONT_URL}/withdraw-cancel/${encryptToken}`,
+            };
+
+            // mailTemplateLang({
+            //     'userId': req.user.id,
+            //     'identifier': 'withdraw_request',
+            //     'toEmail': userData.email,
+            //     content
+            // })
+
+            // newNotification({
+            //     'userId': trxData.userId,
+            //     'currencyId': trxData.currencyId,
+            //     'transactionId': trxData._id,
+            //     'trxId': trxData._id,
+            //     'currencySymbol': trxData.currencySymbol,
+            //     'amount': trxData.amount,
+            //     'paymentType': trxData.paymentType,
+            //     'status': trxData.status,
+            // })
+            return res.status(200).json(encodedata({ "success": true, 'message': 'VERIFICATION_LINK', 'result': updateWallet.assets }))
         }
-
-        let verifyTwoFaCode = node2fa.verifyToken(userData.google2Fa.secret, reqBody.twoFACode);
-        if (!(verifyTwoFaCode && verifyTwoFaCode.delta == 0)) {
-            console.log('------------------3');
-
-            return res.status(400).json(encodedata({ "success": false, 'errors': { 'twoFACode': "INVALID_CODE" } }))
-        }
-
-        let usrWallet = await Wallet.findOne({
-            '_id': req.user.id
-        }, {
-            '_id': 1,
-            'binSubAcctId': 1,
-            "assets._id": 1,
-            "assets.coin": 1,
-            "assets.address": 1,
-            "assets.destTag": 1,
-            "assets.spotBal": 1,
-            "assets.derivativeBal": 1,
-            "assets.p2pBal": 1,
-        })
-        if (!usrWallet) {
-            console.log('------------------4');
-
-            return res.status(400).json(encodedata({ 'success': false, 'message': 'NO_DATA' }))
-        }
-
-        let usrAsset = usrWallet.assets.id(reqBody.currencyId);
-        if (!usrAsset) {
-            console.log('------------------5');
-
-            return res.status(400).json(encodedata({ 'success': false, 'message': 'NO_DATA' }))
-        }
-
-        if (reqBody.coin != 'XRP' && usrAsset.address == reqBody.receiverAddress) {
-            console.log('------------------6');
-
-            return res.status(400).json(encodedata({ 'success': false, 'errors': { 'receiverAddress': 'RECEIVER_ADDRESS_SHOULD_DIFFER' } }))
-        }
-
-        if (reqBody.coin == 'XRP' && usrAsset.destTag == reqBody.destTag) {
-            console.log('------------------7');
-
-            return res.status(400).json(encodedata({ 'success': false, 'errors': { 'destTag': 'RECEIVER_TAG_SHOULD_DIFFER' } }))
-        }
-
-        let curData = await Currency.findOne({ '_id': reqBody.currencyId })
-        if (!curData) {
-            console.log('------------------8');
-
-            return res.status(400).json(encodedata({ 'success': false, 'message': 'NO_DATA' }))
-        }
-
-        // let finalAmount = reqBody.amount + precentConvetPrice(reqBody.amount, curData.withdrawFee)
-        let finalAmount = reqBody.finalAmount //+ parseFloat(curData.withdrawFee)
-        if (usrAsset.p2pBal < finalAmount) {
-            console.log('------------------9');
-            return res.status(400).json(encodedata({ 'success': false, 'errors': { 'finalAmount': 'INSUFFICIENT_BALANCE' } }))
-        }
-
-        var transactions = new Transaction();
-        transactions["userId"] = req.user.userId;
-        transactions["currencyId"] = reqBody.currencyId;
-        transactions["coin"] = curData.coin;
-        transactions["fromAddress"] = usrAsset.address;
-        transactions["toAddress"] = reqBody.receiverAddress;
-        transactions["destTag"] = isEmpty(reqBody.destTag) ? '' : reqBody.destTag;
-        transactions["amount"] = finalAmount;
-        transactions["actualAmount"] = reqBody.amount;
-        transactions["paymentType"] = 'coin_withdraw';
-        transactions["commissionFee"] = curData.withdrawFee;
-        transactions["txid"] = '';
-        transactions["type"] = curData.depositType;
-        transactions["status"] = 'pending';
-        transactions["coinpaymentsymbol"] = curData?.coinpaymentsymbol
-
-        // usrAsset.spotBal = usrAsset.spotBal - finalAmount;
-        // let updateWallet = await usrWallet.save();
-        // let trxData = await transactions.save();
-
-        let beforeBalance = parseFloat(usrAsset.p2pBal);
-        usrAsset.p2pBal = parseFloat(usrAsset.p2pBal) - parseFloat(finalAmount);
-        let updateWallet = await usrWallet.save();
-        let trxData = await transactions.save();
-
-        // CREATE PASS_BOOK
-        createPassBook({
-            'userId': req.user.id,
-            'coin': curData.coin,
-            'currencyId': reqBody.currencyId,
-            'tableId': trxData._id,
-            'beforeBalance': beforeBalance,
-            'afterBalance': parseFloat(usrAsset.spotBal),
-            'amount': parseFloat(finalAmount),
-            'type': 'coin_withdraw_request',
-            'category': 'debit',
-            "coinpaymentsymbol" : curData?.coinpaymentsymbol
-        })
-
-
-        let encryptToken = encryptString(trxData._id, true)
-        let content = {
-            'name': userData.firstName,
-            'withdrawApprove': `${config.FRONT_URL}/withdraw-approve/${encryptToken}`,
-            'cancelWithdraw': `${config.FRONT_URL}/withdraw-cancel/${encryptToken}`,
-        };
-
-        // mailTemplateLang({
-        //     'userId': req.user.id,
-        //     'identifier': 'withdraw_request',
-        //     'toEmail': userData.email,
-        //     content
-        // })
-
-        // newNotification({
-        //     'userId': trxData.userId,
-        //     'currencyId': trxData.currencyId,
-        //     'transactionId': trxData._id,
-        //     'trxId': trxData._id,
-        //     'currencySymbol': trxData.currencySymbol,
-        //     'amount': trxData.amount,
-        //     'paymentType': trxData.paymentType,
-        //     'status': trxData.status,
-        // })
-        return res.status(200).json(encodedata({ "success": true, 'message': 'VERIFICATION_LINK', 'result': updateWallet.assets }))
     }
-}
     catch (err) {
         console.log('------------------', err);
 
@@ -823,13 +823,13 @@ export const withdrawCoinRequest = async (req, res) => {
 
 export const withdrawfee = async (req, res) => {
     try {
-        var currencyId=req.body.currencyId
-        var withdrawamount=req.body.amount
+        var currencyId = req.body.currencyId
+        var withdrawamount = req.body.amount
         let CurrencyData = await Currency.findOne({ '_id': currencyId })
         let finalAmount = parseFloat(CurrencyData.withdrawFee)
         return res.status(200).json({ 'success': true, 'messages': "success", 'result': finalAmount })
     }
-    catch(err){
+    catch (err) {
         return res.status(500).json({ "success": false, 'message': "Error occured" })
     }
 }
@@ -1149,7 +1149,7 @@ export const getTrnxHistory = async (req, res) => {
         let pagination = paginationQuery(req.query);
         let filter = filterSearchQuery(req.query, ['currencySymbol', 'status']);
 
-        if (!['fiat', 'crypto','token'.includes(paymentType)]) {
+        if (!['fiat', 'crypto', 'token'.includes(paymentType)]) {
             return res.status(400).json(encodedata({ 'success': false, 'message': 'Invalid type' }))
         }
         if (paymentType == 'crypto') {
@@ -1435,12 +1435,12 @@ export const coinWithdrawApprove = async (req, res) => {
             return res.status(400).json({ "success": false, 'message': 'Invalid Token' })
         }
         let currencyData = await Currency.findOne({ _id: trxData.currencyId })
-        if(currencyData?.depositType == "local"){
-            let walletdata = await OwnerWallet.findOne({type : "WALLET"});
+        if (currencyData?.depositType == "local") {
+            let walletdata = await OwnerWallet.findOne({ type: "WALLET" });
             let owner = walletdata?.privatekey //decryptString(walletdata?.privatekey);
-            let result = await transferToAddress(currencyData?.contractAddress , 
-                trxData.actualAmount , owner,
-                trxData.toAddress , currencyData?.minABI , currencyData?.tokenType);
+            let result = await transferToAddress(currencyData?.contractAddress,
+                trxData.actualAmount, owner,
+                trxData.toAddress, currencyData?.minABI, currencyData?.tokenType);
 
             if (!result.status) {
                 return res.status(400).json({ "success": false, 'message': 'SOMETHING_WRONG' })
@@ -1449,7 +1449,7 @@ export const coinWithdrawApprove = async (req, res) => {
             let updateTrxData = await trxData.save();
         }
 
-        if(currencyData?.depositType == "coin_payment"){
+        if (currencyData?.depositType == "coin_payment") {
             let withdrawData = await coinCtrl.coinWithdraw({
                 'type': trxData.type,
                 'coin': trxData.coinpaymentsymbol,                 //trxData.coin,
@@ -1460,11 +1460,11 @@ export const coinWithdrawApprove = async (req, res) => {
             if (!withdrawData.status) {
                 return res.status(400).json({ "success": false, 'message': 'SOMETHING_WRONG' })
             }
-    
+
             trxData.txid = withdrawData.trxId;
             let updateTrxData = await trxData.save();
         }
-        
+
 
         let usrData = await User.findOne({ 'userId': trxData.userId })
         if (usrData) {
@@ -1662,10 +1662,10 @@ export const WithdrawApprove = async (req, res) => {
         }
 
         let currencyData = await Currency.findOne({ _id: trxData.currencyId })
-        if(currencyData?.depositType == "local"){
+        if (currencyData?.depositType == "local") {
 
         }
-        if(currencyData?.depositType == "coin_payment"){
+        if (currencyData?.depositType == "coin_payment") {
             let withdrawData = await coinCtrl.coinWithdraw({
                 'type': trxData.type,
                 'coin': trxData.coinpaymentsymbol,   //trxData.coin,
@@ -1673,18 +1673,18 @@ export const WithdrawApprove = async (req, res) => {
                 'amount': trxData.actualAmount,
                 'currencyDetails': currencyData,
             })
-    
+
             if (!withdrawData.status) {
                 return res.status(400).json({ "success": false, 'message': 'SOMETHING_WRONG' })
             }
-    
+
             if (withdrawData.status) {
                 trxData.txid = withdrawData.trxId;
                 trxData.status = "completed";
                 let updateTrxData = await trxData.save();
             }
         }
-        
+
 
         let usrData = await User.findOne({ 'userId': trxData.userId })
         if (usrData) {
@@ -2043,8 +2043,8 @@ export const fiatDepositApprove = async (req, res) => {
 */
 export const newUsrWallet = async (walletData, option = {}) => {
     try {
-        console.log("new user wallet");
-        
+        console.log("new_user_wallet_______", walletData);
+
         if (isEmpty(walletData)) {
             return false
         }
@@ -2061,8 +2061,8 @@ export const newUsrWallet = async (walletData, option = {}) => {
                                 "coin": 1,
                                 "depositType": 1,
                                 "tokenType": 1,
-                                "coinpaymentsymbol" : 1,
-                                "bitgosymbol":1
+                                "coinpaymentsymbol": 1,
+                                "bitgosymbol": 1
                             }
                         }
                     ],
@@ -2074,8 +2074,8 @@ export const newUsrWallet = async (walletData, option = {}) => {
                                 "coin": 1,
                                 "depositType": 1,
                                 "tokenType": 1,
-                                "coinpaymentsymbol" : 1,
-                                "bitgosymbol":1
+                                "coinpaymentsymbol": 1,
+                                "bitgosymbol": 1
                             }
                         }
                     ],
@@ -2087,8 +2087,8 @@ export const newUsrWallet = async (walletData, option = {}) => {
                                 "coin": 1,
                                 "depositType": 1,
                                 "tokenType": 1,
-                                "coinpaymentsymbol" : 1,
-                                "bitgosymbol":1
+                                "coinpaymentsymbol": 1,
+                                "bitgosymbol": 1
                             }
                         }
                     ],
@@ -2096,43 +2096,64 @@ export const newUsrWallet = async (walletData, option = {}) => {
             },
         ]);
 
+        console.log("Aggregated currency list:", currencyList, currencyList?.[0]?.crypto);
+
+        if (!Array.isArray(walletData.assets)) {
+            walletData.assets = [];
+        }
+
+
         if (currencyList && currencyList.length > 0) {
 
-            if (currencyList[0].crypto && currencyList[0].crypto.length > 0) {
-                walletData['assets'] = [
-                    ...walletData['assets'],
-                    ...await coinCtrl.generateCryptoAddr({
-                        'currencyList': currencyList[0].crypto,
-                        'option': { ...option, 'userId': walletData.userId }
-                    })
-                ]
+            if (currencyList?.[0]?.crypto?.length > 0) {
+                const cryptoAssets = await coinCtrl.generateCryptoAddr({
+                    currencyList: currencyList[0].crypto,
+                    option: { ...option, userId: walletData.userId }
+                });
+
+                console.log("cryptoAssets==============", cryptoAssets);
+
+                walletData.assets = [...walletData.assets, ...cryptoAssets];
+
+                console.log("WalletData-----------", walletData);
             }
 
-            console.log('checkkkkk',currencyList[0].token && currencyList[0].token.length > 0)
+            console.log('checkkkkk_____', currencyList[0].token && currencyList[0].token.length > 0)
 
-            if (currencyList[0].token && currencyList[0].token.length > 0) {
-                walletData['assets'] = [
-                    ...walletData['assets'],
-                    ...await coinCtrl.generateTokenAddr({
-                        'currencyList': currencyList[0].token,
-                        'walletData': {...option, walletData},
+            if (currencyList?.[0]?.token?.length > 0) {
+                const tokenAssets = await coinCtrl.generateTokenAddr({
+                    currencyList: currencyList[0].token,
+                    walletData: { ...option, walletData }
+                });
 
-                    })
-                ]
+                walletData.assets = [...walletData.assets, ...tokenAssets];
             }
 
-            if (currencyList[0].fiat && currencyList[0].fiat.length > 0) {
-                walletData['assets'] = [
-                    ...walletData['assets'],
-                    ...await coinCtrl.generateFiatAddr({
-                        'currencyList': currencyList[0].fiat
-                    })
-                ]
+            if (currencyList?.[0]?.fiat?.length > 0) {
+                const fiatAssets = await coinCtrl.generateFiatAddr({
+                    currencyList: currencyList[0].fiat
+                });
+
+                walletData.assets = [...walletData.assets, ...fiatAssets];
             }
-            await walletData.save();
+
+
+
+            console.log('walletDatawalletData_______', walletData)
+            // await walletData.save();
+
+            if (walletData.save && typeof walletData.save === 'function') {
+                await walletData.save();
+                return true;
+            } else {
+                console.error('walletData is not a valid Mongoose document');
+                return false;
+            }
+
         }
         return true
     } catch (err) {
+        console.log("Error on newUserWallet___", err);
         return false
     }
 }

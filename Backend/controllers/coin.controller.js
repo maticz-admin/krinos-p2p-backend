@@ -19,8 +19,8 @@ import * as coinPayment from './coin/coinpaymentGateway';
 
 import * as bitgoPayment from "./bitgo.controller";
 
-import {validatecryptoaddress} from '../config/coinvalidation';
-import {createAddress} from './P2PCONTROLLER/token.controller';
+import { validatecryptoaddress } from '../config/coinvalidation';
+import { createAddress } from './P2PCONTROLLER/token.controller';
 
 
 // import model
@@ -77,11 +77,11 @@ export const coinWithdraw = async ({
             return await binanceCtrl.withdraw(coin, toAddress, amount)
         } else if (type == 'local') {
             return await localWithdraw({ coin, toAddress, amount, currencyDetails })
-        } else if(type == 'coin_payment'){
-           var destTag = "";
+        } else if (type == 'coin_payment') {
+            var destTag = "";
             return await coinPayment.createWithdrawal({
                 currencySymbol: coin,
-                amount: amount,  
+                amount: amount,
                 address: toAddress,
                 destTag: destTag
             })
@@ -121,7 +121,7 @@ export const localWithdraw = async ({
         //         amount
         //     })
         // }else
-        if(currencyDetails.type == 'crypto'){
+        if (currencyDetails.type == 'crypto') {
             if (coin == 'BNB') {
                 return await bnbCtrl.bnbMovetoUser({
                     userAddress: toAddress,
@@ -131,30 +131,30 @@ export const localWithdraw = async ({
                 })
             }
         }
-        if(currencyDetails.type == 'token'){
-            if(currencyDetails.tokenType == 'bep20'){
+        if (currencyDetails.type == 'token') {
+            if (currencyDetails.tokenType == 'bep20') {
                 return await bnbCtrl.tokenMoveToUser({
                     amount,
                     adminAddress: config.COIN_GATE_WAY.BNB.ADDRESS,
-                    userAddress : toAddress,
+                    userAddress: toAddress,
                     contractAddress: currencyDetails.contractAddress,
                     adminPrivateKey: config.COIN_GATE_WAY.BNB.PRIVATE_KEY,
-                    minAbi : currencyDetails.minABI,
-                    decimals : currencyDetails.contractDecimal
+                    minAbi: currencyDetails.minABI,
+                    decimals: currencyDetails.contractDecimal
                 })
             }
-            if(currencyDetails.tokenType == 'trc20'){
+            if (currencyDetails.tokenType == 'trc20') {
                 return await tronCtrl.tokenMoveToUser({
                     amount,
                     fromAddress: config.COIN_GATE_WAY.TRON.ADDRESS,
-                    toAddress : toAddress,
+                    toAddress: toAddress,
                     currencycontract: currencyDetails.contractAddress,
                     privateKey: decryptString(config.COIN_GATE_WAY.TRON.PRIVATEKEY),
-                    decimals : currencyDetails.contractDecimal
+                    decimals: currencyDetails.contractDecimal
                 })
             }
         }
-         
+
         return {
             'status': false
         }
@@ -172,7 +172,7 @@ export const localWithdraw = async ({
 export const generateCryptoAddr = async ({ currencyList = [], option = {} }) => {
     try {
         console.log("Generate crypto addr");
-        
+
         if (!Array.isArray(currencyList)) {
             return []
         }
@@ -189,7 +189,7 @@ export const generateCryptoAddr = async ({ currencyList = [], option = {} }) => 
                         "_id": currency._id,
                         "coin": currency.coin,
                         "privateKey": '',
-                        'createdBlock' : ''
+                        'createdBlock': ''
                     }
 
                     if (subAccAsset.status) {
@@ -204,7 +204,7 @@ export const generateCryptoAddr = async ({ currencyList = [], option = {} }) => 
                         "privateKey": '',
                         "address": '',
                         "destTag": '',
-                        'createdBlock' : ''
+                        'createdBlock': ''
                     }
                     // let ntwAddDoc = await ntwAddress(currency.coin, option)
                     let ntwAddDoc = await createAddress();
@@ -212,7 +212,7 @@ export const generateCryptoAddr = async ({ currencyList = [], option = {} }) => 
                         assetObj['address'] = ntwAddDoc.address
                         assetObj['privateKey'] = ntwAddDoc && ntwAddDoc.privateKey ? encryptString(ntwAddDoc.privateKey) : "";
                         assetObj['destTag'] = ntwAddDoc.destTag ? ntwAddDoc.destTag : '',
-                        assetObj['createdBlock'] = ntwAddDoc?.createdBlock
+                            assetObj['createdBlock'] = ntwAddDoc?.createdBlock
                     }
                     assetList.push(assetObj)
                 }
@@ -235,20 +235,22 @@ export const generateCryptoAddr = async ({ currencyList = [], option = {} }) => 
                 else if (currency.depositType == 'bitgo') {
                     let label = 'KRINOS' + option.emailId; // user registered address
                     let phrase = 'KRINOS' + option.emailId;  // config ipn url
-                    var bitgo_details = await bitgoPayment.CreateAddress(currency.bitgosymbol, label , phrase)
+                    var bitgo_details = await bitgoPayment.CreateAddress(currency.bitgosymbol, label, phrase)
                     let assetObj = {
                         "_id": currency._id,
                         "coin": currency.coin,
                     }
                     assetObj['address'] = bitgo_details.address
                     assetObj['bitgo_id'] = bitgo_details.walletid,
-                    assetObj["bitgo_webhookid"] = bitgo_details?.webhookid
+                        assetObj["bitgo_webhookid"] = bitgo_details?.webhookid
                     assetList.push(assetObj)
                 }
             }
         }
+        console.log('assetListassetList', assetList)
         return assetList
     } catch (err) {
+        console.log("generateCryptoAddr______", err);
         return []
     }
 }
@@ -323,7 +325,7 @@ export const generateTokenAddr = async ({ currencyList = [], walletData }) => {
                 if (currency.depositType == 'bitgo') {
                     let label = 'KRINOS' + walletData?.emailId; // user registered address
                     let phrase = config?.IPN_URL;  // config ipn url
-                    var bitgo_details = await bitgoPayment.CreateAddress(currency.bitgosymbol, label , phrase)
+                    var bitgo_details = await bitgoPayment.CreateAddress(currency.bitgosymbol, label, phrase)
 
                     let assetObj = {
                         "_id": currency._id,
@@ -332,14 +334,15 @@ export const generateTokenAddr = async ({ currencyList = [], walletData }) => {
                     }
                     assetObj['address'] = bitgo_details.address
                     assetObj['bitgo_id'] = bitgo_details.walletid,
-                    assetObj["bitgo_webhookid"] = bitgo_details?.webhookid
+                        assetObj["bitgo_webhookid"] = bitgo_details?.webhookid
                     assetList.push(assetObj)
                 }
             }
         }
+        console.log('assetListassetListtokennnn', assetList)
         return assetList
     } catch (err) {
-        console.log('generateTokenAddr_error',err)
+        console.log('generateTokenAddr_error', err)
         return []
     }
 }
@@ -387,11 +390,11 @@ export const isCryptoAddr = async (coin, address, currencyId) => {
             return false
         }
         var data = await validatecryptoaddress(coin)
-        if(valid){
+        if (valid) {
             return true
-        }else{
+        } else {
             return false
-        }  
+        }
     } catch (err) {
         return false
     }
@@ -436,7 +439,7 @@ export const ntwAddress = async (network, option) => {
         if (network == 'BNB') {
             return await bnbCtrl.createAddress()
         }
-         else if (network == "TRX"){
+        else if (network == "TRX") {
             return await tronCtrl.createAddress()
         }
         // else if (network == 'XRP') {

@@ -17,9 +17,9 @@ const bitcore = require('bitcore-lib');
 
 const tron_rpc_url = 'https://greatest-newest-emerald.tron-mainnet.quiknode.pro/ac81d8377a69068d91f54299e01b5b8851c1e43b'
 const EVM_RPC = {
-    bnb : "https://practical-spring-frfailed to fetch initial client constants from BitGoog.bsc.quiknode.pro/dabbf8657aa56f634cb64e11baadf47cec7be616/",
-    eth : "https://still-cool-hill.quiknode.pro/9bc3fbdf9f4d222c9e1843b1ab5f2de64fc31352",
-    pol : "https://dimensional-attentive-frog.matic.quiknode.pro/e172038277e7698137daaad81e1771cb9e36401e"
+    bnb: "https://practical-spring-frfailed to fetch initial client constants from BitGoog.bsc.quiknode.pro/dabbf8657aa56f634cb64e11baadf47cec7be616/",
+    eth: "https://still-cool-hill.quiknode.pro/9bc3fbdf9f4d222c9e1843b1ab5f2de64fc31352",
+    pol: "https://dimensional-attentive-frog.matic.quiknode.pro/e172038277e7698137daaad81e1771cb9e36401e"
 }
 
 const ACCESS_TOKEN = process.env.BITGOTOKEN
@@ -40,78 +40,83 @@ const ACCESS_TOKEN = process.env.BITGOTOKEN
 const ENTERPRICE_ID = process.env.ENTERPRICE_ID
 const WEBHOOK_URL = `${config.SERVER_URL}/bitgo-webhook`;
 
+console.log("WEBHOkk_____", WEBHOOK_URL);
+
 const bitgo = new BitGo({
     accessToken: ACCESS_TOKEN,
-    env: 'prod',   //'test',
+    env: 'test',   //'test', 'prod'
 });
 
-export const CreateAddress = async(symbol , label , phrase) => {
-    try{
-        console.log("inside create address" , symbol , label);
-        const { wallet } = await bitgo.coin(symbol).wallets().generateWallet({
+export const CreateAddress = async (symbol, label, phrase) => {
+    try {
+        console.log("inside create address", symbol, label);
+
+        const coin = bitgo.coin(symbol);
+
+        const { wallet } = await coin.wallets().generateWallet({
             label: label, //'murugavelrajmaticz@gmail.com',
             passphrase: phrase, //'murugavelwallet',
             enterprise: ENTERPRICE_ID,
             walletVersion: 5
         });
-        console.log("create wallet" , wallet, WEBHOOK_URL);
-        
+        console.log("create wallet", wallet, WEBHOOK_URL);
+
         let addwebhok = await wallet.addWebhook({
             type: 'transfer',
             allToken: false,
             url: WEBHOOK_URL,
             label: 'For Transaction',
         })
-        
-        console.log("addwebhok",addwebhok)
+
+        console.log("addwebhok", addwebhok)
         return {
-            webhookid : addwebhok?.id,
-            walletid : addwebhok?.walletId,
-            address  : wallet?._wallet?.receiveAddress?.address
+            webhookid: addwebhok?.id,
+            walletid: addwebhok?.walletId,
+            address: wallet?._wallet?.receiveAddress?.address
         }
     }
-    catch(e){
-        console.log("error on create wallet" , e);
+    catch (e) {
+        console.log("error on create wallet", symbol, e);
         return {
-            webhookid : "",
-            walletid : "",
-            address  : ""
+            webhookid: "",
+            walletid: "",
+            address: ""
         }
     }
 }
 
 
-export const SendAmount = async(walletid , symbol , amount , recipientAddress) => {
+export const SendAmount = async (walletid, symbol, amount, recipientAddress) => {
     try {
         console.log("enter send Amount");
-        
+
         // Define the wallet ID (replace with actual wallet ID)
         const wallet = await bitgo.coin(symbol).wallets().get({ id: walletid });
         let bal = await wallet.balance()
         // Define the recipient address and amount to send (in satoshis)
         // const recipientAddress = 'tb1qkfht7nnd64d6cg578sr6qv75ksjuw6ck6nq7yn';
         const amountToSend = amount   //10000; // Example amount in satoshis (0.0001 BTC)
-    
+
         // Create a transaction
         // const webhook = await wallet.addWebhook
 
-        
+
         const transaction = await wallet.sendMany({
-          recipients: [
-            {
-              address: recipientAddress,
-              amount: amountToSend,
-            },
-          ],
-          // Optional: Set the fee rate (in satoshis per byte)
-          feeRate: 1000, // Example fee rate
-          // Specify the passphrase to unlock the wallet
-          walletPassphrase: 'murugavelwallet',
+            recipients: [
+                {
+                    address: recipientAddress,
+                    amount: amountToSend,
+                },
+            ],
+            // Optional: Set the fee rate (in satoshis per byte)
+            feeRate: 1000, // Example fee rate
+            // Specify the passphrase to unlock the wallet
+            walletPassphrase: 'murugavelwallet',
         });
         console.log('Transaction Sent: ', transaction);
-      } catch (error) {
+    } catch (error) {
         console.error('Error sending transaction:', error);
-      }
+    }
 }
 
 
@@ -136,17 +141,17 @@ export const SendAmountSend = async (walletid, symbol, amount, recipientAddress)
 };
 
 
-export const GetBitgoBalance = async(walletid , symbol) => {
-    try{
-        console.log("bitgo balance" , walletid , symbol);
-        
+export const GetBitgoBalance = async (walletid, symbol) => {
+    try {
+        console.log("bitgo balance", walletid, symbol);
+
         const wallet = await bitgo.coin(symbol).wallets().get({ id: walletid });
         let bal = await wallet.balance();
-        console.log("balance " ,  bal  , wallet?._wallet?.balanceString);
+        console.log("balance ", bal, wallet?._wallet?.balanceString);
         return parseFloat(wallet?._wallet?.balanceString);
     }
-    catch(e){
-        console.log("error on get bitgobalance" , e);
+    catch (e) {
+        console.log("error on get bitgobalance", e);
     }
 }
 
@@ -157,147 +162,171 @@ export const GetBitgoBalance = async(walletid , symbol) => {
  * BODY : currency, address, txn_id, amount, dest_tag
 */
 export const depositwebhook = async (req, res) => {
-    // write_log(JSON.stringify(req.body))
-    // write_log(JSON.stringify(req.headers))
     try {
-        console.log("deposited webhookk" , req?.body);
+        console.log("deposited_webhookk______", req?.body);
         let reqBody = req?.body;
-        
-        // {
-        //     "hash": "77d342de7bc66ed3cbccc2f1c2a8250f1d6f9f0d33fa0d2338baa2ee2cd35cce",
-        //     "transfer": "67ee1f20433579b93adab161e6401ac7",
-        //     "coin": "tbtc",
-        //     "type": "transfer",
-        //     "state": "unconfirmed",
-        //     "wallet": "67ee1c55e4a2d5d0707f5aad903afd17",
-        //     "walletType": "hot",
-        //     "transferType": "receive",
-        //     "baseValue": 28648,
-        //     "baseValueString": "28648",
-        //     "value": 28648,
-        //     "valueString": "28648",
-        //     "feeString": "165",
-        //     "initiator": [
-        //       "external"
-        //     ],
-        //     "receiver": "tb1p9scn9yfxkd2aeu4hhflpxwsyvcy5g475aemkhc6hls84yz05lyrsvg4dnh"
-        //   }
-         // Resources
-        //req?.body;
-        // let coinpaymentsymbol = reqBody?.coin == "tbtc" ? "BTC" : "ETH"
-        let AdminAddress = config?.BITGO_ADMIN_WALLET[reqBody?.coin?.toLowerCase()]?.address //"tb1pqykx30ajt9twvud6s76cuhm4cr5asjly2zskpmjka4vt07r8fh7qwxuesy"
-        let decimal = config?.BITGO_ADMIN_WALLET[reqBody?.coin?.toLowerCase()]?.decimal
-        // let AdminWalletId = config?.BITGO_ADMIN_WALLET[reqBody?.coin?.toLowerCase()]?.walletid;
+        console.log("RequestBody-------------", req?.body);
 
+        let AdminAddress = config?.BITGO_ADMIN_WALLET[reqBody?.coin?.toLowerCase()]?.address;
+        let decimal = config?.BITGO_ADMIN_WALLET[reqBody?.coin?.toLowerCase()]?.decimal;
 
-        if (reqBody?.state == 'confirmed' && reqBody?.transferType == "receive" && reqBody?.value > 0) {  //&& reqBody?.value > 0//reqBody?.state == 'unconfirmed' && 
-            let currencyData = await Currency.findOne({ 'bitgosymbol': reqBody?.coin })
-            let trxnData = await Transaction.findOne({ 'currencyId': currencyData._id, 'transfer_id': reqBody?.transfer });
-            console.log("trxnDatatrxnDatatrxnData" , trxnData);
-            // if(false){
-            //     return res.status(400).json({ 'success': false, 'messages': "Transaction already exist" })
-            // }
-            console.log("currencyData",currencyData)
+        console.log("🛠 Config Admin Address:", AdminAddress, reqBody?.transfer);
+        console.log("🛠 Config Decimal:", decimal);
+
+        if (reqBody?.state === 'confirmed' && reqBody?.transferType === "receive" && reqBody?.value > 0) {
+            let currencyData = await Currency.findOne({ 'bitgosymbol': reqBody?.coin });
+            console.log("🔍 Currency Data:", currencyData);
+
             if (!currencyData) {
-               return res.status(400).json({ 'success': false, 'messages': "Invalid currency" })
+                return res.status(400).json({ success: false, messages: "Invalid currency" });
             }
+
+            // ✅ MODIFIED: moved this above trxnData
             let findAsset = {
-                '_id': currencyData?._id,
-                // 'address': reqBody?.receiver
-                "bitgo_id" : reqBody?.wallet
+                "_id": currencyData?._id,
+                "bitgo_id": reqBody?.wallet
+            };
+            console.log("🔍 findAsset Query:", findAsset);
+
+            // ✅ MODIFIED: original query with extra null check
+            let usrWallet = await Wallet.findOne({
+                "assets._id": currencyData._id,
+                "assets.bitgo_id": reqBody.wallet
+            });
+
+            // ✅ NEW: fallback check if not found
+            if (!usrWallet) {
+                const fallback = await Wallet.find({ "assets.bitgo_id": reqBody.wallet });
+                console.error("❌ User Wallet not found for currency & bitgo_id. Found wallets by bitgo_id only:", JSON.stringify(fallback, null, 2));
+                return res.status(400).json({ success: false, messages: "User wallet not found" });
             }
-            let usrWallet = await Wallet.findOne({ assets: { $elemMatch: findAsset }})
-            let userAssetData = await Wallet.findOne({ assets: { $elemMatch: findAsset }}).populate({ path: "_id" })
+
+            console.log("👤 Found User Wallet:", usrWallet);
+
+            // ✅ MODIFIED: extra null safety
             let userWalletData = usrWallet.assets.id(currencyData._id);
             if (!userWalletData) {
-                console.log("not user wallet data");
-               return res.status(400).json({ 'success': false, 'messages': "Invalid assets" })
+                console.error("❌ Asset not found in user wallet. Wallet assets:", usrWallet.assets);
+                return res.status(400).json({ success: false, messages: "Asset not found in user wallet" });
             }
+
+            console.log("📦 User Asset Data:", userWalletData);
+
+            // ✅ MOVED: trxnData lookup after checking currencyData and usrWallet
+            let trxnData = await Transaction.findOne({
+                currencyId: currencyData._id,
+                transfer_id: reqBody.transfer
+            });
+            console.log("🔄 Existing Transaction:", trxnData);
+
             if (trxnData) {
-                console.log("trans exist");
-               return res.status(400).json({ 'success': false, 'messages': "Already payment exists" })
+                console.log("Transaction already exists");
+                return res.status(400).json({ success: false, messages: "Already payment exists" });
             }
+
             let transactions = new Transaction();
             transactions["userId"] = usrWallet?.userId;
             transactions["currencyId"] = currencyData?._id;
             transactions["coin"] = reqBody?.coin;
-            transactions["toAddress"] = userWalletData?.address//reqBody?.receiver;
-            transactions["amount"] = reqBody?.value/10**8;
-            transactions["actualAmount"] = reqBody?.baseValue/10**parseFloat(decimal);
+            transactions["toAddress"] = userWalletData?.address;
+            transactions["amount"] = reqBody?.value / 10 ** 8;
+            transactions["actualAmount"] = reqBody?.baseValue / 10 ** parseFloat(decimal);
             transactions["txid"] = reqBody?.hash;
             transactions["status"] = 'pending';
             transactions["paymentType"] = 'coin_deposit';
-            transactions["commissionFee"] = parseFloat(reqBody?.feeString)/10**parseFloat(decimal);
+            transactions["commissionFee"] = parseFloat(reqBody?.feeString) / 10 ** parseFloat(decimal);
             transactions["transfer_id"] = reqBody?.transfer;
-            // if (currencyData.symbol == 'XRP') {
-            //     transactions["destTag"] = reqBody.dest_tag;
-            // }
+
             let beforeBalance = parseFloat(userWalletData.p2pBal);
-            userWalletData.p2pBal = parseFloat(userWalletData.p2pBal) + parseFloat(reqBody?.value/10**parseFloat(decimal))
+            userWalletData.p2pBal = parseFloat(userWalletData.p2pBal) + parseFloat(reqBody?.value / 10 ** parseFloat(decimal));
             await usrWallet.save();
 
-            // CREATE PASS_BOOK
+            // ✅ Email Content Setup
             createPassBook({
-                'userId' : usrWallet._id,
-                'coin' : currencyData.coin,
-                'currencyId' : currencyData._id,
-                'tableId' : transactions._id,
-                'beforeBalance' : beforeBalance,
-                'afterBalance' : parseFloat(userWalletData.p2pBal),
-                'amount' : parseFloat(reqBody?.value/10**parseFloat(decimal)),
-                'type' : 'coin_deposit',
-                'category' : 'credit'
-            })
-            // await Assets.findOneAndUpdate(
-            //     { '_id': userAssetData._id },
-            //     { $inc: { 'spotwallet': parseFloat(reqBody.amount).toFixed(8) } }
-            // )
+                userId: usrWallet._id,
+                coin: currencyData.coin,
+                currencyId: currencyData._id,
+                tableId: transactions._id,
+                beforeBalance,
+                afterBalance: parseFloat(userWalletData.p2pBal),
+                amount: parseFloat(reqBody?.value / 10 ** parseFloat(decimal)),
+                type: 'coin_deposit',
+                category: 'credit'
+            });
+
             let content = {
-                'email': userAssetData._id.email,
-                'date': new Date(),
-                'amount': parseFloat(reqBody?.value/10**parseFloat(decimal)).toFixed(8),
-                'transactionId': reqBody?.hash,
-                'currency': reqBody?.coin,
-                userData: userAssetData._id,
+                email: usrWallet._id.email,
+                date: new Date(),
+                amount: parseFloat(reqBody?.value / 10 ** parseFloat(decimal)).toFixed(8),
+                transactionId: reqBody?.hash,
+                currency: reqBody?.coin,
+                userData: usrWallet._id,
             };
+
             mailTemplateLang({
-                'userId': userAssetData._id._id,
-                'identifier': 'User_deposit',
-                'toEmail': userAssetData._id.email,
+                userId: usrWallet._id._id,
+                identifier: 'User_deposit',
+                toEmail: usrWallet._id.email,
                 content
-            })
-            
+            });
+
             let gasestimate;
-            if(reqBody?.coin == "tbtc"){
-                //gasestimate = await EstimateGaseFeeForBTC(reqBody?.wallet , reqBody?.coin , AdminAddress , 1000);
+            if (reqBody?.coin === "tbtc") {
+                gasestimate = await EstimateGasForCoin(reqBody?.coin);
+            } else {
                 gasestimate = await EstimateGasForCoin(reqBody?.coin);
             }
-            else{
-                gasestimate = await EstimateGasForCoin(reqBody?.coin);
+
+            console.log("Value:", reqBody.value.toString());
+            console.log("Gas Fee:", gasestimate.gasfee.toString());
+
+
+            console.log("⛽ Gas Estimate:", gasestimate);
+
+            // value: 1000000000000000, gasfee: '35028195143200000'
+            const depositAmount = parseInt(reqBody.value);   // Convert string or number to parseInt
+            const gasFee = parseInt(gasestimate.gasfee);     // Same here
+
+            if (depositAmount <= gasFee) {
+                console.log("Deposit too small to cover gas fees.", depositAmount, gasFee);
+                // handle accordingly
             }
-            let final_amount = parseFloat(reqBody?.value) - parseFloat(gasestimate?.gasfee);
-            const transaction = await internalTransfer(userWalletData?.bitgo_id, reqBody?.coin, reqBody?.valueString, AdminAddress , "" , true)
-            console.log("transactiontransactiontransaction",transaction)
-            if(transaction?.state == 'signed'){
+
+            const final_amount = depositAmount - gasFee;
+
+            console.log("📤 Final Amount After Gas:", final_amount);
+
+            const transaction = await internalTransfer(
+                userWalletData?.bitgo_id,
+                reqBody?.coin,
+                reqBody?.valueString,
+                AdminAddress,
+                "",
+                true
+            );
+            console.log("transactiontransactiontransaction", transaction);
+
+            if (transaction?.state === 'signed') {
                 transactions["status"] = 'completed';
             }
+
             let trxData = await transactions.save();
-            return res.status(200).json({ 'success': true, 'messages': "Updated successfully" })
+            return res.status(200).json({ success: true, messages: "Updated successfully" });
         }
-       // return res.status(400).json({ 'success': true, 'messages': "Payment status pending" })
-    } 
-    catch (err) {
-        console.log("Error on send amount", err);
-        return res.status(500).json({ 'success': false, 'messages': "Error on server" })
+
+    } catch (err) {
+        console.log("❌ Error on send amount", err);
+        return res.status(500).json({ success: false, messages: "Error on server" });
     }
 }
 
 
-export const WithdrawAmount = async(req , res) => {
-    try{
-        
-        console.log("withdraw",  req?.body , req?.user);
-        let {coin , amount , receiveraddress , fee , twoFACode , minimumWithdraw} = req?.body;
+
+export const WithdrawAmount = async (req, res) => {
+    try {
+
+        console.log("withdraw", req?.body, req?.user);
+        let { coin, amount, receiveraddress, fee, twoFACode, minimumWithdraw } = req?.body;
         let AdminAddress = config?.BITGO_ADMIN_WALLET[coin?.toLowerCase()]?.address //"tb1pqykx30ajt9twvud6s76cuhm4cr5asjly2zskpmjka4vt07r8fh7qwxuesy"
         let decimal = config?.BITGO_ADMIN_WALLET[coin?.toLowerCase()]?.decimal
         let AdminWalletId = config?.BITGO_ADMIN_WALLET[coin?.toLowerCase()]?.walletid;
@@ -306,11 +335,11 @@ export const WithdrawAmount = async(req , res) => {
             console.log("not currency data");
             return res.status(400).json(encodedata({ 'success': false, 'messages': "Invalid currency" }))
         }
-        if(parseFloat(amount) < parseFloat(currencyData?.minimumWithdraw)){
+        if (parseFloat(amount) < parseFloat(currencyData?.minimumWithdraw)) {
             console.log("withdraw limit");
             return res.status(400).json(encodedata({ 'success': false, 'messages': `Minimum withdraw amount is ${currencyData?.minimumWithdraw}` }))
         }
-        if(currencyData?.withdrawStatus != "On"){
+        if (currencyData?.withdrawStatus != "On") {
             console.log("ndeposit status");
             return res.status(400).json(encodedata({ 'success': false, 'messages': `Withdraw blocked by admin` }))
         }
@@ -318,7 +347,7 @@ export const WithdrawAmount = async(req , res) => {
             '_id': currencyData._id,
             // 'address': receiveraddress
         }
-        let usrWallet = await Wallet.findOne({userId : req?.user?.userId, assets: { $elemMatch: findAsset } })
+        let usrWallet = await Wallet.findOne({ userId: req?.user?.userId, assets: { $elemMatch: findAsset } })
         let userAssetData = await Wallet.findOne({ assets: { $elemMatch: findAsset } }).populate({ path: "_id" })
         let userWalletData = usrWallet.assets.id(currencyData._id);
         if (!userWalletData) {
@@ -340,11 +369,11 @@ export const WithdrawAmount = async(req , res) => {
 
 
 
-        if(userWalletData?.p2pBal > (parseFloat(amount) + parseFloat(fee))){
-            let adminbalance = await GetBitgoBalance(AdminWalletId , coin);
-            console.log("admin balance" , adminbalance);
-            
-            if((adminbalance/10**decimal) > parseFloat(amount) + parseFloat(fee)){
+        if (userWalletData?.p2pBal > (parseFloat(amount) + parseFloat(fee))) {
+            let adminbalance = await GetBitgoBalance(AdminWalletId, coin);
+            console.log("admin balance", adminbalance);
+
+            if ((adminbalance / 10 ** decimal) > parseFloat(amount) + parseFloat(fee)) {
                 let transactions = new Transaction();
                 transactions["userId"] = usrWallet?.userId;
                 transactions["currencyId"] = currencyData?._id;
@@ -357,26 +386,26 @@ export const WithdrawAmount = async(req , res) => {
                 transactions["paymentType"] = 'coin_withdraw';
                 transactions["commissionFee"] = fee;
                 // transactions["transfer_id"] = reqBody?.transfer;
-                
+
                 let beforeBalance = parseFloat(userWalletData.p2pBal);
                 userWalletData.p2pBal = parseFloat(userWalletData.p2pBal) - (parseFloat(amount) + parseFloat(fee))
                 await usrWallet.save();
                 // CREATE PASS_BOOK
                 createPassBook({
-                    'userId' : usrWallet._id,
-                    'coin' : currencyData.coin,
-                    'currencyId' : currencyData._id,
-                    'tableId' : transactions._id,
-                    'beforeBalance' : beforeBalance,
-                    'afterBalance' : parseFloat(userWalletData.p2pBal),
-                    'amount' : amount,
-                    'type' : 'coin_withdraw',
-                    'category' : 'debit'
+                    'userId': usrWallet._id,
+                    'coin': currencyData.coin,
+                    'currencyId': currencyData._id,
+                    'tableId': transactions._id,
+                    'beforeBalance': beforeBalance,
+                    'afterBalance': parseFloat(userWalletData.p2pBal),
+                    'amount': amount,
+                    'type': 'coin_withdraw',
+                    'category': 'debit'
                 });
 
-                let finalamount = parseFloat(amount)*10**decimal
-                const transaction = await internalTransfer(AdminWalletId , coin , finalamount?.toString() , receiveraddress)
-                console.log("transactiontransactiontransaction", transaction , finalamount)
+                let finalamount = parseFloat(amount) * 10 ** decimal
+                const transaction = await internalTransfer(AdminWalletId, coin, finalamount?.toString(), receiveraddress)
+                console.log("transactiontransactiontransaction", transaction, finalamount)
                 if (transaction?.state == 'signed') {
                     transactions["status"] = 'completed';
                     transactions["txid"] = transaction?.txid
@@ -405,62 +434,64 @@ export const WithdrawAmount = async(req , res) => {
                 return res.status(400).json(encodedata({ 'success': false, 'message': "INSUFFICIENT_FUND_ADMIN_WALLET" }))
             }
         }
-        else{
+        else {
             console.log("Insufficient ");
             return res.status(400).json({ 'success': false, 'messages': "INSUFFICIENT_FUND" })
         }
-        
+
     }
-    catch(e){
-        console.log("error on withdraw amount" , e);
-    }
-}
-
-
-
-export const EstimateGasForCoin = async(coin) => {
-    try{
-        let estimategas = await bitgo.coin(coin).feeEstimate({numBlocks: 2});
-        console.log("estimategas" , estimategas);
-
-        if(coin == "tbtc"){
-            return {
-                gasfee : estimategas?.feePerKb
-            }
-        }
-        else if(coin == "eth"){
-            return {
-                gasfee : estimategas?.feePerKb
-            }
-        }
-    }
-    catch(e){
-        console.log("error on estimate gas for coin" , e);
+    catch (e) {
+        console.log("error on withdraw amount", e);
     }
 }
 
-export const EstimateGaseFeeForBTC = async(walletid , coin , recipientAddress , amount) => {
-    try{
+
+
+export const EstimateGasForCoin = async (coin) => {
+    try {
+
+        console.log("numBlocks: 6================", 6);
+
+        const feeData = await bitgo.coin(coin).feeEstimate({ numBlocks: 6 });
+        console.log("estimategas", feeData);
+
+        if (["tbtc", "eth"].includes(coin)) {
+            return { gasfee: feeData?.feeEstimate || feeData?.feePerKb || '0' };
+        }
+
+        // For EVM chains like polygon, tpolygon
+        return {
+            gasfee: feeData?.feeEstimate || feeData?.feePerKb || '0'
+        };
+    } catch (e) {
+        console.log("❌ error on estimate gas for coin", e);
+        return { gasfee: '0' };
+    }
+};
+
+
+export const EstimateGaseFeeForBTC = async (walletid, coin, recipientAddress, amount) => {
+    try {
         const wallet = await bitgo.coin(coin).wallets().get({ id: walletid });
         const txPrebuild = await wallet.prebuildTransaction({
             recipients: [{
-              address: recipientAddress,
-              amount: amount, // in satoshis
+                address: recipientAddress,
+                amount: amount, // in satoshis
             }],
             feeTxConfirmTarget: 2 // estimate fee for 2-block confirmation
-          });
+        });
 
-          console.log('Estimated fee (satoshis):', txPrebuild.feeInfo);
-          return {gasfee : txPrebuild?.feeInfo?.fee}
+        console.log('Estimated fee (satoshis):', txPrebuild.feeInfo);
+        return { gasfee: txPrebuild?.feeInfo?.fee }
     }
-    catch(e){
-        console.log("error on estimate gas fee for btc" , e);
-        
+    catch (e) {
+        console.log("error on estimate gas fee for btc", e);
+
     }
 }
 
-export const serializeTransaction = async(toAmount , walletaddress) => {
-    try{
+export const serializeTransaction = async (toAmount, walletaddress) => {
+    try {
         const network = bitcoin.networks.mainet;
         const txid = 'e3c...'; // Replace with actual txid
         const vout = 0;
@@ -484,15 +515,15 @@ export const serializeTransaction = async(toAmount , walletaddress) => {
         const rawTx = tx.toHex();
         return rawTx;
     }
-    catch(e){
-        console.log("Error on serialize transaction" , e);
+    catch (e) {
+        console.log("Error on serialize transaction", e);
     }
 }
 
-export async function internalTransfer(walletid , symbol , amount , recipientAddress , walletphrase , internal) {
+export async function internalTransfer(walletid, symbol, amount, recipientAddress, walletphrase, internal) {
     try {
-        console.log("internal transfer" , walletid , symbol , amount , recipientAddress);
-        
+        console.log("internal transfer", walletid, symbol, amount, recipientAddress);
+
         const wallet = await bitgo.coin(symbol).wallets().get({ id: walletid });
         console.log(`Wallet Found: ${wallet.label()} (${wallet.id()})`);
         // Internal Transfer
@@ -506,44 +537,44 @@ export async function internalTransfer(walletid , symbol , amount , recipientAdd
 
         console.log("Transfer Successful:", transfer);
         return transfer?.transfer
-    //     const wallet = await bitgo.coin("tbtc").wallets().get({ id: "67dace8747425cbe905d49fd34b0a6bc" });
-    // let transferlist = await wallet.transfers();
-    // console.log("list of transaction" , transferlist);
+        //     const wallet = await bitgo.coin("tbtc").wallets().get({ id: "67dace8747425cbe905d49fd34b0a6bc" });
+        // let transferlist = await wallet.transfers();
+        // console.log("list of transaction" , transferlist);
     } catch (error) {
         console.error("Error in Internal Transfer:", error.message);
     }
 }
 
 
-export async function internalTransfersendMany(walletid , symbol , amount , recipientAddress) {
+export async function internalTransfersendMany(walletid, symbol, amount, recipientAddress) {
     try {
         // walletid = "67ff57f96c21b7da0bbcf0560ad81c2f"
         // symbol = "polygon"
         // amount = '100000000000000000'
         // recipientAddress = "0x387e71773a6217b5209cb63e8e5b91b4816588a9"
-        console.log("internal transfer" , walletid , symbol , amount , recipientAddress);
+        console.log("internal transfer", walletid, symbol, amount, recipientAddress);
         const wallet = await bitgo.coin(symbol).wallets().get({ id: walletid });
         console.log(`Wallet Found: ${wallet.label()} (${wallet.id()})`);
         // Internal Transfer
         const transfer = await wallet.sendMany({
             recipients: [
-              {
-                address: recipientAddress,
-                amount: amount,
-              },
+                {
+                    address: recipientAddress,
+                    amount: amount,
+                },
             ],
             // Optional: Set the fee rate (in satoshis per byte)
             feeRate: 1000, // Example fee rate
             // Specify the passphrase to unlock the wallet
             walletPassphrase: 'KRINOSmhi@yopmail.com',
-            type : "internal"
-          });
+            type: "internal"
+        });
 
         console.log("Transfer Successful:", transfer);
         return transfer?.transfer
-    //     const wallet = await bitgo.coin("tbtc").wallets().get({ id: "67dace8747425cbe905d49fd34b0a6bc" });
-    // let transferlist = await wallet.transfers();
-    // console.log("list of transaction" , transferlist);
+        //     const wallet = await bitgo.coin("tbtc").wallets().get({ id: "67dace8747425cbe905d49fd34b0a6bc" });
+        // let transferlist = await wallet.transfers();
+        // console.log("list of transaction" , transferlist);
     } catch (error) {
         console.error("Error in Internal Transfer:", error.message);
     }
@@ -594,7 +625,7 @@ export const tronEstimateGasFee = async (data) => {
         const tronWeb = await UseTronWeb();
         let baseAddress = await tronWeb.address.toHex(data.walletaddress);
         if (data.type == 'Token') {
-            var options = {feeLimit: 1000000000};
+            var options = { feeLimit: 1000000000 };
             var parameter = [
                 { type: "address", value: data.toAddress },
                 { type: "uint256", value: data.amount },
@@ -636,61 +667,61 @@ export const tronEstimateGasFee = async (data) => {
 export const UseWeb3 = async (data) => {
 
     try {
-      const RPC_URL = EVM_RPC[data?.coin?.tolowerCase()] //UseRPCURL(tokenType);
-      console.log("chefaksdgjaskfgjlasjfglasjflasjflas in use web3", tokenType, RPC_URL);
-      const httpProvider = new Web3.providers.HttpProvider(RPC_URL);
-      const web3 = new Web3(httpProvider);
-      return web3;
+        const RPC_URL = EVM_RPC[data?.coin?.tolowerCase()] //UseRPCURL(tokenType);
+        console.log("chefaksdgjaskfgjlasjfglasjflasjflas in use web3", tokenType, RPC_URL);
+        const httpProvider = new Web3.providers.HttpProvider(RPC_URL);
+        const web3 = new Web3(httpProvider);
+        return web3;
     } catch (err) {
-      console.log("UseWeb3", err)
+        console.log("UseWeb3", err)
     }
-  };
+};
 
-  const EstGas = async (data, toAddress, amount , decimal) => {
+const EstGas = async (data, toAddress, amount, decimal) => {
     try {
-      const TokenContract = await UsePrivateERC20(data.contractAddress, data.privateKey, data.tokenType)
-      let sendamount = amount * (10**decimal)
-      /* Encode Transfer ABI */
-      let encoded = await TokenContract.methods.transfer(toAddress, sendamount.toString()).encodeABI();
-      return encoded
+        const TokenContract = await UsePrivateERC20(data.contractAddress, data.privateKey, data.tokenType)
+        let sendamount = amount * (10 ** decimal)
+        /* Encode Transfer ABI */
+        let encoded = await TokenContract.methods.transfer(toAddress, sendamount.toString()).encodeABI();
+        return encoded
     } catch (e) {
-      console.log('EstGas_err', e);
-      return {
-        status: false
-      }
+        console.log('EstGas_err', e);
+        return {
+            status: false
+        }
     }
-  }
+}
 
 export const evmEstimateGasFee = async (data) => {
     try {
-      let gasFee = 0
-      let { toAddress, amount, walletaddress, type, tokenType, currency } = data
-      const web3 = await UseWeb3(data);
-      const gasPrice = await web3.eth.getGasPrice()
-      const encoded = type == 'token' ? await EstGas(data, toAddress, amount) : ""
-      //Calculate-Estimategasfee
-      if (type == 'token') {
-        gasFee = await web3.eth.estimateGas({ from: walletaddress, toAddress, encoded })
-      } else {
-        gasFee = await web3.eth.estimateGas({ from: walletaddress, toAddress })
-      }
-      return {
-        gasFee: gasFee ? ((gasPrice * gasFee) / 10 ** 18).toFixed(5) : 0,
-      };
+        let gasFee = 0
+        let { toAddress, amount, walletaddress, type, tokenType, currency } = data
+        const web3 = await UseWeb3(data);
+        const gasPrice = await web3.eth.getGasPrice()
+        const encoded = type == 'token' ? await EstGas(data, toAddress, amount) : ""
+        //Calculate-Estimategasfee
+        if (type == 'token') {
+            gasFee = await web3.eth.estimateGas({ from: walletaddress, toAddress, encoded })
+        } else {
+            gasFee = await web3.eth.estimateGas({ from: walletaddress, toAddress })
+        }
+        return {
+            gasFee: gasFee ? ((gasPrice * gasFee) / 10 ** 18).toFixed(5) : 0,
+        };
     } catch (e) {
-      console.log("evmEstimateGasFee_err", e);
+        console.log("evmEstimateGasFee_err", e);
     }
-  }
+}
 
 export const btcEstimatedGasPrice = async () => {
     try {
         let response = await axios.get(`${"https://mempool.space/testnet/api/v1/fees/recommended"}`);
         if (response.data == '' || response.data == undefined || response.data == null) {
-            let data = {economyFee: 4, hourFee: 150, fastestFee: 262} 
-            var Data = {data: data,}
+            let data = { economyFee: 4, hourFee: 150, fastestFee: 262 }
+            var Data = { data: data, }
             return Data;
-        }else {
-            var Data = {data: response.data,}
+        } else {
+            var Data = { data: response.data, }
             return Data;
         }
     } catch (err) {
@@ -699,19 +730,19 @@ export const btcEstimatedGasPrice = async () => {
 }
 
 
-export const EstimateGasFee = async(data)=> {
-    try{
-        if(data?.coin?.tolowerCase() == "tbtc" || data?.coin?.tolowerCase() == "btc"){
+export const EstimateGasFee = async (data) => {
+    try {
+        if (data?.coin?.tolowerCase() == "tbtc" || data?.coin?.tolowerCase() == "btc") {
             let result = await btcEstimatedGasPrice();
         }
-        if(data?.coin?.tolowerCase() == "ttrx" || data?.coin?.tolowerCase() == "trx"){
+        if (data?.coin?.tolowerCase() == "ttrx" || data?.coin?.tolowerCase() == "trx") {
             let result = await tronEstimateGasFee()
         }
-        else{
+        else {
             let result = await evmEstimateGasFee()
         }
     }
-    catch(e){
-        console.log("error on estimate gas" , e);
+    catch (e) {
+        console.log("error on estimate gas", e);
     }
 }

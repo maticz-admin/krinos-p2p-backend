@@ -49,27 +49,27 @@ let currencyUpload = multer({
 
 export const uploadCurrency = (req, res, next) => {
   currencyUpload(req, res, function (err) {
-     
-      if (!isEmpty(req.validationError)) {
-          return res.status(400).json({
-              success: false,
-              errors: {
-                  [req.validationError.fieldname]: req.validationError.messages,
-              },
-          });
-      }
 
-      if (err instanceof multer.MulterError) {
-          return res
-              .status(400)
-              .json({ success: false, errors: { [err.field]: "TOO_LARGE" } });
-      } else if (err) {
-          return res
-              .status(500)
-              .json({ success: false, message: "SOMETHING_WRONG" });
-      }
+    if (!isEmpty(req.validationError)) {
+      return res.status(400).json({
+        success: false,
+        errors: {
+          [req.validationError.fieldname]: req.validationError.messages,
+        },
+      });
+    }
 
-      return next();
+    if (err instanceof multer.MulterError) {
+      return res
+        .status(400)
+        .json({ success: false, errors: { [err.field]: "TOO_LARGE" } });
+    } else if (err) {
+      return res
+        .status(500)
+        .json({ success: false, message: "SOMETHING_WRONG" });
+    }
+
+    return next();
   });
 };
 
@@ -92,9 +92,10 @@ export const getCurrency = async (req, res) => {
             withdrawStatus: 1,
             depositminlimit: 1,
             commisionfee: 1,
-            buyercommisionfee : 1,
+            buyercommisionfee: 1,
+            chainId: 1,
             // coinpaymentsymbol: 1,
-            bitgosymbol:1,
+            bitgosymbol: 1,
             image: {
               $cond: [
                 { $eq: ["$image", ""] },
@@ -111,7 +112,7 @@ export const getCurrency = async (req, res) => {
             fundFee: 1,
             api: 1,
             key: 1,
-            bitgosymbol : 1
+            bitgosymbol: 1
           },
         },
       ])
@@ -222,12 +223,13 @@ export const currencyList = async (req, res) => {
         withdrawStatus: 1,
         depositminlimit: 1,
         commisionfee: 1,
-        buyercommisionfee : 1,
+        buyercommisionfee: 1,
+        chainId: 1,
         // coinpaymentsymbol: 1,
-        bitgosymbol:1,
+        bitgosymbol: 1,
         api: 1,
         key: 1,
-        bitgosymbol : 1
+        bitgosymbol: 1
       }).sort({ createdAt: -1 });
 
       let csvData = [header];
@@ -266,12 +268,13 @@ export const currencyList = async (req, res) => {
         withdrawStatus: 1,
         depositminlimit: 1,
         commisionfee: 1,
-        buyercommisionfee : 1,
+        buyercommisionfee: 1,
+        chainId: 1,
         // coinpaymentsymbol: 1,
-        bitgosymbol:1,
+        bitgosymbol: 1,
         api: 1,
         key: 1,
-        bitgosymbol : 1
+        bitgosymbol: 1
       }).sort({ createdAt: -1 });
       // .skip(pagination.skip).limit(pagination.limit);
 
@@ -310,12 +313,13 @@ export const currencyList = async (req, res) => {
         withdrawStatus: 1,
         depositminlimit: 1,
         commisionfee: 1,
-        buyercommisionfee : 1,
+        buyercommisionfee: 1,
+        chainId: 1,
         // coinpaymentsymbol: 1,
-        bitgosymbol:1,
+        bitgosymbol: 1,
         api: 1,
         key: 1,
-        bitgosymbol : 1
+        bitgosymbol: 1
       })
         .sort({ createdAt: -1 })
         .skip(pagination.skip)
@@ -365,13 +369,14 @@ export const addCurrency = async (req, res) => {
       depositStatus: reqBody.depositStatus,
       withdrawStatus: reqBody.withdrawStatus,
       commisionfee: reqBody?.commisionfee,
-      buyercommisionfee : reqBody?.buyercommisionfee,
+      buyercommisionfee: reqBody?.buyercommisionfee,
+      chainId: reqBody?.chainId,
       decimal: reqBody.decimals,
       coinpaymentsymbol: reqBody?.bitgosymbol,
-      bitgosymbol : reqBody?.bitgosymbol
+      bitgosymbol: reqBody?.bitgosymbol
     });
     if (reqBody.depositType == "local") {
-        newDoc["api"] = reqBody?.api,
+      newDoc["api"] = reqBody?.api,
         newDoc["key"] = reqBody?.key
     }
     if (reqBody.type == "token") {
@@ -414,7 +419,7 @@ export const updateCurrency = async (req, res) => {
   try {
     let reqBody = req.body,
       reqFile = req.files;
-      // console.log('reqBody-----reqFile',reqBody, reqFile)
+    // console.log('reqBody-----reqFile',reqBody, reqFile)
     let checkCurrency = await Currency.findOne({
       coin: reqBody.coin,
       _id: { $ne: reqBody.currencyId },
@@ -448,10 +453,11 @@ export const updateCurrency = async (req, res) => {
     currencyDoc.withdrawStatus = reqBody.withdrawStatus;
     currencyDoc.commisionfee = reqBody?.commisionfee;
     currencyDoc.buyercommisionfee = reqBody?.buyercommisionfee
+    currencyDoc.chainId = reqBody?.chainId
     // currencyDoc.coinpaymentsymbol = reqBody?.coinpaymentsymbol;
     currencyDoc.bitgosymbol = reqBody?.bitgosymbol
     if (reqBody.depositType == "local") {
-        currencyDoc.api = reqBody?.api,
+      currencyDoc.api = reqBody?.api,
         currencyDoc.key = reqBody?.key
     }
     if (reqBody.type == "token") {
@@ -525,7 +531,7 @@ export const prefferedcurrencyList = async (req, res) => {
         coin: 1,
         showSymbol: 1,
         status: 1,
-        image : 1
+        image: 1
       }).sort({ createdAt: -1 });
 
       let csvData = [header];
@@ -544,8 +550,8 @@ export const prefferedcurrencyList = async (req, res) => {
         coin: 1,
         showSymbol: 1,
         status: 1,
-        image : 1
-        
+        image: 1
+
       }).sort({ createdAt: -1 });
       // .skip(pagination.skip).limit(pagination.limit);
 
@@ -564,7 +570,7 @@ export const prefferedcurrencyList = async (req, res) => {
         coin: 1,
         showSymbol: 1,
         status: 1,
-        image : 1
+        image: 1
       })
         .sort({ createdAt: -1 })
         .skip(pagination.skip)
@@ -601,12 +607,12 @@ export const addPreferredCurrency = async (req, res) => {
         .json(encodedata({ success: false, errors: { coin: "Coin already exists" } }));
     }
     const newDoc = new PreferredCurrency({
-        coin: reqBody?.coin,
-        showSymbol: reqBody?.symbol,
-        status: "active",
-        image : reqFile.image[0].filename,
+      coin: reqBody?.coin,
+      showSymbol: reqBody?.symbol,
+      status: "active",
+      image: reqFile.image[0].filename,
     });
-    
+
 
     let newData = await newDoc.save();
     // addPriceCNV(newData);
@@ -632,7 +638,7 @@ export const updatePreferredCurrency = async (req, res) => {
   try {
     let reqBody = req.body,
       reqFile = req.files;
-      // console.log('reqBody-----reqFile',reqBody, reqFile)
+    // console.log('reqBody-----reqFile',reqBody, reqFile)
     let checkCurrency = await PreferredCurrency.findOne({
       coin: reqBody.coin,
       _id: { $ne: reqBody.currencyId },
@@ -644,7 +650,7 @@ export const updatePreferredCurrency = async (req, res) => {
     }
 
     let currencyDoc = await PreferredCurrency
-    .findOne({ _id: reqBody.currencyId });
+      .findOne({ _id: reqBody.currencyId });
 
     currencyDoc.coin = reqBody.coin;
     currencyDoc.showSymbol = reqBody.symbol;

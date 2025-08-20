@@ -241,8 +241,9 @@ export const generateCryptoAddr = async ({ currencyList = [], option = {} }) => 
                         "coin": currency.coin,
                     }
                     assetObj['address'] = bitgo_details.address
-                    assetObj['bitgo_id'] = bitgo_details.walletid,
-                        assetObj["bitgo_webhookid"] = bitgo_details?.webhookid
+                    assetObj['bitgo_id'] = bitgo_details.walletid
+                    assetObj["bitgo_webhookid"] = bitgo_details?.webhookid
+                    assetObj["bitgo_passphrase"] = bitgo_details.passphrase
                     assetList.push(assetObj)
                 }
             }
@@ -333,8 +334,9 @@ export const generateTokenAddr = async ({ currencyList = [], walletData }) => {
                         // "privateKey": coinpayment_details.privateKey
                     }
                     assetObj['address'] = bitgo_details.address
-                    assetObj['bitgo_id'] = bitgo_details.walletid,
-                        assetObj["bitgo_webhookid"] = bitgo_details?.webhookid
+                    assetObj['bitgo_id'] = bitgo_details.walletid
+                    assetObj["bitgo_webhookid"] = bitgo_details?.webhookid
+                    assetObj["bitgo_passphrase"] = bitgo_details.passphrase
                     assetList.push(assetObj)
                 }
             }

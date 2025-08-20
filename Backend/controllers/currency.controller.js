@@ -349,12 +349,17 @@ export const addCurrency = async (req, res) => {
   try {
     let reqBody = req.body,
       reqFile = req.files;
+
     let checkCurrency = await Currency.findOne({ coin: reqBody.symbol });
+
+    console.log("CheckCurrrency_______", checkCurrency);
+
     if (checkCurrency) {
       return res
         .status(400)
-        .json(encodedata({ success: false, errors: { coin: "Coin already exists" } }));
+        .json(encodedata({ success: false, message: "Coin Already Exists", errors: { coin: "Coin already exists" } }));
     }
+
     const newDoc = new Currency({
       name: reqBody.name,
       coin: reqBody.symbol,
@@ -375,6 +380,8 @@ export const addCurrency = async (req, res) => {
       coinpaymentsymbol: reqBody?.bitgosymbol,
       bitgosymbol: reqBody?.bitgosymbol
     });
+
+
     if (reqBody.depositType == "local") {
       newDoc["api"] = reqBody?.api,
         newDoc["key"] = reqBody?.key
@@ -398,6 +405,7 @@ export const addCurrency = async (req, res) => {
     let newData = await newDoc.save();
     addPriceCNV(newData);
     newAssetAllUsr(newData);
+
     return res
       .status(200)
       .json(encodedata({ success: true, message: "Coin added successfully" }))

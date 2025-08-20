@@ -175,7 +175,7 @@ export const depositwebhook = async (req, res) => {
         console.log("🛠 Config Admin Address:", AdminAddress, reqBody?.transfer);
         console.log("🛠 Config Decimal:", decimal);
 
-        if (reqBody?.state === 'confirmed' && reqBody?.value > 0) {
+        if (reqBody?.state === 'confirmed' && reqBody?.transferType === "receive" && reqBody?.value > 0) {
             let currencyData = await Currency.findOne({ 'bitgosymbol': reqBody?.coin });
             console.log("🔍 Currency Data:", currencyData);
 
@@ -206,10 +206,7 @@ export const depositwebhook = async (req, res) => {
             console.log("👤 Found User Wallet:", usrWallet);
 
             // ✅ MODIFIED: extra null safety
-            let userWalletData = usrWallet.assets.find(
-                (asset) => asset.bitgo_id === reqBody.wallet
-            );
-
+            let userWalletData = usrWallet.assets.id(currencyData._id);
             if (!userWalletData) {
                 console.error("❌ Asset not found in user wallet. Wallet assets:", usrWallet.assets);
                 return res.status(400).json({ success: false, messages: "Asset not found in user wallet" });

@@ -2173,6 +2173,7 @@ export const newAssetAllUsr = async (currency) => {
         }, { 'multi': true })
         return true
     } catch (err) {
+        console.log("Error on newAssetAllUsr", err);
         return false
     }
 }

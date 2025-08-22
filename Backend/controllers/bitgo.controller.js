@@ -44,7 +44,7 @@ console.log("WEBHOkk_____", WEBHOOK_URL);
 
 const bitgo = new BitGo({
     accessToken: ACCESS_TOKEN,
-    env: 'test',   //'test', 'prod'
+    env: 'prod',   //'test', 'prod'
 });
 
 export const CreateAddress = async (symbol, label, phrase) => {
@@ -63,7 +63,7 @@ export const CreateAddress = async (symbol, label, phrase) => {
 
         let addwebhok = await wallet.addWebhook({
             type: 'transfer',
-            allToken: false,
+            // allToken: false,
             url: WEBHOOK_URL,
             label: 'For Transaction',
         })
@@ -278,36 +278,38 @@ export const depositwebhook = async (req, res) => {
                 content
             });
 
-            // let gasestimate;
-            // if (reqBody?.coin === "tbtc") {
-            //     gasestimate = await EstimateGasForCoin(reqBody?.coin);
-            // } else {
-            //     gasestimate = await EstimateGasForCoin(reqBody?.coin);
-            // }
+            let gasestimate;
+            if (reqBody?.coin === "tbtc") {
+                gasestimate = await EstimateGasForCoin(reqBody?.coin, userWalletData?.bitgo_id, userWalletData?.address, reqBody?.value);
+            } else {
+                gasestimate = await EstimateGasForCoin(reqBody?.coin, userWalletData?.bitgo_id, userWalletData?.address, reqBody?.value);
+            }
 
-            // console.log("Value:", reqBody.value.toString());
-            // console.log("Gas Fee:", gasestimate.gasfee.toString());
+            console.log("Value:", reqBody.value.toString());
+            console.log("Gas Fee:", gasestimate.gasfee.toString());
 
 
-            // console.log("⛽ Gas Estimate:", gasestimate);
+            console.log("⛽ Gas Estimate:", gasestimate);
 
             // // value: 1000000000000000, gasfee: '35028195143200000'
-            // const depositAmount = parseInt(reqBody.value);   // Convert string or number to parseInt
-            // const gasFee = parseInt(gasestimate.gasfee);     // Same here
+
+            const depositAmount = BigInt(reqBody.value.toString());
+            const gasFee = gasestimate.gasfee;
 
             // if (depositAmount <= gasFee) {
-            //     console.log("Deposit too small to cover gas fees.", depositAmount, gasFee);
-            //     // handle accordingly
+            //     console.log("❌ Deposit too small to cover gas fees:", depositAmount.toString(), gasFee.toString());
+            //     return res.status(400).json({ success: false, message: "Deposit amount is too small to cover gas fee." });
             // }
 
-            // const final_amount = depositAmount - gasFee;
+            const final_amount = depositAmount - gasFee;
 
-            // console.log("📤 Final Amount After Gas:", final_amount);
+            console.log("📤 Final Amount After Gas:", final_amount);
 
             const transaction = await internalTransfer(
                 userWalletData?.bitgo_id,
                 reqBody?.coin,
-                reqBody?.valueString,
+                // final_amount,
+                reqBody.value.toString(),
                 AdminAddress,
                 walletPhrase,
                 true
@@ -454,28 +456,58 @@ export const WithdrawAmount = async (req, res) => {
 }
 
 
-
-export const EstimateGasForCoin = async (coin) => {
+export const EstimateGasForCoin = async (coin, walletId, toAddress, amount) => {
     try {
 
-        console.log("numBlocks: 6================", 6);
 
-        const feeData = await bitgo.coin(coin).feeEstimate({ numBlocks: 6 });
-        console.log("estimategas", feeData);
+        const wallet = await bitgo.coin(reqBody.coin).wallets().get({ id: walletId });
+        const balance = BigInt(wallet.balanceString());
+        console.log("Wallet Balance:", balance);
 
-        if (["tbtc", "eth"].includes(coin)) {
-            return { gasfee: feeData?.feeEstimate || feeData?.feePerKb || '0' };
-        }
+        const feeEstimate = await bitgo.coin(coin.toLowerCase()).feeEstimate({
+            recipients: [
+                {
+                    address: toAddress,
+                    amount: amount.toString()
+                }
+            ]
+        });
 
-        // For EVM chains like polygon, tpolygon
+        console.log("🎯 Accurate Fee Estimate:", feeEstimate);
+
         return {
-            gasfee: feeData?.feeEstimate || feeData?.feePerKb || '0'
+            gasfee: BigInt(feeEstimate?.feeEstimate || '0')
         };
+
     } catch (e) {
-        console.log("❌ error on estimate gas for coin", e);
-        return { gasfee: '0' };
+        console.log("❌ Error estimating accurate gas", e);
+        return { gasfee: BigInt(0) };
     }
 };
+
+
+
+// export const EstimateGasForCoin = async (coin) => {
+//     try {
+
+//         console.log("numBlocks: 6================", 6);
+
+//         const feeData = await bitgo.coin(coin).feeEstimate({ numBlocks: 6 });
+//         console.log("estimategas", feeData);
+
+//         if (["tbtc", "eth"].includes(coin)) {
+//             return { gasfee: feeData?.feeEstimate || feeData?.feePerKb || '0' };
+//         }
+
+//         // For EVM chains like polygon, tpolygon
+//         return {
+//             gasfee: feeData?.feeEstimate || feeData?.feePerKb || '0'
+//         };
+//     } catch (e) {
+//         console.log("❌ error on estimate gas for coin", e);
+//         return { gasfee: '0' };
+//     }
+// };
 
 
 export const EstimateGaseFeeForBTC = async (walletid, coin, recipientAddress, amount) => {

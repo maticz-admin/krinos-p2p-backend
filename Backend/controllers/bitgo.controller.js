@@ -42,12 +42,14 @@ const WEBHOOK_URL = `${config.SERVER_URL}/bitgo-webhook`;
 
 const bitgo = new BitGo({
     accessToken: ACCESS_TOKEN,
-    env: 'prod',   //'test',
+    env: "test",
+    // env: 'prod',   //'test',
 });
 
 export const CreateAddress = async(symbol , label , phrase) => {
     try{
         console.log("inside create address" , symbol , label);
+        console.log('tokencheckkk',ACCESS_TOKEN)
         const { wallet } = await bitgo.coin(symbol).wallets().generateWallet({
             label: label, //'murugavelrajmaticz@gmail.com',
             passphrase: phrase, //'murugavelwallet',
@@ -58,7 +60,7 @@ export const CreateAddress = async(symbol , label , phrase) => {
         
         let addwebhok = await wallet.addWebhook({
             type: 'transfer',
-            allToken: false,
+            // allToken: true,
             url: WEBHOOK_URL,
             label: 'For Transaction',
         })

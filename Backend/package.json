@@ -31,7 +31,6 @@
     "crypto": "^1.0.1",
     "crypto-js": "^3.3.0",
     "crypto-random-string": "^3.0.1",
-    "csv-express": "^1.2.2",
     "ethereumjs-tx": "^2.1.2",
     "execution-time": "^1.4.1",
     "express": "^4.17.1",
